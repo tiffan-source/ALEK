@@ -6,21 +6,23 @@ import {
   } from "react-router-dom";
 import { useRouteMatch } from 'react-router-dom';
 import Affaires from './Affaires';
+import { matchAffaires } from './matchAffaires';
+import { strutures } from '../../../structure';
 
 let affaire = strutures['VISO']['Affaires'];
 
 function AffairesRouter() {
-    let {path, url} = useRouteMatch();
+    let {path} = useRouteMatch();
   return (
     <Router>
         <Switch>
         <Route exact path={path}>
             <Affaires/>
         </Route>
-        {Object.keys(strutures).map( panel => {
+        {Object.keys(affaire).map( panel => {
             return (
-            <Route exact path={`/${panel}`}>
-                {matchStructure[panel]}
+            <Route exact path={`${path}/${panel}`}>
+                {matchAffaires[panel]}
             </Route>
             );
         })}
