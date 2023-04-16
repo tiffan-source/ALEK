@@ -4,7 +4,7 @@ import { panelMaker } from '../utils/panelMaker';
 
 function Panel() {
   return (
-    <nav className='p-4'>
+    <nav className='p-1 bg-white font-mono text-xl'>
         {panelMaker(strutures, null)}
     </nav>
   )

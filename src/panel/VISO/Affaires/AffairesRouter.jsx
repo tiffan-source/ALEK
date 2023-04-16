@@ -6,6 +6,9 @@ import {
   } from "react-router-dom";
 import { useRouteMatch } from 'react-router-dom';
 import Affaires from './Affaires';
+import { strutures } from "C:/ALEK/src/structure";
+import { matchStructure } from "C:/ALEK/src/matchStructure";
+
 
 let affaire = strutures['VISO']['Affaires'];
 
