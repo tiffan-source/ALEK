@@ -12,7 +12,7 @@ function Affaires() {
 
 
   return (
-    <div className='bg-slate-400'>
+    <div className='bg-gray-200'>
         <div className="font-mono text-xl">ALEATEK
         <hr
       class="my-0.3 h-0.5 border-t-0 bg-black opacity-100 dark:opacity-50" /></div>
@@ -59,7 +59,13 @@ function Affaires() {
        
         
       </div>
+      <div>
+
+      <hr
+      class="my-0.3 h-0.5 border-t-0 bg-black opacity-100 dark:opacity-50" />
+      </div>
       <div className="flex justify-between items-start py-2">
+      
         <div className="font-mono text-xl">Liste des plans d'affaires</div>
         <div className='flex items-center'>  </div>
         <div className="flex items-center space-x-2">

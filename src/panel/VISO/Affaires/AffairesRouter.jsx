@@ -7,7 +7,7 @@ import {
 import { useRouteMatch } from 'react-router-dom';
 import Affaires from './Affaires';
 import { strutures } from "C:/ALEK/src/structure";
-import { matchStructure } from "C:/ALEK/src/matchStructure";
+import { matchStructure } from "C:/ALEK/src/panel/VISO/Affaires/matchStructure.js";
 
 
 let affaire = strutures['VISO']['Affaires'];
@@ -20,9 +20,9 @@ function AffairesRouter() {
         <Route exact path={path}>
             <Affaires/>
         </Route>
-        {Object.keys(strutures).map( panel => {
+        {Object.keys(strutures).map( panel => {console.log(`${path}/${panel}`)
             return (
-            <Route exact path={`/${panel}`}>
+            <Route exact path={`${path}/${panel}`}>
                 {matchStructure[panel]}
             </Route>
             );
