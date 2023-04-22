@@ -16,7 +16,7 @@ function App() {
         <div>
           <Panel/>
         </div>
-        <div>
+        <div className="bg-gray-100">
           <Switch>
             {Object.keys(strutures).map( panel => {
               return (
