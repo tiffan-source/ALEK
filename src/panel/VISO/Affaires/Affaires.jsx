@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowsLeftRightToLine, faChevronLeft, faFloppyDisk, faMinus, faPlus, faPrint, faRotateLeft, faSquareEnvelope, faPlay, faChevronRight, faCaretLeft } from '@fortawesome/free-solid-svg-icons'
 import oilPump from '../../../assets/icon/oil-pump.png';
@@ -6,9 +6,15 @@ import erase from "../../../assets/icon/erase.png";
 import filter from "../../../assets/icon/filter.png";
 import refresh from "../../../assets/icon/refresh.png";
 import sun from "../../../assets/icon/sun.png";
+import MainModal from '../../../component/CreateAffaire.jsx/MainModal';
 
 function Affaires() {
+  const [showModal, setShowModal] = useState(false);
   return (
+    <>
+    <div>
+    {showModal && <MainModal handleClose={()=>{setShowModal(false)}}/>}
+    </div>
     <div className='w-full h-full'>
       <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>AVISO</h1>
       <nav className='flex justify-between border-t border-gray-400 p-1 bg-green-200'>
@@ -19,7 +25,9 @@ function Affaires() {
         <div className='flex gap-2'>
           <ul className='flex'>
             <li>
-              <button className='border border-gray-200 shadow-md bg-white p-[1px]'>
+              <button className='border border-gray-200 shadow-md bg-white p-[1px]' onClick={()=>{
+                setShowModal(!showModal);
+              }}>
               <FontAwesomeIcon icon={faPlus}/>
               Nouv.Plan d'Affaire
               </button>
@@ -187,7 +195,16 @@ function Affaires() {
         </thead>
       </table>
     </div>
+    </>
+    
+
+
+
   )
+
+  /* MODAL */
+  
+  
 }
 
 export default Affaires
