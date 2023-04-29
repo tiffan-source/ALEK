@@ -18,9 +18,9 @@ function App() {
         </div>
         <div className="bg-gray-100">
           <Switch>
-            {Object.keys(strutures).map( panel => {
+            {Object.keys(strutures).map( (panel, index) => {
               return (
-                <Route path={`/${panel}`}>
+                <Route key={index} path={`/${panel}`}>
                   {matchStructure[panel]}
                 </Route>
               );

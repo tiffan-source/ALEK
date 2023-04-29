@@ -19,9 +19,9 @@ function AffairesRouter() {
         <Route exact path={path}>
             <Affaires/>
         </Route>
-        {Object.keys(affaire).map( panel => {
+        {Object.keys(affaire).map( (panel, index) => {
             return (
-            <Route exact path={`${path}/${panel}`}>
+            <Route key={index} exact path={`${path}/${panel}`}>
                 {matchAffaires[panel]}
             </Route>
             );

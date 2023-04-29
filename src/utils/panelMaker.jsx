@@ -10,10 +10,10 @@ export let panelMaker = (structures, ancestor)=>{
 
     return (
         <ul className={ancestor ? "px-8" : ""}>
-            {Object.keys(structures).map(structure=>{
+            {Object.keys(structures).map((structure, index)=>{
                 let path = `${ancestor ? '/'+ancestor : ''}${'/'+structure}`;
                 return (
-                    <li>
+                    <li key={index}>
                         <a href={path}>{structure}</a>
                         {panelMaker(structures[structure], ancestor ? ancestor+'/'+structure : structure)}
                     </li>

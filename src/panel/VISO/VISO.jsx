@@ -15,9 +15,9 @@ function VISO() {
   return (
     <Router>
         <Switch>
-          {Object.keys(visio).map( panel => {
+          {Object.keys(visio).map( (panel, index) => {
             return (
-              <Route path={`${path}/${panel}`}>
+              <Route key={index} path={`${path}/${panel}`}>
                 {matchVISO[panel]}
               </Route>
             );

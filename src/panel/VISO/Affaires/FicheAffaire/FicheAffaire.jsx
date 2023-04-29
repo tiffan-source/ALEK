@@ -85,9 +85,9 @@ function FicheAffaire() {
       </nav>
 
       <div>
-      {Object.keys(subComs).map(subCom=>{
+      {Object.keys(subComs).map((subCom, index)=>{
         return (
-          <span onClick={()=>{setComplement(subComs[subCom])}} className='p-1 font-thin cursor-pointer text-sm shadow'>{subCom}</span>
+          <span key={index} onClick={()=>{setComplement(subComs[subCom])}} className='p-1 font-thin cursor-pointer text-sm shadow'>{subCom}</span>
         )
       })}
       </div>
