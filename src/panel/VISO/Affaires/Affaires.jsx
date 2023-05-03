@@ -16,7 +16,7 @@ function Affaires() {
     {showModal && <MainModal handleClose={()=>{setShowModal(false)}}/>}
     </div>
     <div className='w-full h-full'>
-      <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>AVISO</h1>
+      <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>ALEATEK</h1>
       <nav className='flex justify-between border-t border-gray-400 p-1 bg-green-200'>
         <h2 className='text-blue-800 flex items-center'>
           <img src={oilPump} alt="OilPump" className='w-[2rem]'/>

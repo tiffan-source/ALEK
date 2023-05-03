@@ -1,7 +1,7 @@
 import FicheAffaire from "./FicheAffaire/FicheAffaire";
-import MissionPrestation from "./MissionPrestation/MissionPrestation";
+import MissionPrestation  from "./MissionPrestation/MissionPrestation";
 
 export let matchAffaires = {
     "Fiche Affaire": <FicheAffaire/>,
-    "MissionPrestation" : <MissionPrestation/>
+    "Mission/Prestation": <MissionPrestation/>  
 }

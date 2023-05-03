@@ -17,12 +17,12 @@ function FicheAffaire() {
   let [complement, setComplement] = useState(Object.MissionPrestation(subComs)[0]);
   return (
     <div className='w-full h-full text-sm'>
-      <h1 className='border-t border-gray-400 p-1 MissionPrestationbg-green-200 font-bold'>AVISO</h1>
+      <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>ALEATEK</h1>
 
       <nav className='flex justify-between border-t border-gray-400 p-1 bg-green-200'>
         <h2 className='text-blue-800 flex items-center'>
           <img src={oilPump} alt="OilPump" className='w-[2rem]'/>
-          Fiche D'Affaire
+          Fiche Affaire
         </h2>
         <div className='flex gap-2'>
           <ul className='flex'>

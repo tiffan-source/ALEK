@@ -2,7 +2,7 @@ export let strutures = {
     "VISO" : {
         "Affaires" : {
             "Fiche Affaire" : {},
-            "MissionPrestation" : {},
+            "Mission/Prestation" : {},
             "IT" : {},
             "Constructeurs" : {},
             "CTC" : {}
