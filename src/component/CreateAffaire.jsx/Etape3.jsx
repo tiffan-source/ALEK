@@ -23,14 +23,14 @@ class Etape3 extends Component {
   
           <div className='flex justify-between'>
             <div className='flex items-center gap-2 py-1'>
-              <label htmlFor="" className=''>N Contrat Aleatck</label>
+              <label htmlFor="" className=''>N° Contrat ALEATEK</label>
               <input className='shadow-inner border w-[12rem]' type="text" disabled/>
             </div>
           </div>
   
           <div className='flex justify-between'>
             <div className='flex items-center gap-2 py-1'>
-              <label htmlFor="" className=''>N Affaire Aleatck</label>
+              <label htmlFor="" className=''>N° Affaire ALEATEK</label>
               <input className='shadow-inner border w-[12rem]' type="text" onChange={(e)=>{
                 this.props.modifyField("champ", e.target.value);
               }}/>
@@ -101,7 +101,7 @@ class Etape3 extends Component {
         <div  className='border border-gray-400 p-2 mb-2'>
           <div className='flex justify-between'>
             <div className='flex items-center gap-2 py-1'>
-              <label htmlFor="" className=''>N Offre</label>
+              <label htmlFor="" className=''>N°Offre</label>
               <input className='shadow-inner border' type="text" />
             </div>
 
