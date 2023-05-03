@@ -8,8 +8,16 @@ import Panel from "./panel/Panel";
 import { strutures } from "./structure";
 import { matchStructure } from "./matchStructure";
 import "./index.css";
+import { useEffect } from "react";
+import axios from "axios";
 
 function App() {
+  useEffect(()=>{
+    axios.post("http://127.0.0.1:8000/api/users/dj-rest-auth/login/", {
+      username : "dodo",
+      password : "1230"
+    }).then(res=>console.log(res))
+  });
   return (
     <div className="App grid grid-cols-[20rem_auto] h-screen w-screen">
       <Router>

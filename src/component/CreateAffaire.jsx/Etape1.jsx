@@ -6,11 +6,11 @@ function Etape1() {
       <fieldset className='border border-gray-400 px-4 py-2'>
         <legend>Creation d'un plan d'Affaire</legend>
         <div>
-          <input type="radio" name="" id="" />
+          <input type="radio" name="typeAffaire" id="" />
           <label htmlFor="">Nouvelle Affaire et son Plan Affaire</label>
         </div>
         <div>
-          <input type="radio" name="" id="" />
+          <input type="radio" name="typeAffaire" id="" />
           <label htmlFor="">Plan d'Affaire Supplementaire dans l'alliance courante</label>
         </div>
       </fieldset>
