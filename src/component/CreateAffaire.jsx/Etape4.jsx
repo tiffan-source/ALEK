@@ -7,25 +7,25 @@ function Etape4() {
 
         <div className='flex gap-8'>
           <div className='flex items-center gap-2 py-1'>
-            <label htmlFor="" className=''>N Affaire</label>
+            <label htmlFor="" className=''>N° Affaire</label>
             <input className='shadow-inner border w-[12rem]' type="text" />
           </div>
           <div className='flex items-center gap-2 py-1'>
-            <label htmlFor="" className=''>N Plan</label>
+            <label htmlFor="" className=''>N° Plan</label>
             <input className='shadow-inner border w-[8rem]' type="text" />
           </div>
         </div>
 
         <div className='flex justify-between'>
           <div className='flex items-center gap-2 py-1'>
-            <label htmlFor="" className=''>Libele Affaire</label>
+            <label htmlFor="" className=''>Libelle Affaire</label>
             <input className='shadow-inner border w-[12rem]' type="text" />
           </div>
         </div>
 
         <div>
           <div className='flex items-center gap-2 py-1'>
-            <label htmlFor="" className=''>Libele Plan  </label>
+            <label htmlFor="" className=''>Libele Plan Affaire </label>
             <input className='shadow-inner border' type="text" />
           </div>
         </div>
@@ -52,7 +52,7 @@ function Etape4() {
             </select>
           </div>
           <div className='flex flex-col'>
-            <label htmlFor="" className=''>Destination d'ouvrage</label>
+            <label htmlFor="" className=''>Destination</label>
             <select className='shadow-inner border border-gray-800 bg-white p-1 w-[14rem]' type="text">
               <option value="">Destination#1</option>
               <option value="">Destination#2</option>
@@ -62,7 +62,7 @@ function Etape4() {
 
         <div>
           <div className='flex items-center gap-2 py-1'>
-            <label htmlFor="" className=''>Date debut Prestation BV</label>
+            <label htmlFor="" className=''>Date début Prestation BV</label>
             <input className='shadow-inner border w-[10rem]' type="date" />
           </div>
         </div>
@@ -70,7 +70,7 @@ function Etape4() {
         <div className='flex justify-between'>
           <div>
             <div className='flex items-center gap-2 py-1'>
-              <label htmlFor="" className=''>Date de debut du chantier</label>
+              <label htmlFor="" className=''>Date de début du chantier</label>
               <input className='shadow-inner border w-[10rem]' type="date" />
             </div>
           </div>
