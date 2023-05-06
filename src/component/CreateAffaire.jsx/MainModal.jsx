@@ -10,6 +10,7 @@ import Etape8 from './Etape8'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { Component } from 'react'
+import axios from 'axios'
 
 
 
@@ -34,7 +35,8 @@ class MainModal extends Component{
                 "numero_service_en_charge": null,
                 "marques": null
             }
-        }
+        };
+        
     }
 
     modifyField = (field, value)=>{
@@ -54,10 +56,12 @@ class MainModal extends Component{
         // <Etape7/>,
         <Etape8/>,
     ];
-    
 
-    handleField = (event)=>{
-
+    componentDidUpdate(prevProps, prevStates){
+        if(prevStates.index == 1 && this.state.index == 2)
+        {
+            console.log("Make query");
+        }
     }
 
     render(){
@@ -97,13 +101,34 @@ class MainModal extends Component{
                                     {this.state.index < this.stages.length
                                     &&
                                     <button onClick={()=>{
+                                        
+                                        let index = this.state.index;
+                                        
+                                        // if(index == 1){
+
+                                        //     let csrfvalue;
+
+                                        //     document.cookie.split(';').forEach(item=>{
+                                        //         if(item.includes('csrftoken')){
+                                        //             csrfvalue = item.split('=')[1];
+                                        //         }
+                                        //     })
+                                            
+                                        //     axios.post("http://localhost:8000/api/admin/ficheaffaire/", this.state.dataFormAffaire,
+                                        //     {withCredentials : true, headers : {'X-CSRFToken' : csrfvalue}}).then(response=>{
+                                        //         console.log(response);
+                                        //     })
+                                        // }
+
                                         this.setState(state=>{
-                                            let index = state.index + 1;
+                                            index = state.index + 1;
                                             return {
                                                 index : index,
                                                 states : this.stages[index]
                                             }
-                                        })
+                                        });
+
+                                        
                                     }} className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1'>Suivant</button>}
                                 </div>
     
