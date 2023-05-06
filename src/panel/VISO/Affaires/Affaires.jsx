@@ -125,11 +125,11 @@ function Affaires() {
       </div>
 
       <div className='bg-gray-400 border-4 border-green-400 text-white flex flex-wrap'>
-        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N Affaire</label><input type="text" className='shadow-inner border'/></div>
+        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N° Affaire</label><input type="text" className='shadow-inner border'/></div>
         <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">Libelle Afaire</label><input type="text" className='shadow-inner border'/></div>
-        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N Offre</label><input type="text" className='shadow-inner border'/></div>
-        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N CB</label><input type="text" className='shadow-inner border'/></div>
-        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N Plan Aff.</label><input type="text" className='shadow-inner border'/></div>
+        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N° Offre</label><input type="text" className='shadow-inner border'/></div>
+        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N° SERVICE</label><input type="text" className='shadow-inner border'/></div>
+        <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">N° Plan Aff.</label><input type="text" className='shadow-inner border'/></div>
         <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">Lib. Complementaire</label><input type="text" className='shadow-inner border'/></div>
         <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">Charge d'Affaire</label><input type="text" className='shadow-inner border'/></div>
         <div className='flex flex-col w-fit m-1 text-sm'><label htmlFor="">Implentation</label><input type="text" className='shadow-inner border'/></div>
@@ -152,11 +152,11 @@ function Affaires() {
           </div>
           <div>
             <input type="radio" name="" id="" />
-            <label htmlFor="">Ou mon CB intervient</label>
+            <label htmlFor="">Ou mon SERVICE intervient</label>
           </div>
           <div>
             <input type="radio" name="" id="" />
-            <label htmlFor="">Que mon CB gere</label>
+            <label htmlFor="">Que mon SERVICE gere</label>
           </div>
         </fieldset>
       </div>
@@ -166,10 +166,10 @@ function Affaires() {
           <tr>
             <th></th>
             <th>...</th>
-            <th>N Affaire</th>
+            <th>N°Affaire</th>
             <th>Plan</th>
             <th>Type</th>
-            <th>Tut</th>
+            <th>Tutorat</th>
             <th>Rapport</th>
             <th>RFCT</th>
             <th>Delai</th>
@@ -181,16 +181,16 @@ function Affaires() {
             <th>Nom CA</th>
             <th>Client</th>
             <th>Destination</th>
-            <th>CB</th>
+            <th>SERVICE</th>
             <th>Risque</th>
             <th>Montant tvx</th>
             <th>Contrat du</th>
-            <th>N Offie</th>
+            <th>N° Offie</th>
             <th>Produit</th>
             <th>LAT</th>
             <th>Armoire</th>
             <th>Maestro</th>
-            <th>N Provisoire</th>
+            <th>N° Provisoire</th>
           </tr>
         </thead>
       </table>
