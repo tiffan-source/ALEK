@@ -1,5 +1,5 @@
 export let strutures = {
-    "VISO" : {
+    "Aleatek" : {
         "Affaires" : {
             "Fiche Affaire" : {},
             "Mission/Prestation" : {},

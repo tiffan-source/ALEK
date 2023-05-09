@@ -9,7 +9,7 @@ import Affaires from './Affaires';
 import { matchAffaires } from './matchAffaires';
 import { strutures } from '../../../structure';
 
-let affaire = strutures['VISO']['Affaires'];
+let affaire = strutures['Aleatek']['Affaires'];
 
 function AffairesRouter() {
     let {path} = useRouteMatch();

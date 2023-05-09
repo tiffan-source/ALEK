@@ -8,10 +8,10 @@ import {
   Route,
 } from "react-router-dom";
 
-let visio = strutures['VISO'];
+let visio = strutures['Aleatek'];
 
 function VISO() {
-  let {path, url} = useRouteMatch()
+  let {path} = useRouteMatch()
   return (
     <Router>
         <Switch>

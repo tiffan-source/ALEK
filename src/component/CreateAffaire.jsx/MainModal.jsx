@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Etape1 from './Etape1'
-import Etape2 from './Etape2'
 import Etape3 from './Etape3'
 import Etape4 from './Etape4'
 import Etape5 from './Etape5'
-import Etape6 from './Etape6'
-import Etape7 from './Etape7'
 import Etape8 from './Etape8'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { Component } from 'react'
 import axios from 'axios'
-
-
-
 
 class MainModal extends Component{
 
@@ -34,34 +28,78 @@ class MainModal extends Component{
                 "client": null,
                 "numero_service_en_charge": null,
                 "marques": null
+            },
+            dataFormPlanAffaire : {
+                "libelle_plan_affaire": "",
+                "numero_plan": null,
+                "risque": "",
+                "devise": null,
+                "debut_chantier": null,
+                "fin_chantier": null,
+                "visite_reunions": "",
+                "cplt_geo": "",
+                "numero_voie": "",
+                "lieu_dit": "",
+                "compte_postal": "",
+                "ville": "",
+                "pays": "",
+                "type_affaire": "",
+                "montant_des_travaux": null,
+                "type_montant": null,
+                "debut_prestation_bv": null,
+                "nb": "",
+                "numero_affaire": null,
+                "charge_de_affaire": null,
+                "destination": null,
+                "produit": null
             }
         };
         
     }
 
-    modifyField = (field, value)=>{
+    modifyAffaireField = (field, value)=>{
         this.setState(state=>{
             state.dataFormAffaire[field] = value;
             return state;
         })
     }
 
+    modifyPlanField = (field, value)=>{
+        this.setState(state=>{
+            state.dataFormPlanAffaire[field] = value;
+            return state;
+        })
+    }
+
+    getDataForm = ()=>{
+        return {...this.state.dataFormAffaire, ...this.state.dataFormPlanAffaire};
+    }
+
     stages = [
         <Etape1/>,
-        // <Etape2/>,
-        <Etape3 modifyField={this.modifyField}/>,
-        <Etape4/>,
-        <Etape5/>,
-        // <Etape6/>,
-        // <Etape7/>,
+        <Etape3 modifyField={this.modifyAffaireField}/>,
+        <Etape4 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField}/>,
+        <Etape5 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField}/>,
         <Etape8/>,
     ];
 
     componentDidUpdate(prevProps, prevStates){
-        if(prevStates.index == 1 && this.state.index == 2)
-        {
-            console.log("Make query");
-        }
+        // if(prevStates.index === 1 && this.state.index === 2)
+        // {
+        //     console.log("Make query");
+        //     let csrfvalue;
+
+        //     document.cookie.split(';').forEach(item=>{
+        //         if(item.includes('csrftoken')){
+        //             csrfvalue = item.split('=')[1];
+        //         }
+        //     })
+                                            
+        //     axios.post("http://localhost:8000/api/admin/ficheaffaire/", this.state.dataFormAffaire,
+        //         {withCredentials : true, headers : {'X-CSRFToken' : csrfvalue}}).then(response=>{
+        //             console.log(response);
+        //         })
+        // }
     }
 
     render(){
@@ -101,34 +139,13 @@ class MainModal extends Component{
                                     {this.state.index < this.stages.length
                                     &&
                                     <button onClick={()=>{
-                                        
-                                        let index = this.state.index;
-                                        
-                                        // if(index == 1){
-
-                                        //     let csrfvalue;
-
-                                        //     document.cookie.split(';').forEach(item=>{
-                                        //         if(item.includes('csrftoken')){
-                                        //             csrfvalue = item.split('=')[1];
-                                        //         }
-                                        //     })
-                                            
-                                        //     axios.post("http://localhost:8000/api/admin/ficheaffaire/", this.state.dataFormAffaire,
-                                        //     {withCredentials : true, headers : {'X-CSRFToken' : csrfvalue}}).then(response=>{
-                                        //         console.log(response);
-                                        //     })
-                                        // }
-
                                         this.setState(state=>{
-                                            index = state.index + 1;
+                                            let index = state.index + 1;
                                             return {
                                                 index : index,
                                                 states : this.stages[index]
                                             }
                                         });
-
-                                        
                                     }} className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1'>Suivant</button>}
                                 </div>
     

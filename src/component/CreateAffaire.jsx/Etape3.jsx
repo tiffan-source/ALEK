@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { Component, useEffect, useState } from 'react'
+import React, { Component} from 'react'
 
 class Etape3 extends Component {
 
@@ -18,21 +18,21 @@ class Etape3 extends Component {
     axios.get('http://localhost:8000/api/admin/client/',
     { withCredentials: true}).then(response=>{
       let data = response.data.results;
-      this.props.modifyField("client", data[0].first_name + " " + data[0].last_name)
+      this.props.modifyField("client", data[0].id)
       this.setState({client : data});
     });
 
     axios.get('http://localhost:8000/api/admin/services/',
     { withCredentials: true}).then(response=>{
       let data = response.data.results;
-      this.props.modifyField("numero_service_en_charge", data[0].code_services + " " + data[0].code_services)
+      this.props.modifyField("numero_service_en_charge", data[0].id)
       this.setState({service : data});
     });
 
     axios.get('http://localhost:8000/api/admin/marque/',
     { withCredentials: true}).then(response=>{
       let data = response.data.results;
-      this.props.modifyField("marques", data[0].name)
+      this.props.modifyField("marques", data[0].id)
       this.setState({marque : data});
     });
   }

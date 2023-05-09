@@ -16,8 +16,14 @@ function App() {
     axios.post("http://127.0.0.1:8000/api/users/dj-rest-auth/login/", {
       username : "dodo",
       password : "1230"
-    }).then(res=>console.log(res))
-  });
+    }, {withCredentials : true}).then(res=>{
+      let data = res.data;
+      console.log(data);
+      localStorage.clear();         
+      localStorage.setItem('key', data.key);         
+      axios.defaults.headers.common['Authorization'] = `Token ${data['key']}`;  
+    })
+  }, []);
   return (
     <div className="App grid grid-cols-[20rem_auto] h-screen w-screen">
       <Router>

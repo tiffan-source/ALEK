@@ -12,6 +12,8 @@ export let panelMaker = (structures, ancestor)=>{
         <ul className={ancestor ? "px-8" : ""}>
             {Object.keys(structures).map((structure, index)=>{
                 let path = `${ancestor ? '/'+ancestor : ''}${'/'+structure}`;
+                let reelPath = window.location.pathname.replace('%', ' ');
+                console.log(reelPath);
                 return (
                     <li key={index}>
                         <a href={path}>{structure}</a>

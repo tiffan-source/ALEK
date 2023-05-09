@@ -1,6 +1,6 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowsLeftRightToLine, faChevronLeft, faFloppyDisk, faMinus, faPlus, faPrint, faRotateLeft, faSquareEnvelope, faPlay, faChevronRight, faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faMinus, faPlus, faPrint, faRotateLeft, faChevronRight, faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import oilPump from '../../../../assets/icon/oil-pump.png'; //Change Image After
 
 function MissionPrestation() {

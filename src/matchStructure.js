@@ -4,7 +4,7 @@ import StatGene from "./panel/StatGene/StatGene";
 import VISO from "./panel/VISO/VISO";
 
 export let matchStructure  = {
-    "VISO" : <VISO/>,
+    "Aleatek" : <VISO/>,
     "Statistiques Generales" : <StatGene/>,
     "Personel" : <Personel/>,
     "Geographie" : <Geographie/>,
