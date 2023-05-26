@@ -10,7 +10,7 @@ import {
 
 let visio = strutures['Aleatek'];
 
-function VISO() {
+function VISORouter() {
   let {path} = useRouteMatch()
   return (
     <Router>
@@ -27,4 +27,4 @@ function VISO() {
   )
 }
 
-export default VISO
+export default VISORouter

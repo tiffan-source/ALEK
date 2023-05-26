@@ -12,20 +12,20 @@ import { strutures } from '../../../structure';
 let affaire = strutures['Aleatek']['Affaires'];
 
 function AffairesRouter() {
-    let {path} = useRouteMatch();
+  let {path} = useRouteMatch();
   return (
     <Router>
         <Switch>
-        <Route exact path={path}>
-            <Affaires/>
-        </Route>
-        {Object.keys(affaire).map( (panel, index) => {
-            return (
-            <Route key={index} exact path={`${path}/${panel}`}>
-                {matchAffaires[panel]}
-            </Route>
-            );
-        })}
+          <Route exact path={path}>
+              <Affaires/>
+          </Route>
+          {Object.keys(affaire).map( (panel, index) => {
+              return (
+              <Route key={index} path={`${path}/${panel}`}>
+                  {matchAffaires[panel]}
+              </Route>
+              );
+          })}
         </Switch>
     </Router>
   )

@@ -1,13 +1,16 @@
 import React from 'react'
-import Etape1 from './Etape1'
-import Etape3 from './Etape3'
-import Etape4 from './Etape4'
-import Etape5 from './Etape5'
-import Etape8 from './Etape8'
+import Etape1 from './Etape/Etape1'
+import Etape3 from './Etape/Etape3'
+import Etape4 from './Etape/Etape4'
+import Etape5 from './Etape/Etape5'
+import Etape8 from './Etape/Etape8'
+import Etape7 from './Etape/Etape7'
+import Etape6 from './Etape/Etape6'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { Component } from 'react'
 import axios from 'axios'
+import Button from '../utils/Button/Button'
 
 class MainModal extends Component{
 
@@ -18,6 +21,7 @@ class MainModal extends Component{
             index : 0,
             states : this.stages[0],
             dataFormAffaire : {
+                "numero_affaire": "",
                 "libelle_affaire": "",
                 "statut_affaire": null,
                 "numero_offre": "",
@@ -27,12 +31,16 @@ class MainModal extends Component{
                 "date_contrat": null,
                 "client": null,
                 "numero_service_en_charge": null,
-                "marques": null
+                "charge_de_affaire": null,
+                "assistant": null,
+                "chef_projet": null,
+                "marques": null,
+                "intervenant" : []
             },
             dataFormPlanAffaire : {
                 "libelle_plan_affaire": "",
                 "numero_plan": null,
-                "risque": "",
+                "risque": null,
                 "devise": null,
                 "debut_chantier": null,
                 "fin_chantier": null,
@@ -43,15 +51,19 @@ class MainModal extends Component{
                 "compte_postal": "",
                 "ville": "",
                 "pays": "",
-                "type_affaire": "",
+                "departement": "",
+                "province": "",
+                "type_affaire": null,
                 "montant_des_travaux": null,
                 "type_montant": null,
                 "debut_prestation_bv": null,
                 "nb": "",
-                "numero_affaire": null,
-                "charge_de_affaire": null,
-                "destination": null,
-                "produit": null
+                "affaire": null,
+                "produit": null,
+                "destination": [],
+                "intervention_technique": [],
+                "missions": [],
+                "constructeurs": [],
             }
         };
         
@@ -71,6 +83,26 @@ class MainModal extends Component{
         })
     }
 
+    createAffaireAndPlan = ()=>{
+        let intervenant = [
+            this.state.dataFormAffaire.assistant,
+            this.state.dataFormAffaire.charge_de_affaire,
+            this.state.dataFormAffaire.chef_projet,
+        ];
+
+        intervenant = [...new Set(intervenant)];
+
+        axios.post("http://127.0.0.1:8000/api/admin/ficheaffaire/",
+        {...this.state.dataFormAffaire, intervenant : intervenant},
+        {withCredentials : true}).then(res=>{
+            axios.post("http://127.0.0.1:8000/api/admin/plan/affaire/",
+            {...this.state.dataFormPlanAffaire, affaire : res.data.id},
+            {withCredentials : true}).then(res=>{
+                window.location.reload();
+            });
+        });
+    }
+
     getDataForm = ()=>{
         return {...this.state.dataFormAffaire, ...this.state.dataFormPlanAffaire};
     }
@@ -79,28 +111,11 @@ class MainModal extends Component{
         <Etape1/>,
         <Etape3 modifyField={this.modifyAffaireField}/>,
         <Etape4 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField}/>,
-        <Etape5 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField}/>,
-        <Etape8/>,
+        <Etape5 dataFormAffaire={this.getDataForm} modifyField={this.modifyAffaireField}/>,
+        <Etape6 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField}/>,
+        <Etape7 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField}/>,
+        <Etape8 dataFormAffaire={this.getDataForm} modifyField={this.modifyPlanField} create={this.createAffaireAndPlan}/>,
     ];
-
-    componentDidUpdate(prevProps, prevStates){
-        // if(prevStates.index === 1 && this.state.index === 2)
-        // {
-        //     console.log("Make query");
-        //     let csrfvalue;
-
-        //     document.cookie.split(';').forEach(item=>{
-        //         if(item.includes('csrftoken')){
-        //             csrfvalue = item.split('=')[1];
-        //         }
-        //     })
-                                            
-        //     axios.post("http://localhost:8000/api/admin/ficheaffaire/", this.state.dataFormAffaire,
-        //         {withCredentials : true, headers : {'X-CSRFToken' : csrfvalue}}).then(response=>{
-        //             console.log(response);
-        //         })
-        // }
-    }
 
     render(){
         return (
@@ -127,7 +142,7 @@ class MainModal extends Component{
                                 <div>
                                     {this.state.index > 0
                                     &&
-                                    <button onClick={()=>{
+                                    <Button action={()=>{
                                         this.setState(state=>{
                                             let index = state.index - 1;
                                             return {
@@ -135,10 +150,10 @@ class MainModal extends Component{
                                                 states : this.stages[index]
                                             }
                                         })
-                                    }} className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1'>Precedent</button>}
-                                    {this.state.index < this.stages.length
+                                    }}>Precedent</Button>}
+                                    {this.state.index < this.stages.length - 1
                                     &&
-                                    <button onClick={()=>{
+                                    <Button action={()=>{
                                         this.setState(state=>{
                                             let index = state.index + 1;
                                             return {
@@ -146,13 +161,13 @@ class MainModal extends Component{
                                                 states : this.stages[index]
                                             }
                                         });
-                                    }} className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1'>Suivant</button>}
+                                    }}>Suivant</Button>}
                                 </div>
     
                                 <div>
-                                    <button className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1' onClick={()=>{
+                                    <Button action={()=>{
                                         this.props.handleClose()
-                                    }}>Annuler</button>
+                                    }}>Annuler</Button>
                                 </div>
                             </div>
                         </div>
@@ -161,7 +176,5 @@ class MainModal extends Component{
             </div>
         )
     }
-
 }
-
 export default MainModal
