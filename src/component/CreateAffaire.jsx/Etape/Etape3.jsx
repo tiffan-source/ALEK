@@ -1,118 +1,98 @@
 import axios from 'axios';
-import React, { Component} from 'react'
+import React, { useEffect, useState } from 'react';
 import LabelInput from '../../utils/LabelInput/LabelInput';
 import LabelSelect from '../../utils/LabelSelect/LabelSelect';
 
-class Etape3 extends Component {
+const Etape3 = ({ modifyField, dataAffaire }) => {
+  const [client, setClient] = useState([]);
 
-  constructor(){
-    super();
-    this.state = {
-      client : [],
-      service : [],
-      marque : []
-    }
-  }
+  useEffect(() => {
+    modifyField("statut", dataAffaire.statut || "En cours");
 
-  componentDidMount(){
+    const fetchData = async () => {
+      const response = await axios.get(process.env.REACT_APP_STARTURIBACK + '/entreprise_and_responsable/');
+      const dataEntreprise = response.data;
+      modifyField("client", dataAffaire.client || dataEntreprise[0].id);
+      setClient(dataEntreprise);
+    };
 
-    this.props.modifyField("statut_affaire", "Encours");
+    fetchData();
+  }, []);
 
-    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/client/',
-    { withCredentials: true}).then(response=>{
-      let data = response.data.results;
-      this.props.modifyField("client", data[0].id)
-      this.setState({client : data});
-    });
+  const validateForm = () => {
+    // Logique de validation ici
+  };
 
-    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/services/',
-    { withCredentials: true}).then(response=>{
-      let data = response.data.results;
-      this.props.modifyField("numero_service_en_charge", data[0].id)
-      this.setState({service : data});
-    });
+  return (
+    <div>
+      <div className='border border-gray-400 p-2 mb-2'>
+        <LabelInput label="N° Contrat ALEATEK" disabled />
 
-    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/marque/',
-    { withCredentials: true}).then(response=>{
-      let data = response.data.results;
-      this.props.modifyField("marques", data[0].id)
-      this.setState({marque : data});
-    });
-  }
+        <LabelInput
+          label="N° Affaire ALEATEK"
+          value={dataAffaire.numero}
+          onChange={(e) => {
+            modifyField("numero", e.target.value);
+          }}
+        />
 
-  render(){
-    return (
-      <div>
-        <div className='border border-gray-400 p-2 mb-2'>
+        <LabelInput
+          label="Libele Affaire"
+          value={dataAffaire.libelle}
+          onChange={(e) => {
+            modifyField("libelle", e.target.value);
+          }}
+        />
 
-          <LabelInput label="N° Contrat ALEATEK" disabled/>
-
-          <LabelInput label="N° Affaire ALEATEK" onChange={(e)=>{
-              this.props.modifyField("numero_affaire", e.target.value);
-            }}/>
-
-          <LabelInput label="Libele Affaire" onChange={(e)=>{
-            this.props.modifyField("libelle_affaire", e.target.value);
-          }}/>
-  
-          <LabelSelect label="Statut Affaire" onChange={(e)=>{
-              this.props.modifyField("statut_affaire", e.target.value);
-            }} options={{
-              "Encours" : "Encours",
-              "Acheve" : "Acheve",
-              "Abandonne" : "Abandonne"
-            }}/>
-
-        </div>
-  
-        <div className='border border-gray-400 p-2 mb-2'>
-          <LabelSelect label="Client" onChange={(e)=>{
-              this.props.modifyField("client", e.target.value);
-            }} options={
-              this.state.client.reduce((prev, curr)=>{
-                let key = curr.first_name + " " + curr.last_name;
-                prev[key] = curr.id;
-                return prev
-              }, {})
-            }/>
-        </div>
-  
-        <div className='border border-gray-400 p-2 mb-2'>
-          <LabelSelect label="Gerer par: Service N" onChange={(e)=>{
-              this.props.modifyField("numero_service_en_charge", e.target.value);
-            }} options={
-              this.state.service.reduce((prev, curr)=>{
-                let key = curr.code_services;
-                prev[key] = curr.id;
-                return prev
-              }, {})
-            }/>
-        </div>
-  
-        <div className='border border-gray-400 p-2 mb-2'>
-          <LabelSelect label="Marque" onChange={(e)=>{
-            this.props.modifyField("marques", e.target.value);
-          }} options={
-            this.state.marque.reduce((prev, curr)=>{
-              let key = curr.name;
-              prev[key] = curr.id;
-              return prev
-            }, {})
-          }/>
-        </div>
-  
-        <div  className='border border-gray-400 p-2 mb-2'>
-            <LabelInput label="N°Offre"  onChange={(e)=>{
-              this.props.modifyField("numero_offre", e.target.value);
-            }}/>
-
-            <LabelInput label="Date du contrat" onChange={(e)=>{
-              this.props.modifyField("date_contrat", e.target.value);
-            }} type="date"/>
-        </div>
+        <LabelSelect
+          label="Statut Affaire"
+          value={dataAffaire.statut}
+          onChange={(e) => {
+            modifyField("statut", e.target.value);
+          }}
+          options={{
+            "En cours": "En cours",
+            "Achevé": "Achevé",
+            "Abandonné": "Abandonné"
+          }}
+        />
       </div>
-    )
-  }
-}
 
-export default Etape3
+      <div className='border border-gray-400 p-2 mb-2'>
+        <LabelSelect
+          label="Client"
+          value={dataAffaire.client}
+          onChange={(e) => {
+            modifyField("client", e.target.value);
+          }}
+          options={client.reduce((prev, curr) => {
+            let key = curr.raison_sociale;
+            prev[key] = curr.id;
+            return prev;
+          }, {})}
+        />
+      </div>
+
+      <div className='border border-gray-400 p-2 mb-2'>
+        <LabelInput
+          label="N°Offre"
+          value={dataAffaire.numero_offre}
+          onChange={(e) => {
+            modifyField("numero_offre", e.target.value);
+          }}
+        />
+
+        <LabelInput
+          label="Date du contrat"
+          value={dataAffaire.date_contrat}
+          onChange={(e) => {
+            modifyField("date_contrat", e.target.value);
+          }}
+          type="date"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default Etape3;

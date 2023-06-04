@@ -10,13 +10,16 @@ function Document() {
   const [documentSelect, setdocumentSelect] = useState(null);
 
   useEffect(()=>{
-    let id = localStorage.getItem("planAffaire");
-    if(id){
-      axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/plan/affaire/' + id).then(res=>{
-      }).catch((error)=>{
-        localStorage.removeItem("planAffaire")
-      })
-    }
+    (async()=>{
+      try {
+        let id = localStorage.getItem("planAffaire");
+        if(id){    
+          await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
+        }
+      } catch (error) {
+        localStorage.removeItem("planAffaire")        
+      }
+    })();
   }, []);
 
   return (
@@ -33,7 +36,7 @@ function Document() {
         <Tabs tabs={[
           {title : "Documents recus", content : <Recu document={documentSelect} selectDocument={setdocumentSelect}/>},
           {title : "Affectations", content : <Affectation document={documentSelect}/>},
-          {title : "Verification", content : <Verification/>}
+          {title : "Verification", content : <Verification document={documentSelect}/>}
         ]}/>
       </div>
     </>

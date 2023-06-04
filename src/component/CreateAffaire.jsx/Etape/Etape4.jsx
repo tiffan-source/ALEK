@@ -4,6 +4,7 @@ import axios from 'axios';
 import LabelInput from '../../utils/LabelInput/LabelInput';
 import LabelSelect from '../../utils/LabelSelect/LabelSelect';
 import LabelCheckbox from '../../utils/LabelCheckbox/LabelCheckbox';
+import Adresse from '../../Adresse/Adresse';
 
 class Etape4 extends Component{
 
@@ -14,30 +15,23 @@ class Etape4 extends Component{
       startChantier : "",
       endChantier : "",
       destinations : [],
-      products : []
     }
   }
 
-  componentDidMount(){
+  async componentDidMount(){
     this.props.modifyField("devise", "€");
-    this.props.modifyField("numero_plan", "1");
+    this.props.modifyField("numero", "1");
     this.props.modifyField("type_montant", "HT");
-    this.props.modifyField("type_affaire", "CTC");
+    this.props.modifyField("type", "CTC");
     this.props.modifyField("risque", "Normal");
+    try {
+      let batiment = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/batiment/');
 
-    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/ouvrage/destinations',
-    { withCredentials: true}).then(response=>{
-      let data = response.data.results;
-      this.props.modifyField("destination", data[0].id)
-      this.setState({destinations : data});
-    });
-
-    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/product',
-    { withCredentials: true}).then(response=>{
-      let data = response.data.results;
-      this.props.modifyField("produit", data[0].id)
-      this.setState({products : data});
-    });
+      this.props.setBatiment(this.props.batiment || batiment.data.results[0].id)
+      this.setState({destinations : batiment.data.results});
+    } catch (error) {
+    console.log(error); 
+    }
   }
 
   setDebutChantier = (e) => {
@@ -49,7 +43,7 @@ class Etape4 extends Component{
 
   setFinChantier = (e) =>{
     let value = parseInt(e.target.value);
-    let start = new Date(this.props.dataFormAffaire().debut_chantier);
+    let start = new Date(this.props.dataPlan.debut_chantier);
     start = moment(start.toLocaleDateString())
     
     if(value < 0){
@@ -81,94 +75,84 @@ class Etape4 extends Component{
       <>
       <div>
         <div className='flex gap-8'>
-          <LabelInput label="N° Affaire" disabled value={this.props.dataFormAffaire().numero_contrat}/>
+          <LabelInput label="N° Affaire" disabled value={this.props.dataAffaire.numero}/>
           <LabelInput label="N° Plan" disabled value={1}/>
         </div>
 
-        <LabelInput label="Libelle Affaire" value={this.props.dataFormAffaire().libelle_affaire} disabled/>
+        <LabelInput label="Libelle Affaire" value={this.props.dataAffaire.libelle} disabled/>
 
-        <LabelInput label="Libele Plan Affaire" onChange={(e)=>{
-          this.props.modifyField("libelle_plan_affaire", e.target.value);
+        <LabelInput label="Libele Plan Affaire" value={this.props.dataPlan.libelle} onChange={(e)=>{
+          this.props.modifyField("libelle", e.target.value);
         }}/>
       </div>
 
       <div className='border border-gray-400 p-2 mb-2'>
         <div className='flex items-center justify-between'>
-          <LabelInput label="Montant travaux" onChange={(e)=>{
-            this.props.modifyField("montant_des_travaux", e.target.value);
+          <LabelInput col label="Montant travaux" value={this.props.dataPlan.prix} onChange={(e)=>{
+            this.props.modifyField("prix", e.target.value);
           }}/>
 
-          <LabelSelect col label="Devise" onChange={(e)=>{
+          <LabelSelect col label="Devise" value={this.props.dataPlan.devise} onChange={(e)=>{
             this.props.modifyField("devise", e.target.value);
           }} options={{
             "€" : "€",
             "$" : "$"
           }}/>
 
-          <LabelSelect col label="(HT/TTC)" onChange={(e)=>{
+          <LabelSelect col label="(HT/TTC)" value={this.props.dataPlan.type_montant} onChange={(e)=>{
             this.props.modifyField("type_montant", e.target.value);
           }} options={{
             "HT" : "HT",
             "TTC" : "TTC"
           }}/>
 
-          <LabelSelect col label="Destination" onChange={(e)=>{
-            this.props.modifyField("destination", e.target.value);
+          <LabelSelect col label="Destination" value={this.props.batiment} onChange={(e)=>{
+            this.props.setBatiment(e.target.value)
           }} options={
             this.state.destinations.reduce((prev, curr)=>{
-              let key = curr.nom;
+              let key = curr.libelle;
               prev[key] = curr.id;
               return prev
             }, {})
           }/>
         </div>
 
-        <LabelInput label="Date début Prestation" type="date" onChange={(e)=>{
-          this.props.modifyField("debut_prestation_bv", e.target.value);
+        <LabelInput label="Date début Prestation" value={this.props.dataPlan.debut_prestation} type="date" onChange={(e)=>{
+          this.props.modifyField("debut_prestation", e.target.value);
         }}/>
 
         <div className='flex justify-between'>
-          <LabelInput label="Date de début du chantier" value={this.state.startChantier} type="date" onChange={this.setDebutChantier}/>
+          <LabelInput label_w="24" label="Date de début du chantier" value={this.props.dataPlan.debut_chantier || this.state.startChantier} type="date" onChange={this.setDebutChantier}/>
           <LabelInput label="Duree" type="number" value={this.state.duree} onChange={this.setFinChantier} span_info="Mois"/>
         </div>
 
-        <LabelInput label="Date de fin" type="date" value={this.state.endChantier} onChange={this.setDureeChantier}/>
+        <LabelInput label="Date de fin" type="date" value={this.props.dataPlan.fin_chantier || this.state.endChantier} onChange={this.setDureeChantier}/>
 
         <div className='flex justify-between'>
-          <LabelInput label="Nb document a examiner" type="number" onChange={(e)=>{
-            this.props.modifyField("nb", e.target.value);
+          <LabelInput label="Nb document a examiner" value={this.props.dataPlan.doc} type="number" onChange={(e)=>{
+            this.props.modifyField("doc", e.target.value);
           }}/>
 
-          <LabelInput label="Nb visites/reunions prevues" type="number" onChange={(e)=>{
-            this.props.modifyField("visite_reunions", e.target.value);
+          <LabelInput label="Nb visites/reunions prevues" value={this.props.dataPlan.visite} type="number" onChange={(e)=>{
+            this.props.modifyField("visite", e.target.value);
           }}/>
         </div>
 
         <div className="flex justify-between">
-          <LabelSelect label="Type d'affaire" onChange={e=>{
-            this.props.modifyField("destination", e.target.value);
+          <LabelSelect label="Type d'affaire" value={this.props.dataPlan.type} onChange={e=>{
+            this.props.modifyField("type", e.target.value);
           }} options={{
             "CTC" : "CTC",
             "VT" : "VT"
           }} />
 
-          <LabelSelect label="Produit" onChange={(e)=>{
-            this.props.modifyField("produit", e.target.value);
-          }} options={
-            this.state.products.reduce((prev, curr)=>{
-              let key = curr.name;
-              prev[key] = curr.id;
-              return prev
-            }, {})
-          }/>
-
-          <LabelSelect label="Risque"  onChange={e=>{
+          <LabelSelect label="Risque" value={this.props.dataPlan.risque} onChange={e=>{
             this.props.modifyField("risque", e.target.value);
           }} options={{
             "Normal": "Normal",
             "Particulier": "Particulier",
             "Complexe": "Complexe"          
-            }}/>
+          }}/>
         </div>
 
   
@@ -179,33 +163,10 @@ class Etape4 extends Component{
           <span>Adresse du Chantier</span>
           <div className='grid grid-cols-2 gap-2'>
             <div className='border border-gray-600 p-1'>
-              <LabelInput label="Cplt Geo" onChange={(e)=>{
-                this.props.modifyField("cplt_geo", e.target.value);
-              }}/>
-              <LabelInput label="N et voie" onChange={(e)=>{
-                this.props.modifyField("numero_voie", e.target.value);
-              }}/>
-              <LabelInput label="Lieu dit" onChange={(e)=>{
-                this.props.modifyField("lieu_dit", e.target.value);
-              }}/>
-              <LabelInput label="CP/VIlle" onChange={(e)=>{
-                if(Number.isInteger(parseInt(e.target.value)))
-                  this.props.modifyField("compte_postal", e.target.value);
-                else
-                  this.props.modifyField("ville", e.target.value);
-              }}/>
-              <LabelInput label="Departement" onChange={(e)=>{
-                this.props.modifyField("departement", e.target.value);
-              }}/>
-              <LabelInput label="Province" onChange={(e)=>{
-                this.props.modifyField("province", e.target.value);
-              }}/>
-              <LabelInput label="Pays" onChange={(e)=>{
-                this.props.modifyField("pays", e.target.value);
-              }}/>
+              <Adresse adress={this.props.adress} setAdress={this.props.setAdress}/>
             </div>
             
-            <div className='flex flex-col justify-between border border-gray-600 p-1'>
+            {/* <div className='flex flex-col justify-between border border-gray-600 p-1'>
               <LabelCheckbox label="Utiliser l'adresse postal pour l'envoi des courriers"/>
 
               <div>
@@ -217,7 +178,7 @@ class Etape4 extends Component{
                   <LabelInput label="Cedex" type="number" col/>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
       </div>
       </>

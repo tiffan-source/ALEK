@@ -1,266 +1,286 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import LabelInput from '../utils/LabelInput/LabelInput';
 import LabelSelect from '../utils/LabelSelect/LabelSelect';
 import Button from '../utils/Button/Button';
-import LabelCheckbox from '../utils/LabelCheckbox/LabelCheckbox';
 import axios from 'axios';
-import moment from 'moment';
 
-class CreateDocument extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-        pdfFiles: [],
-        dataDocument : {
-          "dossier": null,
-          "nature": "",
-          "numero_externe": null,
-          "date_de_indice": null,
-          "date_de_reception": null,
-          "indice": "",
-          "titre": "",
-          "num_revision": "",
-          "emetteur": null,
-          "ouvrage": null,
-          "numero_aleatek": null,
-          "exam": [],
-          "fichier_attache": [],
-          "affectation": []
-        },
+/**
+ * Ma logique de selection
+ * 
+ * Quand j'initialise je cherche tous les AffairesOuvrages et je fais ce que je fais plus bas quand je selectionne
+ * 
+ * Quand je selection un AffaireOuvrage, je cherche tous les EntrepriseAffaireOuvrage avec mon service
+ * Je definis et un premier EntrepriseAffaire et un EntrepriseAffaireSelect et un EntrepriseAffaireOuvrageSelect
+ * si je trouve pas EntrepriseAffaire dans mon service je definis EntrepriseAffaire = []
+ * EntrepriseAffaireSelect et EntrepriseAffaireOuvrageSelect a null
+ * 
+ * Quand je selectionne un EntrepriseAffaireSelect je definis un EntrepriseAffaireSelect et un EntrepriseAffaireOuvrageSelect
+ *
+ */
 
-        pdfData : {
-          "nom_fichier" : "",
-          "cree_le" : "",
-        },
+const CreateDocument = (props) => {
+  const [pdfData, setPdfData] = useState({
+    nom: '',
+    date: '',
+  });
 
-        id_affaire : null,
+  const [id_affaire, setIdAffaire] = useState(null);
+  const [affaireOuvrages, setAffaireOuvrages] = useState([]);
+  const [affaireOuvragesSelect, setAffaireOuvragesSelect] = useState(null);
 
-        ouvrages : [],
-        emetteurs : []
-    };
-  }
+  const [entrepriseAffaireForSelectOuvrage, setEntrepriseAffaireForSelectOuvrage] = useState([]);
 
-  componentDidMount(){
+  // A utiliser pour la creation
+  const [entrepriseAffaireOuvrageSelect, setEntrepriseAffaireOuvrageSelect] = useState(null);
+  const [pdfFiles, setPdfFiles] = useState([]);
+  const [dataDocument, setDataDocument] = useState({
+    dossier : "Execution",
+    nature : "TOUS",
+    indice : "",
+    date_indice : "",
+    date_reception : "",
+    titre : "",
+    numero_revision : "",
+    numero_externe : ""
+  })
 
-    let id = localStorage.getItem("planAffaire");
-    if(id){
+  useEffect(()=>{
+    (async()=>{
+      try {
+        let id = localStorage.getItem("planAffaire");
+        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/planaffaire/${id}/`)
+        setIdAffaire(data.affaire);
 
-      this.setState(state=>{
-        return {dataDocument : {...state.dataDocument, dossier : "Execution"}}
-      })
+        let {data: dataOuvrages} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_ouvrage_affaire/${data.affaire}/`);
+        setAffaireOuvrages(dataOuvrages);
 
-      axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/plan/affaire/' + id).then(res=>{
-        this.setState({id_affaire : res.data.affaire})
-        this.setState(state=>{
-          return {dataDocument : {...state.dataDocument, numero_aleatek : res.data.affaire}}
-        })
-      }).catch(err=>localStorage.removeItem("planAffaire"));
+        if(dataOuvrages.length > 0){
+          setAffaireOuvragesSelect(dataOuvrages[0].id)
+        }else{
+          setAffaireOuvragesSelect(null);
+        }
 
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
 
+  useEffect(()=>{
+    (async()=>{
+      try {
+        if(affaireOuvragesSelect !== null){
+          let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/entreprise_for_affaire_ouvrage/${affaireOuvragesSelect}/`);
+          if(data.length > 0){
+            setEntrepriseAffaireForSelectOuvrage(data);
+            setEntrepriseAffaireOuvrageSelect(data[0].id);
+          }else{
+            setEntrepriseAffaireForSelectOuvrage([]);
+            setEntrepriseAffaireOuvrageSelect(null);
+          }
+        }else{
+          setEntrepriseAffaireForSelectOuvrage([]);
+          setEntrepriseAffaireOuvrageSelect(null);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [affaireOuvragesSelect])
 
-      axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/ouvrages').then(res=>{
-        this.setState({ouvrages : res.data.results});
-        this.setState(state=>{
-          return {dataDocument : {...state.dataDocument, ouvrage : res.data.results[0].id}}
-        })
-      });
-
-      axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise/registration/').then(res=>{
-        this.setState({emetteurs : res.data.results});
-        this.setState(state=>{
-          return {dataDocument : {...state.dataDocument, emetteur : res.data.results[0].id}}
-        })
-      });
-    }
-  }
-
-
-  handleFileUpload = (event) => {
+  const handleFileUpload = (event) => {
     let newFile = event.target.files[0];
-    this.setState((prevState) => ({
-      pdfFiles: [...prevState.pdfFiles, {
-        ...prevState.pdfData, fichier : newFile
-      }],
-    }));
-  };
-
-  handleRemoveFile = (index) => {
-    this.setState((prevState) => {
-      const updatedFiles = [...prevState.pdfFiles];
-      updatedFiles.splice(index, 1);
-      return {
-        pdfFiles: updatedFiles,
-      };
-    });
-  };
-
-  createDocument = ()=>{
-    this.state.pdfFiles.forEach(pdfFile=>{
-      let formData = new FormData();
-      formData.append('fichier', pdfFile.fichier);
-      formData.append('nom_fichier', pdfFile.nom_fichier);
-      formData.append('cree_le', pdfFile.cree_le);
-
-      axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichieratacher/',
-      formData, {withCredentials : true}).then(res=>{
-        this.setState(state=>{
-          return {dataDocument : {...state.dataDocument, fichier_attache : [...state.dataDocument.fichier_attache, res.data.id]}}
-        })
-      })
-    });
-
-    axios.get("http://localhost:8000/connecte-users/").then(resUser=>{
-      let idUser = resUser.data.results[0].id;
-      axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/intervenant/', {
-        "affecte_le": moment().format('YYYY-MM-DD'),
-        "action": false,
-        "affecte_par": idUser,
-        "intervenant": [idUser],
-        "intervention_technique": []
-      }, {withCredentials : true}).then(dataAffectation=>{
-        axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/document/', {...this.state.dataDocument, affectation : [dataAffectation.data.id]}, {withCredentials : true}).then(res=>{
-          this.props.annuler();
-        })
-      });
+    setPdfFiles((prevState) => [
+      ...prevState,
+      {
+        ...pdfData,
+        fichier: newFile,
+      },
+    ]);
+    setPdfData({
+      nom: '',
+      date: '',
     })
-  }
+  };
 
-  render() {
-    return (
-      <div className='m-2'>
-        <div className='flex gap-8'>
-          <div>
-            <LabelInput label='N Affaire' disabled value={this.state.id_affaire}/>
-            <LabelSelect label='Emetteur' options={
-              this.state.emetteurs.reduce((prev, curr)=>{
-                let key = curr.raison_social;
-                prev[key] = curr.id;
-                return prev
-              }, {})
-            } onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, emetteur : e.target.value}}
-              })
-            }}/>
-            <LabelSelect label='Ouvrage' options={
-              this.state.ouvrages.reduce((prev, curr)=>{
-                let key = curr.libelle;
-                prev[key] = curr.id;
-                return prev
-              }, {}) 
-            } onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, ouvrage : e.target.value}}
-              })
-            }}/>
-            <LabelInput label='N externe' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, numero_externe : e.target.value}}
-              })
-            }}/>
-            <LabelInput type='date' label='Date reception' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, date_de_reception : e.target.value}}
-              })
-            }}/>
-            <LabelInput label='Titre' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, titre : e.target.value}}
-              })
-            }}/>
-          </div>
-          <div>
-            <LabelInput label='N Revision' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, num_revision : e.target.value}}
-              })
-            }} />
-            <LabelSelect label='Dossier' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, dossier : e.target.value}}
-              })
-            }} options={{
-              "Execution" : "Execution",
-              "Conception" : "Conception"
-            }}/>
-            <LabelInput label='Nature'  onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, nature : e.target.value}}
-              })
-            }}/>
-            <LabelInput label='Indice' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, indice : e.target.value}}
-              })
-            }} />
-            <LabelInput type='date' label='Date indice' onChange={(e)=>{
-              this.setState(state=>{
-                return {dataDocument : {...state.dataDocument, date_de_indice : e.target.value}}
-              })
-            }} />
-          </div>
-        </div>
+  const handleRemoveFile = (index) => {
+    setPdfFiles((prevState) => {
+      const updatedFiles = [...prevState];
+      updatedFiles.splice(index, 1);
+      return updatedFiles;
+    });
+  };
 
-        <div className='flex gap-6 items-center bg-gray-400 p-2'>
-          <LabelCheckbox label='Proprietaire' />
-          <input
-            id='pdf-upload'
-            type='file'
-            accept='application/pdf'
-            className='hidden'
-            onChange={this.handleFileUpload}
-          />
-          <LabelInput label='Nom fichier' value={this.state.pdfData.nom_fichier} onChange={(e)=>{
-            this.setState(state=>{
-              return {pdfData : {...state.pdfData, nom_fichier : e.target.value}};
-            })
+  const createDocument = async () => {
+    let {data} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/documents/`,{
+      ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect
+    }, {withCredentials : true})
+
+    await Promise.all(pdfFiles.map(async pdfFile=>{
+      let formData = new FormData();
+      formData.append('nom', pdfFile.nom)
+      formData.append('date', pdfFile.date)
+      formData.append('fichier', pdfFile.fichier)
+      formData.append('document', data.id)
+
+      await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichierattacher/',
+      formData,
+      {withCredentials : true})
+    }))
+
+    window.location.reload();
+
+  };
+
+
+  return (
+    <div className='m-2'>
+      <div className='flex gap-8'>
+        <div>
+          {id_affaire && <LabelInput label='N Affaire' disabled value={id_affaire} />}
+          <LabelSelect label='Ouvrage' value={affaireOuvragesSelect} options={affaireOuvrages.reduce((prev, curr)=>{
+            let key = curr.ouvrage.libelle;
+            prev[key] = curr.id;
+            return prev;
+          }, {})} onChange={(e)=>{
+            setAffaireOuvragesSelect(e.target.value)
           }}/>
-          <LabelInput label='Creer le' type='date' value={this.state.pdfData.cree_le} onChange={(e)=>{
-            this.setState(state=>{
-              return {pdfData : {...state.pdfData, cree_le : e.target.value}};
-            })
+          <LabelSelect label='Emetteur' value={entrepriseAffaireOuvrageSelect} options={entrepriseAffaireForSelectOuvrage.reduce((prev, curr)=>{
+            let key = curr.entreprise.raison_sociale;
+            prev[key] = curr.id;
+            return prev;
+          }, {})} onChange={(e)=>{
+            setEntrepriseAffaireOuvrageSelect(e.target.value)
           }}/>
-          <label htmlFor='pdf-upload' className='text-blue-600 hover:underline cursor-pointer'>
-            Ajouter le fichier
-          </label>
+          <LabelInput label='N externe' value={dataDocument.numero_externe} onChange={(e)=>{
+            setDataDocument({...dataDocument, numero_externe : e.target.value})
+          }}/>
+          <LabelInput type='date' label='Date reception' value={dataDocument.date_reception} onChange={(e)=>{
+            setDataDocument({...dataDocument, date_reception : e.target.value})
+          }}/>
+          <LabelInput label='Titre' value={dataDocument.titre} onChange={(e)=>{
+            setDataDocument({...dataDocument, titre : e.target.value})
+          }}/>
         </div>
-
-        <table className='text-sm w-full'>
-          <thead>
-            <tr className='grid grid-cols-6 border-b border-gray-600 py-2'>
-              <th className='col-span-2 text-start'>Nom du fichier</th>
-              <th className='col-span-1 text-start'>Creer le</th>
-              <th className='col-span-2 text-start'>Fichier</th>
-              <th className='col-span-1 text-start'>Retirer</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              this.state.pdfFiles.map((pdfFile, index)=>{
-                return (
-                  <tr key={index} className={'grid grid-cols-6 border-b border-gray-600'}>
-                    <td className='col-span-2'>{pdfFile.nom_fichier}</td>
-                    <td className='col-span-1'>{pdfFile.cree_le}</td>
-                    <td className='col-span-2'>{pdfFile.fichier.name}</td>
-                    <td className='col-span-1 text-center text-red-800'>
-                      <span className='cursor-pointer' onClick={()=>{
-                        this.handleRemoveFile(index);
-                      }}>Retirer</span>
-                    </td>
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </table>
-          
-        <div className='flex gap-6 mt-4'>
-          <Button action={this.createDocument}>Creer le document</Button>
-          <Button action={this.props.annuler}>Annuler</Button>
+        <div>
+          <LabelInput label='N Revision' value={dataDocument.numero_revision} onChange={(e)=>{
+            setDataDocument({...dataDocument, numero_revision : e.target.value})
+          }}/>
+          <LabelSelect label='Dossier' value={dataDocument.dossier} options={{
+            "Execution" : "Execution",
+            "Conception" : "Conception",
+          }} onChange={(e)=>{
+            setDataDocument({...dataDocument, dossier : e.target.value})
+          }}/>
+          <LabelSelect label='Nature' value={dataDocument.nature} options={{
+            'TOUS': 'TOUS',
+            'Descriptif': 'Descriptif',
+            'AT/DTA': 'AT/DTA',
+            'Attestation Incendie': 'Attestation Incendie',
+            'Carnet': 'Carnet',
+            'Certificat': 'Certificat',
+            'Certificat incendie': 'Certificat incendie',
+            'Compte rendue': 'Compte rendu',
+            'Courrier': 'Courrier',
+            'fiche techinique': 'Fiche Technique',
+            'Note': 'Note',
+            'Note de calcule': 'Note de calcule',
+            'Notice': 'Notice',
+            'Plan': 'Plan',
+            'PV': 'PV',
+            'PV Incendie': 'PV Incendie',
+            'Rapport': 'Rapport',
+            'Schéma': 'Schéma'
+          }} onChange={(e)=>{
+            setDataDocument({...dataDocument, nature : e.target.value})
+          }}/>
+          <LabelInput label='Indice' value={dataDocument.indice} onChange={(e)=>{
+            setDataDocument({...dataDocument, indice:e.target.value})
+          }}/>
+          <LabelInput type='date' label='Date indice'  value={dataDocument.date_indice} onChange={(e)=>{
+            setDataDocument({...dataDocument, date_indice : e.target.value})
+          }}/>
         </div>
       </div>
-    );
-  }
-}
+
+      <div className='flex gap-6 items-center bg-gray-400 p-2'>
+        <input
+          id='pdf-upload'
+          type='file'
+          accept='application/pdf'
+          className='hidden'
+          onChange={handleFileUpload}
+        />
+        <LabelInput
+          label='Nom fichier'
+          value={pdfData.nom}
+          onChange={(e) => {
+            setPdfData((prevState) => ({
+              ...prevState,
+              nom: e.target.value,
+            }));
+          }}
+        />
+        <LabelInput
+          label='Creer le'
+          type='date'
+          value={pdfData.date}
+          onChange={(e) => {
+            setPdfData((prevState) => ({
+              ...prevState,
+              date: e.target.value,
+            }));
+          }}
+        />
+        <label htmlFor='pdf-upload' className='text-blue-600 hover:underline cursor-pointer'>
+          Ajouter le fichier
+        </label>
+      </div>
+
+      <table className='text-sm w-full'>
+        <thead>
+          <tr className='grid grid-cols-6 border-b border-gray-600 py-2'>
+            <th className='col-span-2 text-start'>Nom du fichier</th>
+            <th className='col-span-1 text-start'>Creer le</th>
+            <th className='col-span-2 text-start'>Fichier</th>
+            <th className='col-span-1 text-start'>Retirer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {pdfFiles.map((pdfFile, index) => {
+            return (
+              <tr key={index} className={'grid grid-cols-6 border-b border-gray-600'}>
+                <td className='col-span-2'>{pdfFile.nom}</td>
+                <td className='col-span-1'>{pdfFile.date}</td>
+                <td className='col-span-2'>{pdfFile.fichier.name}</td>
+                <td className='col-span-1 text-center text-red-800'>
+                  <span
+                    className='cursor-pointer'
+                    onClick={() => {
+                      handleRemoveFile(index);
+                    }}
+                  >
+                    Retirer
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      <div className='flex gap-6 mt-4'>
+        {entrepriseAffaireOuvrageSelect !==null ?
+        <Button action={createDocument}>Creer le document</Button> :
+        <div className='text-xs max-w-lg text-red-700'>
+          Vous ne pouvez pas creer de document sans emetteur ou sans ouvrage.
+          Si vous avez selectionner un ouvrage assurer vous d'avoir affecter une entreprise a cet ouvrage
+        </div>
+        }
+        <Button action={props.annuler}>Annuler</Button>
+      </div>
+    </div>
+  );
+};
 
 export default CreateDocument;

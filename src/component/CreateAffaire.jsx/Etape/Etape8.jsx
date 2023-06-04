@@ -12,16 +12,13 @@ class Etape8 extends Component {
     }
   }
 
-  componentDidMount(){
-    axios.get('http://localhost:8000/api/admin/missions',
-    { withCredentials: true}).then(response=>{
-      let data = response.data.results;
-      this.setState({missions : data});
-    });
-  }
-
-  componentDidUpdate(){
-    this.props.modifyField("missions", this.state.mission_select);
+  async componentDidMount(){
+    try {
+      let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/');
+      this.setState({missions : data.results});
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render(){
@@ -58,7 +55,7 @@ class Etape8 extends Component {
                       {mission.code_mission}
                     </td>
                     <td>
-                      {mission.libelle_mission}
+                      {mission.libelle}
                     </td>
                   </tr>
                 )
@@ -69,7 +66,7 @@ class Etape8 extends Component {
           <div className='my-2 text-end'>
             <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={()=>{
 
-              this.props.create();
+              this.props.create(this.state.mission_select);
 
             }}>Valider</button>
           </div>

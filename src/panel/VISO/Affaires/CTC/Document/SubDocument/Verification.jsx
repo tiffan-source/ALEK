@@ -1,8 +1,295 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import Button from '../../../../../../component/utils/Button/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faList, faPlus, faWindowMaximize, faCheck } from '@fortawesome/free-solid-svg-icons';
+import LabelSelect from '../../../../../../component/utils/LabelSelect/LabelSelect';
+import axios from 'axios';
+import AddComment from '../../../../../../component/Modal/AddComment';
+import moment from 'moment';
 
-function Verification() {
+function Verification(props) {
+
+  const [document, setDocument] = useState(null)
+  const [missions, setMissions] = useState([])
+
+  const [modal, setModal] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  const [avis, setAvis] = useState('F');
+
+  const [user, setuser] = useState(null);
+
+  const [oldComments, setOldComments] = useState([]);
+
+  const [prevAvis, setPrevAvis] = useState(null);
+
+  const [affaireOuvrage, setAffaireOuvrage] = useState({})
+
+  useEffect(()=>{
+    (async()=>{
+      try {
+        let id = localStorage.getItem('planAffaire')
+        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
+        let id_affaire = data.affaire;
+        let {data : missionsResponse} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_mission/${id_affaire}/`);
+        setMissions(missionsResponse);
+        let {data : singleDoc} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_document/${id_affaire}/${props.document}/`);
+        setDocument(singleDoc);
+        let {data: userResponse} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/utilisateur-connecte/`)
+        setuser(userResponse.id);
+
+        let {data: previousAvis} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_avis_on_document_by_collaborateur/${props.document}/${userResponse.id}/`);
+        if(previousAvis.avis)
+        {
+          setAvis(previousAvis.avis.codification)
+          setPrevAvis(previousAvis.avis)
+
+          let {data:oldCommRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_comment_for_avis/${previousAvis.avis.id}/`)
+          setOldComments(oldCommRes)
+        }
+
+        let {data : affOuvrRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_affaire_ouvrage_from_document/${props.document}/`)
+        setAffaireOuvrage(affOuvrRes)
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, [props.document]);
+
+  let enregistrer = async()=>{
+    if(prevAvis)
+    {
+      await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/avis/${prevAvis.id}/`)
+    }
+
+    let {data: avisResponse} = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/avis/',
+    {
+      id_document : props.document,
+      codification : avis,
+      collaborateurs : user
+    }, {withCredentials: true});
+
+    await Promise.all(comments.map(async comment=>{
+      await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/commentaire/',
+      {
+        id_avis : avisResponse.id,
+        commentaire : comment.commentaire,
+        a_suivre : comment.a_suivre
+      }, {withCredentials : true});
+    }));
+
+    window.location.reload()
+  }
+
+  let valider = async () => {
+    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvrage.id}/`, {
+      id_affaire : affaireOuvrage.id_affaire,
+      id_ouvrage : affaireOuvrage.id_ouvrage,
+      validateur : user,
+      statut: 1
+    }, {withCredentials : true})
+
+    window.location.reload()
+  }
+
+
+  let devalider = async () => {
+    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvrage.id}/`, {
+      id_affaire : affaireOuvrage.id_affaire,
+      id_ouvrage : affaireOuvrage.id_ouvrage,
+      validateur : null,
+      statut: 0
+    }, {withCredentials : true})
+
+    window.location.reload()
+  }
+
+  let createAso = async () =>{
+    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvrage.id}/`, {
+      id_affaire : affaireOuvrage.id_affaire,
+      id_ouvrage : affaireOuvrage.id_ouvrage,
+      validateur : user,
+      statut: 2
+    }, {withCredentials : true});
+
+    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/aso/`,
+    {
+      redacteur : user,
+      affaireouvrage : affaireOuvrage.id,
+      date : moment().format('YYYY-MM-DD')
+    }, {withCredentials: true});
+
+    window.location.reload();
+  }
+
   return (
-    <div>Verification</div>
+    <>
+        {
+          modal && <AddComment
+          comments={comments}
+          setComments={setComments}
+          avis={avis}
+          handleClose={()=>{setModal(false)}}/>
+        }
+        <div className='m-4'>
+          {props.document === null && <div className='text-sm text-red-600'>Selectioner un document</div>}
+          <div className='flex justify-end'>
+            <Button action={()=>{
+              enregistrer()
+            }}>Enregistrer</Button>
+          </div>
+
+          <div className='bg-white my-4'>
+            <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Rappel Affectations</h2>
+            <table className='text-sm p-2 w-full'>
+              <thead>
+                <tr>
+                  <th className='border border-gray-600'>Emetteur</th>
+                  <th className='border border-gray-600'>Nature</th>
+                  <th className='border border-gray-600'>N externe</th>
+                  <th className='border border-gray-600'>Indice</th>
+                  <th className='border border-gray-600'>Titre</th>
+                  <th className='border border-gray-600'>Ouvrage</th>
+                  <th className='border border-gray-600'>Date Reception</th>
+                  <th className='border border-gray-600'>Intervention</th>
+                  <th className='border border-gray-600'>N Aviso</th>
+                </tr>
+              </thead>
+              <tbody>
+                {document && <tr>
+                  <td>{document.entreprise.raison_sociale}</td>
+                  <td>{document.nature}</td>
+                  <td>{document.numero_externe}</td>
+                  <td>{document.indice}</td>
+                  <td>{document.titre}</td>
+                  <td>{document.ouvrage.libelle}</td>
+                  <td>{document.date_reception}</td>
+                  <td>{missions.reduce((prev, curr, index, arr)=>{
+                      prev += curr.code_mission
+                      if(index !== arr.length - 1)
+                        prev += ' - '
+                      return prev;
+                  }, '')}</td>
+                  <td>{document.id}</td>
+                </tr>}
+              </tbody>
+            </table>
+            <div className='p-2'></div>
+          </div>
+
+          <div className='bg-white my-4'>
+            <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Examen</h2>
+            <div className='mx-8 my-2 grid grid-cols-2 gap-4'>
+              <div>
+                <span className='font-bold text-sm'>Emetteur : </span>
+                <span>{document && document.entreprise.raison_sociale}</span>
+              </div>
+              <div>
+                <span className='font-bold text-sm'>Ouvrage : </span>
+                <span>{document && document.ouvrage.libelle}</span>
+              </div>
+              <LabelSelect label="Avis" value={avis} options={{
+                "F" : "F",
+                "RMQ" : "RMQ",
+                "FA" : "FA",
+                "HM" : "HM",
+                "SO" : "SO",
+                "VI" : "VI"
+              }} onChange={(e)=>{
+                if(e.target.value === 'F')
+                  setComments([])
+
+                setAvis(e.target.value)
+              }}/>
+              <div>
+                <span className='font-bold text-sm'>Affecte par : </span>
+                <span></span>
+              </div>
+              <div>
+                <span className='font-bold text-sm'>Valide par : </span>
+                <span></span>
+              </div>
+              <div>
+                <span className='font-bold text-sm'>Diffuse le : </span>
+                <span></span>
+              </div>
+            </div>
+
+            <div className='mx-8 my-2'>
+
+              {affaireOuvrage.statut === 0 &&
+                <>
+                  <Button action={()=>{
+                    valider()
+                  }}>Valider</Button>
+                  <Button action={()=>{
+                    createAso()
+                  }}>Valider et Attacher a l'ASO</Button>                
+                </>
+              }
+
+              {affaireOuvrage.statut === 1 &&
+                <>
+                  <Button action={()=>{
+                    devalider()
+                  }}>Devalider</Button>
+                  <Button action={()=>{
+                    createAso()
+                  }}>Attacher a l'ASO</Button>                
+                </>
+              }
+
+              {affaireOuvrage.statut === 2 &&
+                <div>
+                  Vous ne pouvez plus effectuer d'action sur cet ouvrage
+                </div>
+              }
+            </div>
+          </div>
+
+          <div className='bg-white my-4'>
+            <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Remarques associes</h2>
+            <div className='p-2'>
+              <Button disabled={avis === 'F'} action={()=>{
+                setModal(true)
+              }}> <FontAwesomeIcon icon={faPlus} /> </Button>
+              <Button> <FontAwesomeIcon icon={faList} /> </Button>
+              <Button> <FontAwesomeIcon icon={faWindowMaximize} /> </Button>
+            </div>
+            <table className='text-sm p-2 w-full'>
+              <thead>
+                <tr className='grid grid-cols-[5rem_auto]'>
+                  <th className='border border-gray-600'>A suivre</th>
+                  <th className='border border-gray-600'>Remarque</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  comments.map((comment, index)=>{
+                    return (
+                      <tr className='grid grid-cols-[5rem_auto]' key={index}>
+                        <td className='my-2 flex justify-center'>{comment.a_suivre && <FontAwesomeIcon icon={faCheck}/>}</td>
+                        <td className='my-2'>{comment.commentaire}</td>
+                      </tr>
+                    )
+                  })
+                }
+                {
+                  oldComments.map((comment, index)=>{
+                    return (
+                      <tr className='grid grid-cols-[5rem_auto]' key={index}>
+                        <td className='my-2 flex justify-center'>{comment.a_suivre && <FontAwesomeIcon icon={faCheck}/>}</td>
+                        <td className='my-2'>{comment.commentaire}</td>
+                      </tr>
+                    )
+                  })
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </>
+
   )
 }
 

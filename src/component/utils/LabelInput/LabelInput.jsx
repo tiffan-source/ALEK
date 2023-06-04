@@ -6,7 +6,7 @@ function LabelInput(props) {
   let labelclass = '';
 
   if(props.label_w)
-    labelclass += 'min-w-[' + props.label_w + 'rem]' 
+    labelclass += `w-[${props.label_w}rem]` 
 
   if(props.col)
     myclass += ' flex-col';

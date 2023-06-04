@@ -5,6 +5,9 @@ import worker from '../assets/icon/worker.png';
 import folder from '../assets/icon/folder.png';
 import document from '../assets/icon/documents.png';
 import aso from '../assets/icon/aso.png';
+import clients from '../assets/icon/clients.png';
+import ouvrage from '../assets/icon/publication.png';
+import visitor from '../assets/icon/visitor.png';
 
 export let matchIcon = {
     "Affaires" : oilPump,
@@ -14,5 +17,8 @@ export let matchIcon = {
     "Constructeurs" : worker,
     "CTC" : folder,
     "Documents" :  document,
-    "ASO" : aso
-}
+    "ASO" : aso,
+    "Clients" : clients,
+    "Ouvrages Diffusion" : ouvrage,
+    "Rapports Visites" : visitor
+};

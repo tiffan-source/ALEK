@@ -6,15 +6,15 @@ export let strutures = {
             "IT" : {},
             "Constructeurs" : {},
             "CTC" : {
-                // "Ouvrages" : {},
-                // "Rapports conceptions" : {},
+                "Ouvrages Diffusion" : {},
+                "Rapports Visites" : {},
                 "Documents" :  {},
                 "ASO" : {},
                 // "CRCT" : {},
                 // "Synthese des avis" : {}
             }
         },
-        // "Clients" : {},
+        "Clients" : {},
         // "Carnet d'adresse" : {},
     },
     // "Statistiques Generales" : {},
