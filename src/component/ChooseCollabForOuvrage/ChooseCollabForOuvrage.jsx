@@ -16,6 +16,15 @@ function ChooseCollabForOuvrage(props) {
                 let id_affaire = data.affaire;
     
                 let {data : all_data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/entreprise_collab_affaire_detail/${id_affaire}/`);
+
+                let {data: entreprises} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/entreprise_for_affaire_ouvrage/${props.ouvrage_affaire}/`);
+
+                let filter = entreprises.map(entreprise=>{
+                    return entreprise.affaire_entreprise_id
+                })
+
+                all_data = all_data.filter(aD=>!filter.includes(aD.id));
+
                 setDataEntrepriseAffaire(all_data);
             } catch (error) {
                 console.log(error);
@@ -26,7 +35,6 @@ function ChooseCollabForOuvrage(props) {
     let enregistrer = async ()=>{
         await Promise.all(entrepriseSelect.map(async eS=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/verify_entreprise_collab_on_ouvrage/${eS}/${props.ouvrage_affaire}/`)
-            console.log(data);
             if(!data.check){
                 await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise_affaire_ouvrage/',
                 {

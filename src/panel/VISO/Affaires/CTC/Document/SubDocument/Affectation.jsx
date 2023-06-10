@@ -60,6 +60,10 @@ function Affectation(props) {
       <div className='m-4'>
         <h2 className='font-bold text-sm my-4'>Affecter des intervenants</h2>
 
+        <div className='m-4'>
+          {props.document !== null && <Button action={()=>{affecter()}}>Affecter</Button>}
+        </div>
+
         <table className='text-sm table-auto mb-4 min-w-[32rem]'>
           <thead>
             <tr>
@@ -90,9 +94,6 @@ function Affectation(props) {
             })}
           </tbody>
         </table>
-      </div>
-      <div className='m-4'>
-        {props.document !== null && <Button action={()=>{affecter()}}>Affecter</Button>}
       </div>
     </div>
   );

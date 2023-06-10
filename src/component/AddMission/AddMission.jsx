@@ -11,8 +11,8 @@ function AddMission(props) {
 
     useEffect(()=>{
         (async()=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/')
-            setMissions(data.results);
+            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/ouvrage/')
+            setMissions(data.results.filter(result=>!props.missionSelect.includes(result.id)));
         })();
     }, []);
 
@@ -39,7 +39,7 @@ function AddMission(props) {
         <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700">
             <div className="flex justify-between items-center pr-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pt-6">
-                    Ajouter des missions
+                    Ajouter des ouvrages
                 </h3>
                 <span className="text-xl cursor-pointer" onClick={props.handleClose}>
                     <FontAwesomeIcon icon={faXmark} />

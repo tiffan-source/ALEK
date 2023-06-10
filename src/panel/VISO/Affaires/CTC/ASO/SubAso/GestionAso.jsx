@@ -4,12 +4,14 @@ import Tabs from '../../../../../../component/utils/Tabs/Tabs';
 import VerificationDocument from './SubGestionAso/VerificationDocument';
 import Livrable from './SubGestionAso/Livrable';
 import axios from 'axios';
+import ListDiffusion from './SubGestionAso/ListDiffusion';
 
 function GestionAso(props) {
     let table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
     const [asoData, setAsoData] = useState({});
     const [avis, setAvis] = useState('');
     const [redacOrCharge, setRedacOrCharge] = useState('');
+    const [validation, setValidation] = useState(false);
 
     useEffect(() => {
         (async()=>{
@@ -33,11 +35,30 @@ function GestionAso(props) {
                     let {data: charge} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/find_charge_affaire_for_affaire/${id_affaire}/`)
                     setRedacOrCharge(charge.nom + " " + charge.prenom)
                 }
+
+                let {data : validation} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_if_can_validate_affaire_ouvrage/${asoRes.affaireouvrage}/`);
+                setValidation(validation.can_validate);
+
             } catch (error) {
                 console.log(error);
             }
         })();        
     }, [props.aso]);
+
+    let accepter = async()=>{
+        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_document_for_affaire_ouvrage/${asoData.affaireouvrage}/`);
+
+        await Promise.all(data.map(async dt=>{
+            await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${dt.id}/`,
+            {...dt, aso : asoData.id}, {withCredentials : true});
+        }));
+
+        await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/aso/${asoData.id}/`, {
+            ...asoData, statut : 1
+        });
+
+        window.location.reload();
+    }
 
     return (
         <div>
@@ -70,20 +91,37 @@ function GestionAso(props) {
                     </div>
                 </div>
                 <div className='p-4 flex justify-end'>
-                    <Button>Accepter</Button>
-                    <Button>Visualiser</Button>
-                    <Button>Classer</Button>
-                    <Button>Diffuser</Button>
+                    {
+                        (validation || parseInt(asoData.statut) !== 0) ? 
+                        <>
+                            {parseInt(asoData.statut) !== 1 && <Button action={()=>{
+                                accepter()
+                            }}>Accepter</Button>}
+
+                            <Button>Visualiser</Button>
+
+                            {parseInt(asoData.statut) !== 0 ?
+                            <>
+                                <Button>Classer</Button>
+                                <Button>Diffuser</Button>                            
+                            </> : ''
+                            }
+                        </>
+                        :
+                        <span className='text-sm text-red-600'>
+                            Cet ASO n'a pas encore ete valider. Certains document n'ont pas encore recu d'avis
+                        </span>
+                    }
                 </div>
             </div>
 
             <div className='bg-white my-4'>
                 <Tabs tabs={[
-                    {title: 'Choix Veriffication', content : <VerificationDocument affaire_ouvrage={asoData.affaireouvrage}/>},
-                    {title: 'Remarque generale', content : ''},
-                    {title: 'Corriger remarque', content : ''},
-                    {title: 'List de diffusion', content : ''},
-                    {title: 'Livrable', content : <Livrable id={asoData.id}/>},
+                    {title: 'Choix Veriffication', content : <VerificationDocument affaire_ouvrage={asoData.affaireouvrage} asoData={asoData}/>},
+                    {title: 'Remarque generale', content : '', disabled : true}, //En cours de Dev
+                    {title: 'Corriger remarque', content : '', disabled : true}, //En cours de Dev
+                    {title: 'List de diffusion', content : <ListDiffusion id={asoData.id}/>},
+                    {title: 'Livrable', content : <Livrable id={asoData.id}/>, disabled : parseInt(asoData.statut) === 0},
                 ]}/>
             </div>
         </div>

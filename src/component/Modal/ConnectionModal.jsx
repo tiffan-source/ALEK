@@ -17,10 +17,10 @@ function ConnectionModal(props) {
 
     let connection = async () => {
       try {
-        const response1 = await axios.get("http://localhost:8000/api/get-csrf-token/", { withCredentials: true });
+        const response1 = await axios.get(process.env.REACT_APP_STARTURIBACK + "/get-csrf-token/", { withCredentials: true });
         const csrfToken = response1.headers['x-csrftoken'];
         
-        const response2 = await axios.post("http://localhost:8000/api/users/dj-rest-auth/login/", {
+        const response2 = await axios.post(process.env.REACT_APP_STARTURIBACK + "/users/dj-rest-auth/login/", {
           username: identifier.email,
           password: identifier.password
         }, {

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 function LabelSelect(props) {
   useEffect(()=>{
   });
-  let myclass = 'flex py-1 gap-2';
+  let myclass = 'flex py-1 gap-2 m-1';
   let labelclass = '';
 
   if(props.label_w)

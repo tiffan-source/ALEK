@@ -5,11 +5,11 @@ export let strutures = {
             "Mission" : {},
             "IT" : {},
             "Constructeurs" : {},
+            "Ouvrages Diffusion" : {},
             "CTC" : {
-                "Ouvrages Diffusion" : {},
-                "Rapports Visites" : {},
                 "Documents" :  {},
                 "ASO" : {},
+                "Rapports Visites" : {},
                 // "CRCT" : {},
                 // "Synthese des avis" : {}
             }

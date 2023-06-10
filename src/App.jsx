@@ -13,29 +13,17 @@ function App() {
   const [modalConnection, setModalConnection] = useState(false);
 
   useEffect(() => {
+    // console.log(process.env.REACT_APP_STARTURIBACK);
     const fetchData = async () => {
       try {
         let token = localStorage.getItem('key');
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Token ${token}`;          
+        }else{
+          delete axios.defaults.headers.common['Authorization'];
         }
 
         let res = await axios.get(process.env.REACT_APP_STARTURIBACK + '/utilisateur-connecte/')
-        
-        // const response2 = await axios.post("http://localhost:8000/api/users/dj-rest-auth/login/", {
-        //   username: 'dodo@gmail.com', // Replace `identifier.email` with the actual email value
-        //   password: 'Anlyou4545' // Replace `identifier.password` with the actual password value
-        // }, {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'X-CSRFToken': csrfToken
-        //   },
-        //   withCredentials: true
-        // });
-
-        // const data = response2.data;
-        // localStorage.setItem('key', data.key);
-        // axios.defaults.headers.common['Authorization'] = `Token ${data.key}`;
 
         setIsLoading(false);
       } catch (error) {

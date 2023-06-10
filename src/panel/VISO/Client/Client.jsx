@@ -3,10 +3,16 @@ import Iconclients from '../../../assets/icon/clients.png'
 import Button from '../../../component/utils/Button/Button';
 import axios from 'axios';
 import CreateEntreprise from '../../../component/Modal/CreateEntreprise';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import ConfirmationModale from '../../../component/Modal/ConfirmationModale';
 
 function Client() {
   const [clients, setClients] = useState([]);
+  const [clientsSelect, setClientsSelect] = useState(null);
+  const [clientsString, setClientsString] = useState('');
   const [modal, setModal] = useState(false);
+  const [edition, setEdition] = useState(null);
 
   useEffect(()=>{
     (async ()=>{
@@ -15,9 +21,26 @@ function Client() {
     })();
   }, []);
 
+  let deleteClient = async (id)=>{
+    try {
+      await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/entreprise/${id}/`);
+      window.location.reload()      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
   <>
-    {modal && <CreateEntreprise close={()=>{setModal(false)}}/>}
+
+    {modal && <CreateEntreprise edition={edition} close={()=>{
+      setModal(false)
+      setEdition(null)
+      }}/>}
+    {clientsSelect && <ConfirmationModale
+      action={()=>{deleteClient(clientsSelect)}}
+      abort={()=>{setClientsSelect(null)}}
+      >Voulez vous vraiment supprimer l'entreprise {clientsString} ?</ConfirmationModale>}
     <div className='w-full h-full'>
       <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>ALEATEK</h1>
       <nav className='flex justify-between border-t border-gray-400 p-1 bg-green-200'>
@@ -43,14 +66,25 @@ function Client() {
               </tr>
             </thead>
             <tbody>
-              {clients.map(client=>{
+              {clients.map((client, index)=>{
                 return (
-                  <tr className='grid grid-cols-[2fr_2fr_2fr_2fr_1fr]'>
+                  <tr className='grid grid-cols-[2fr_2fr_2fr_2fr_1fr]' key={index}>
                     <td>{client.raison_sociale}</td>
                     <td>{client.responsables.length!==0&&(client.responsables[0].nom + " " + client.responsables[0].prenom)}</td>
                     <td>{client.activite}</td>
                     <td>{client.adresse.ville}</td>
-                    <td> <Button>Supprimer</Button> <Button>Editer</Button></td>
+                    <td className='flex justify-start items-start gap-6'>
+                      <Button action={()=>{
+                        setClientsSelect(client.id)
+                        setClientsString(client.raison_sociale)
+                      }}><FontAwesomeIcon icon={faTrash}/></Button>
+                      <Button action={()=>{
+                        setEdition(client.id);
+                        setModal(true);
+                      }}>
+                        <FontAwesomeIcon icon={faPen}/>
+                      </Button>
+                    </td>
                   </tr>
                 )
               })}

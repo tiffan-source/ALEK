@@ -23,12 +23,21 @@ function ActiveMission(props) {
         let id_affaire = data.affaire;
         await Promise.all(activeMission.map(async aM=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_affaire/' + id_affaire + '/' + aM + '/')
-            if(!data.check){
+            if(data.check === false){
                 await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/missions/active/', {
                     id_mission : aM,
                     id_affaire : id_affaire
                 })
             }
+        }));
+
+        let to_remove = props.mission_active.filter(data=>{
+            return !activeMission.includes(data);
+        })
+
+        await Promise.all(to_remove.map(async toRm=>{
+            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_affaire/' + id_affaire + '/' + toRm + '/')
+            await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/missions/active/${data.check}/`)
         }))
 
         window.location.reload();

@@ -3,7 +3,8 @@ import LabelInput from '../utils/LabelInput/LabelInput';
 import LabelSelect from '../utils/LabelSelect/LabelSelect';
 import Button from '../utils/Button/Button';
 import axios from 'axios';
-
+import validator from 'validator';
+import Flash from '../utils/Flash/Flash';
 /**
  * Ma logique de selection
  * 
@@ -42,7 +43,9 @@ const CreateDocument = (props) => {
     titre : "",
     numero_revision : "",
     numero_externe : ""
-  })
+  });
+  const [stringErrors, setStringError] = useState("");
+  const [flash, setFlash] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -59,6 +62,7 @@ const CreateDocument = (props) => {
         }else{
           setAffaireOuvragesSelect(null);
         }
+        validation()
 
       } catch (error) {
         console.log(error);
@@ -88,6 +92,41 @@ const CreateDocument = (props) => {
     })();
   }, [affaireOuvragesSelect])
 
+  useEffect(()=>{
+    validation()
+  }, [dataDocument])
+
+  let validation = ()=>{
+    let {indice, date_indice, date_reception, titre, numero_externe, numero_revision} = dataDocument;
+  
+    if(validator.isEmpty(indice)){
+      setStringError('Veuillez saisir un indice')
+      return;
+    }
+    if(validator.isEmpty(date_indice) || !validator.isDate(date_indice, {format: 'YYYY-MM-DD'})){
+      setStringError('Veuillez saisir une date d\'indice')
+      return;
+    }
+    if(validator.isEmpty(date_reception) || !validator.isDate(date_reception, {format: 'YYYY-MM-DD'})){
+      setStringError('Veuillez saisir une date de reception')
+      return;
+    }
+    if(validator.isEmpty(titre)){
+      setStringError('Veuillez saisir un titre')
+      return;
+    }
+    if(validator.isEmpty(numero_externe) || !validator.isNumeric(numero_externe)){
+      setStringError('Veuillez saisir un numero externe')
+      return;
+    }
+    if(validator.isEmpty(numero_revision) || !validator.isNumeric(numero_revision)){
+      setStringError('Veuillez saisir un numero de revision')
+      return;
+    }
+
+    setStringError('')
+  }
+
   const handleFileUpload = (event) => {
     let newFile = event.target.files[0];
     setPdfFiles((prevState) => [
@@ -112,46 +151,57 @@ const CreateDocument = (props) => {
   };
 
   const createDocument = async () => {
-    let {data} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/documents/`,{
-      ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect
-    }, {withCredentials : true})
+    if(stringErrors){
+      setFlash(true)
+    }else{
+      let {data} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/documents/`,{
+        ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect
+      }, {withCredentials : true})
+  
+      await Promise.all(pdfFiles.map(async pdfFile=>{
+        let formData = new FormData();
+        formData.append('nom', pdfFile.nom)
+        formData.append('date', pdfFile.date)
+        formData.append('fichier', pdfFile.fichier)
+        formData.append('document', data.id)
+  
+        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichierattacher/',
+        formData,
+        {withCredentials : true})
+      }))
 
-    await Promise.all(pdfFiles.map(async pdfFile=>{
-      let formData = new FormData();
-      formData.append('nom', pdfFile.nom)
-      formData.append('date', pdfFile.date)
-      formData.append('fichier', pdfFile.fichier)
-      formData.append('document', data.id)
+      // Devalider l'affaire ouvrage et supprimer l'ASO en cours
 
-      await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichierattacher/',
-      formData,
-      {withCredentials : true})
-    }))
-
-    window.location.reload();
-
+      let {data : affaireOuvrageModifier} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvragesSelect}/`);
+      await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvragesSelect}/`,
+      {...affaireOuvrageModifier, validateur : null})
+  
+      window.location.reload();
+    }
   };
 
 
   return (
     <div className='m-2'>
+      {flash && <Flash setFlash={setFlash}>{stringErrors}</Flash>}
       <div className='flex gap-8'>
         <div>
           {id_affaire && <LabelInput label='N Affaire' disabled value={id_affaire} />}
-          <LabelSelect label='Ouvrage' value={affaireOuvragesSelect} options={affaireOuvrages.reduce((prev, curr)=>{
+          {affaireOuvragesSelect && <LabelSelect label='Ouvrage' value={affaireOuvragesSelect} options={affaireOuvrages.reduce((prev, curr)=>{
             let key = curr.ouvrage.libelle;
             prev[key] = curr.id;
             return prev;
           }, {})} onChange={(e)=>{
             setAffaireOuvragesSelect(e.target.value)
-          }}/>
-          <LabelSelect label='Emetteur' value={entrepriseAffaireOuvrageSelect} options={entrepriseAffaireForSelectOuvrage.reduce((prev, curr)=>{
+          }}/>}
+
+          {entrepriseAffaireOuvrageSelect && <LabelSelect label='Emetteur' value={entrepriseAffaireOuvrageSelect} options={entrepriseAffaireForSelectOuvrage.reduce((prev, curr)=>{
             let key = curr.entreprise.raison_sociale;
             prev[key] = curr.id;
             return prev;
           }, {})} onChange={(e)=>{
             setEntrepriseAffaireOuvrageSelect(e.target.value)
-          }}/>
+          }}/>}
           <LabelInput label='N externe' value={dataDocument.numero_externe} onChange={(e)=>{
             setDataDocument({...dataDocument, numero_externe : e.target.value})
           }}/>

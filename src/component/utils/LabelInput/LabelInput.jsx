@@ -18,6 +18,7 @@ function LabelInput(props) {
         <label htmlFor="" className={labelclass}>{props.label}</label>
         <Input onChange={props.onChange} type={props.type} disabled={props.disabled} value={props.value} readOnly={props.readOnly}/>
         {props.span_info ? <span>{props.span_info}</span> : ''}
+        <span className='text-xs text-red-600'>{props.error}</span>
     </div>
     )
 }

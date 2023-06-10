@@ -13,7 +13,10 @@ const Tabs = ({ tabs }) => {
         {tabs.map((tab, index) => (
           <li
             key={index}
-            onClick={() => handleTabClick(index)}
+            onClick={() => {
+              if(!tab.disabled)
+                handleTabClick(index)
+            }}
             className={"border border-gray-400 p-1 text-sm cursor-pointer" + ( activeTab === index ? ' font-bold' : '')}
           >
             {tab.title}

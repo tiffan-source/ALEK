@@ -88,7 +88,7 @@ function IT() {
                   <div className='flex justify-end'>
                     <table className='mr-4 bg-white'>
                       <thead>
-                        <tr className='grid grid-cols-[12rem_12rem]'>
+                        <tr className='grid grid-cols-[12rem_24rem]'>
                           <th className='border border-gray-400 px-2'>Collaborateur</th>
                           <th className='border border-gray-400 px-2'>Tracabilite</th>
                         </tr>
@@ -96,9 +96,9 @@ function IT() {
                       <tbody>
                         {interventionData.map((dt, index) => {
                           return (
-                            <tr key={index} className='grid grid-cols-[12rem_12rem]'>
-                              <td>{dt.collaborateur.nom + " " + dt.collaborateur.prenom}</td>
-                              <td>{dt.date}</td>
+                            <tr key={index} className='grid grid-cols-[12rem_24rem]'>
+                              <td className='text-center'>{dt.collaborateur.first_name + " " + dt.collaborateur.last_name}</td>
+                              <td className='px-2'>Affecte le {dt.date} par {dt.affecteur.first_name + " " + dt.affecteur.last_name}</td>
                             </tr>
                           );
                         })}

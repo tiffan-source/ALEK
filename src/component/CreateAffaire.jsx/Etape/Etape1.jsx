@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import LabelRadio from '../../utils/LabelRadio/LabelRadio'
 import LabelCheckbox from '../../utils/LabelCheckbox/LabelCheckbox'
 import LabelInput from '../../utils/LabelInput/LabelInput'
 
 function Etape1() {
+
   return (
     <div>
       <fieldset className='border border-gray-400 px-4 py-2'>

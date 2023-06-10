@@ -8,9 +8,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../utils/Button/Button';
 import axios from 'axios';
+import Flash from '../utils/Flash/Flash';
 
 const MainModal = ({ handleClose }) => {
   const [index, setIndex] = useState(0);
+  const [stringErrors, setStringError] = useState("");
+  const [flash, setFlash] = useState(false);
+  const [success, setSuccess] = useState(false)
+
   const [dataFormAffaire, setDataFormAffaire] = useState({
     numero: '',
     libelle: '',
@@ -38,7 +43,7 @@ const MainModal = ({ handleClose }) => {
     doc : '',
     affaire: '',
   });
-  const [batiment, setBatiment] = useState(null)
+  const [batiment, setBatiment] = useState('')
   const [adress, setAdress] = useState({
     cplt_geo : "",
     numero_voie : "",
@@ -89,7 +94,11 @@ const MainModal = ({ handleClose }) => {
             {id_mission : mission, id_affaire : resAffaire.data.id})
         }))
 
-        window.location.reload();
+        setSuccess(true);
+
+        setTimeout(()=>{
+          window.location.reload();
+        }, 2000)
         
     } catch (error) {
         console.log(error);
@@ -97,12 +106,15 @@ const MainModal = ({ handleClose }) => {
   };
 
   const stages = [
-    <Etape1/>,
+    <Etape1
+    />,
     <Etape3
+      setStringError={setStringError}
       modifyField={modifyAffaireField}
       dataAffaire={dataFormAffaire}
     />,
     <Etape4
+      setStringError={setStringError}
       dataAffaire={dataFormAffaire}
       dataPlan={dataFormPlanAffaire}
       modifyField={modifyPlanField}
@@ -131,8 +143,13 @@ const MainModal = ({ handleClose }) => {
 
   const handleNext = () => {
     if (index < stages.length - 1) {
-      
-      setIndex((prevIndex) => prevIndex + 1);
+      if(!stringErrors){
+        setIndex((prevIndex) => prevIndex + 1);
+        setFlash(false)
+      }
+      else{
+        setFlash(true)
+      }
     }
   };
 
@@ -171,6 +188,8 @@ const MainModal = ({ handleClose }) => {
           </div>
         </div>
       </div>
+      {flash && <Flash setFlash={setFlash} type={!stringErrors}>{stringErrors}</Flash>}
+      {success && <Flash setFlash={setFlash} type="success">Affaire Cree</Flash>}
     </div>
   );
 };

@@ -15,7 +15,7 @@ class Etape5 extends Component {
   }
 
   componentDidMount(){
-    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/collaborateurs',
+    axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/collaborateurs/',
     { withCredentials: true}).then(response=>{
       let data = response.data.results;
       this.props.modifyField("charge", data[0].id);

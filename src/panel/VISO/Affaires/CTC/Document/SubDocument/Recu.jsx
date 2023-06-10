@@ -19,7 +19,8 @@ const Recu = (props) => {
         let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
         let id_affaire = data.affaire;
         let {data: docDetail} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_document/${id_affaire}/`);
-        let prepare_for_table = await Promise.all(docDetail.map(doc=>{
+        let prepare_for_table = await Promise.all(docDetail.map(async doc=>{
+          let {data: avis_doc} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/documents/avis/${doc.id}/`)
           return {
             "id" : doc.id,
             "Emetteur" : doc.entreprise.raison_sociale,
@@ -30,7 +31,8 @@ const Recu = (props) => {
             "Ouvrage" : doc.ouvrage.libelle,
             "Nature" : doc.nature,
             "Dossier" : doc.dossier,
-            "Revision" : doc.numero_revision
+            "Revision" : doc.numero_revision,
+            "Avis" : avis_doc.codification
           }
         }));
 

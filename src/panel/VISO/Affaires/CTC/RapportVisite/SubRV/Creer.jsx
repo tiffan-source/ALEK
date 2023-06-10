@@ -59,14 +59,6 @@ function Creer() {
     }, []);
 
     let create = async()=>{
-        console.log(commentaire);
-        console.log(objet_control);
-        console.log(ouvragesSelect);
-        console.log(user);
-        console.log(optionsSelect);
-        console.log(objet);
-        console.log(affaire);
-
         let {data : avisRes} = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/avis_ouvrage/',
         {
             ouvrage : ouvragesSelect,
