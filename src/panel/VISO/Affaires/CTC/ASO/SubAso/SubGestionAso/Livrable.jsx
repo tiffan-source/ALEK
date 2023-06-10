@@ -8,14 +8,18 @@ import styles from './style';
 function Livrable(props) {
 
     let [aso, setAso] = useState({});
+    let [codification, setCodification] = useState(null);
 
     useEffect(()=>{
         (async () =>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/data_for_aso/${props.id}/`)
 
             setAso(data)
+
+            let {data:codif} = await axios.get(process.env.REACT_APP_STARTURIBACK + ``)
         })();
     }, [props.id])
+
     const ASO = (asos)=>{
         let {adresse} = asos.charge;
         let {charge} = asos
@@ -98,6 +102,7 @@ function Livrable(props) {
                                     <Text>
                                         Ouvrage examnie : {asos.ouvrage.libelle}
                                     </Text>
+                                    <Text style={styles.codification}>{asos.codification}</Text>
                                 </View>
                             </View>
                         </View>
@@ -119,13 +124,13 @@ function Livrable(props) {
                         return (
                             <View style={styles.avisMain}>
                                 <View>
-                                    {doc.avis.map(a=>{
+                                    <Text> {">"} Plan N {doc.document.nature} {doc.document.titre} {doc.document.numero_externe} {doc.document.numero_indice}</Text>
+                                    {doc.avis.map((a,index)=>{
                                         return (
-                                            <Text>- {a.commentaire}</Text>
+                                            <Text>{index+1}) {a.commentaire}</Text>
                                         )
                                     })}
                                     <Text>-------------------------------------------------------------------------------------------------------------------------------------------------------</Text>
-                                    <Text> {">"} Plan N {doc.document.nature} {doc.document.titre} {doc.document.numero_externe} {doc.document.numero_indice}</Text>
                                 </View>
                             </View>
                         )

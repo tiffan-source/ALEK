@@ -23,7 +23,7 @@ function GestionAso(props) {
                 let {data : asoRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_aso_for_affaire_one_version/${props.aso}/`);
                 setAsoData(asoRes)
 
-                let {data: avisRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/affaire_ouvrage/${asoRes.affaireouvrage}/avis/`)
+                let {data: avisRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso/${asoRes.id}/`)
 
                 setAvis(avisRes.codification)
 

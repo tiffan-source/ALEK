@@ -114,6 +114,10 @@ const styles = StyleSheet.create({
         // padding : '8px',
         display : 'flex',
         justifyContent : 'space-between'
+    },
+
+    codification:{
+        color : '#F00'
     }
 
 
