@@ -1,5 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import Button from '../../../../../../component/utils/Button/Button';
+import ListDiffusion from './SubGestionRV/ListDiffusion';
+import Tabs from '../../../../../../component/utils/Tabs/Tabs';
+import Livrable from './SubGestionRV/Livrable';
+
+const table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
+
 function Gestion(props) {
   let [result, setResult] = useState({});
 
@@ -9,6 +16,17 @@ function Gestion(props) {
       setResult(data)
     })();
   }, [props.rv]);
+
+  let valider = async ()=>{
+    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/${result.id}/`,{
+      date : result.date,
+      affaire : result.affaire,
+      objet : result.objet,
+      statut : 1
+    }, {withCredentials: true})
+
+    window.location.reload();
+  }
 
   return (
     <div>
@@ -20,16 +38,32 @@ function Gestion(props) {
                 <span>{result.date}</span>
             </div>
             <div>
+                <span>Statut : </span>
+                <span>{table_statut[result.statut]}</span>
+            </div>
+            <div>
                 <span>Responsable d'affaire / Redacteur : </span>
-                <span>{result.redacteur_detail && (result.redacteur_detail.first_name + " " + result.redacteur_detail.last_name)}</span>
+                {/* <span>{result.redacteur_detail && (result.redacteur_detail.first_name + " " + result.redacteur_detail.last_name)}</span> */}
             </div>
             <div>
                 <span>Objet : </span>
                 <span>{result.objet}</span>
             </div>
         </div>
-    </div>
+        <div className='p-4'>
+          {result.statut == 0 && <Button action={()=>{
+            valider()
+          }}>Valider</Button>}
+        </div>
+      </div>
 
+
+      <div className='bg-white my-4'>
+        <Tabs tabs={[
+            {title: 'List de diffusion', content : <ListDiffusion id={result.id}/>, disabled : result.id === undefined},
+            {title: 'Livrable', content : <Livrable id={result.id}/>},
+        ]}/>
+      </div>
     </div>
   )
 }

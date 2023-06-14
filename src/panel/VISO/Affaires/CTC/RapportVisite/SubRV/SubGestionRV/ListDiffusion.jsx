@@ -9,8 +9,10 @@ function ListDiffusion({id}) {
 
     useEffect(()=>{
         (async()=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_entreprise_concerne_by_aso/${id}/`);
-            setDiffusions(data);    
+            if(id !== undefined){
+                let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_entreprise_concerne_by_rv/${id}/`);
+                setDiffusions(data);    
+            }
         })();
     }, [id, triggerUpdate]);
 

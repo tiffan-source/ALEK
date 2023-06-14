@@ -11,14 +11,14 @@ import image from '../../../../../../assets/icon/image.png'
 
 function Creer() {
 
-    const [options, setOptions] = useState({})
-    const [optionsSelect, setOptionsSelect] = useState(null)
-    const [objet, setObjet] = useState('');
-    const [objet_control, setObjet_control] = useState('');
-    const [modal, setModal] = useState(false);
-    const [commentaire, setCommentaire] = useState([]);
+    const [userConnect, setUserConnect] = useState(null);
     const [ouvrages, setOuvrages] = useState([]);
-    const [ouvragesSelect, setOuvragesSelect] = useState([]);
+    const [ouvragesSelect, setOuvragesSelect] = useState('');
+    const [avis, setAvis] = useState([]);
+
+
+    const [objet, setObjet] = useState('');
+    const [modal, setModal] = useState(false);
     const [affaire, setAffaire] = useState(null);
 
     useEffect(()=>{
@@ -29,18 +29,11 @@ function Creer() {
                 let id_affaire = data.affaire;
                 setAffaire(id_affaire)
 
-                let {data: intervenantRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_intervenant/${id_affaire}/`)
-                let {data: charge} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/find_charge_affaire_for_affaire/${id_affaire}/`)
+                let {data:user} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/utilisateur-connecte/`);
 
-                let for_option = {}
-                for_option[charge.nom + " " + charge.prenom] = charge.id;
-                setOptionsSelect(charge.id);
+                let {data: userDetail} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/collaborateurs/${user.id}/`);
 
-                intervenantRes.forEach(element => {
-                    for_option[element.nom + " " + element.prenom] = element.id
-                });
-
-                setOptions(for_option);
+                setUserConnect(userDetail);
 
                 let {data: ouvragRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_ouvrage_affaire/${id_affaire}/`)
 
@@ -56,36 +49,41 @@ function Creer() {
     }, []);
 
     let create = async()=>{
-        let {data : avisRes} = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/avis_ouvrage/',
-        {
-            ouvrage : ouvragesSelect,
-            objet : objet_control
-        }, {withCredentials:true});
 
-        await Promise.all(commentaire.map(async com=>{
-            let form = new FormData()
-            form.append('asuivre', com.a_suivre)
-            form.append('commentaire', com.commentaire)
-            form.append('image', com.image)
-            form.append('avis', avisRes.id)
-            await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/avis_commentaire/',
-            form, {withCredentials:true})
-        }));
-
-        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/rapport/visite/',
+        let {data:resRv} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/`,
         {
             date : moment().format('YYYY-MM-DD'),
-            redacteur : optionsSelect,
             affaire : affaire,
             objet : objet
-        });
+        }, {withCredentials : true});
 
-        window.location.reload();
+        await Promise.all(avis.map(async dataAvis=>{
+            let {data: resAvisOuvrage} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_ouvrage/`,
+            {
+                redacteur : userConnect.id,
+                ouvrage : dataAvis.ouvrage,
+                objet : dataAvis.objet,
+                rv : resRv.id
+            }, {withCredentials :true});
+
+            await Promise.all(dataAvis.commentaires.map(async commentaire=>{
+                let formData = new FormData();
+                formData.append('asuivre', commentaire.asuivre)
+                formData.append('commentaire', commentaire.commentaire)
+                if(commentaire.image){
+                    formData.append('image', commentaire.image)
+                }
+                formData.append('avis', resAvisOuvrage.id)
+                await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_commentaire/`, formData, {withCredentials : true})
+            }));
+        }));
+
+        // window.location.reload();
     }
 
     return (
         <>
-            {modal && <AddCommentRV commentaire={commentaire} setCommentaire={setCommentaire} handleClose={()=>{setModal(false)}}/>}
+            {modal && <AddCommentRV avis={avis} setAvis={setAvis} ouvrage={ouvragesSelect} handleClose={()=>{setModal(false)}}/>}
             <div>
                 <div className='bg-white my-4'>
                     <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Rapport de Visite</h2>
@@ -94,10 +92,12 @@ function Creer() {
                             <span>Date : </span>
                             <span>{moment().format('YYYY-MM-DD')}</span>
                         </div>
-                        <LabelSelect label="Responsable d'affaire / Redacteur : " value={optionsSelect} options={options}
-                        onChange={(e)=>{
-                            setOptionsSelect(e.target.value)
-                        }}/>
+
+                        { userConnect &&
+                        <div>
+                            <span>Redacteur : </span>
+                            <span>{userConnect.last_name + " " + userConnect.first_name}</span>
+                        </div> }
 
                         <div>
                             <span>Statut : </span>
@@ -127,8 +127,23 @@ function Creer() {
                             setOuvragesSelect(e.target.value);
                         }}/>
 
-                        <LabelInput label="objet du controle" value={objet_control} onChange={(e)=>{
-                            setObjet_control(e.target.value)
+                        <LabelInput label="objet du controle" value={avis.find(data=>{return data.ouvrage == ouvragesSelect})?.objet || ""} onChange={(e)=>{
+                            let avisToSet = avis.findIndex((data)=>{
+                                return data.ouvrage == ouvragesSelect;
+                            })
+                            if(avisToSet === -1){
+                                setAvis([...avis, {
+                                    ouvrage : ouvragesSelect,
+                                    objet : e.target.value
+                                }])
+                            }else{
+                                setAvis(avis.map((av, index)=>{
+                                    if(index === avisToSet){
+                                        av.objet = e.target.value
+                                    }
+                                    return av;
+                                }))
+                            }
                         }}/>
                         <div>
                             <Button action={()=>{
@@ -146,21 +161,23 @@ function Creer() {
                             </tr>
                         </thead>
                         <tbody>
-                            {commentaire.map(comm=>{
-                                return (
-                                <tr className='grid grid-cols-6'>
-                                    <td className='flex justify-center col-span-1'><input type="checkbox" name="" id="" checked={comm.a_suivre} /></td>
-                                    <td className='flex justify-center col-span-4'>{comm.commentaire}</td>
-                                    <td className='flex justify-center col-span-1'>{comm.image && <img className='w-[2rem]' src={image} alt='my_default_icon'/>}</td>
-                                </tr>
-                                )
-                            })}
+
+                            {
+                                avis.find(data=>{return data.ouvrage == ouvragesSelect})?.commentaires?.map((comm, index)=>{
+                                    return (
+                                    <tr className='grid grid-cols-6' key={index}>
+                                        <td className='flex justify-center col-span-1'><input type="checkbox" name="" id="" checked={comm.asuivre} disabled/></td>
+                                        <td className='flex justify-center col-span-4'>{comm.commentaire}</td>
+                                        <td className='flex justify-center col-span-1'>{comm.image && <img className='w-[2rem]' src={image} alt='my_default_icon'/>}</td>
+                                    </tr>
+                                    )
+                                })
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
         </>
-
     )
 }
 

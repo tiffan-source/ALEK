@@ -233,7 +233,7 @@ function Livrable(props) {
         <div>
             <div>
                 <Button action={()=>{
-                    sendMail()
+                    // sendMail()
                 }}>Diffuser</Button>
             </div>
             <h2 className='my-4 text-center font-bold text-lg'>Previsualisation du pdf</h2>

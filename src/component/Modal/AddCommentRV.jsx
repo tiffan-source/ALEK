@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../utils/Button/Button';
 import LabelCheckbox from '../utils/LabelCheckbox/LabelCheckbox';
-function AddCommentRV(props) {
+function AddCommentRV({handleClose, avis, setAvis, ouvrage}) {
     const [comment, setComment] = useState('')
     const [asuivre, setAsuivre] = useState(false)
     const [image, setImage] = useState(null)
@@ -22,7 +22,7 @@ function AddCommentRV(props) {
                         Ajouter un commentaire
                     </h3>
                     <span className='text-xl cursor-pointer' onClick={()=>{
-                        props.handleClose()
+                        handleClose()
                     }}><FontAwesomeIcon icon={faXmark}/></span>
                 </div>
                 <div className="px-6 space-y-6">
@@ -48,15 +48,45 @@ function AddCommentRV(props) {
                 </div>
                 <div className="flex items-center justify-between p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                     <Button action={()=>{
-                        props.handleClose();
+                        handleClose();
                     }}>Retour</Button>
                     <Button action={()=>{
-                        props.setCommentaire([...props.commentaire, {
-                            commentaire : comment,
-                            a_suivre : asuivre,
-                            image : image
-                        }])
-                        props.handleClose();
+
+                        let avisToSet = avis.findIndex((data)=>{
+                            return data.ouvrage == ouvrage;
+                        })
+
+                        if(avisToSet === -1){
+                            setAvis([...avis, {
+                                ouvrage : ouvrage,
+                                commentaires: [{
+                                    asuivre : asuivre,
+                                    commentaire : comment,
+                                    image : image
+                                }]
+                            }])
+                        }else{
+                            setAvis(avis.map((av, index)=>{
+                                if(index === avisToSet){
+                                    if(av.commentaires){
+                                        av.commentaires.push({
+                                            asuivre : asuivre,
+                                            commentaire : comment,
+                                            image : image
+                                        })    
+                                    }else{
+                                        av.commentaires = [{
+                                            asuivre : asuivre,
+                                            commentaire : comment,
+                                            image : image
+                                        }]
+                                    }
+                                }
+                                return av;
+                            }))
+                        }
+                        
+                        handleClose();
                     }}>Ajouter</Button>
                 </div>
             </div>

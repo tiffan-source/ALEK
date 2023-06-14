@@ -15,7 +15,6 @@ function Liste(props) {
           "id" : rapport.id,
           "Date" : rapport.date,
           "Object" : rapport.objet,
-          "Redacteur" : rapport.redacteur_detail.first_name + " " + rapport.redacteur_detail.last_name
         }
       }));
 
