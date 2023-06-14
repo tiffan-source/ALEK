@@ -57,28 +57,34 @@ function OuvrageDiffusion() {
     
     let setDiffusion = async (e, ouvrageAfaire)=>{
       try {
-        if(e.target.checked){
-          await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${ouvrageAfaire.id}/`,{
-            id_affaire : ouvrageAfaire.id_affaire_id,
-            id_ouvrage : ouvrageAfaire.id_ouvrage_id,
-            validateur : ouvrageAfaire.validateur_id,
-            statut : ouvrageAfaire.statut,
-            diffusion : true
+        await Promise.all(ouvrageAfaire.entreprise.map(async eao=>{
+          await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/entreprise_affaire_ouvrage/${eao.id}/`,
+          {
+            affaire_ouvrage : eao.affaire_ouvrage_id,
+            affaire_entreprise : eao.affaire_entreprise_id,
+            diffusion : e.target.checked
           })
-        }else{
-          await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${ouvrageAfaire.id}/`,{
-            id_affaire : ouvrageAfaire.id_affaire_id,
-            id_ouvrage : ouvrageAfaire.id_ouvrage_id,
-            validateur : ouvrageAfaire.validateur_id,
-            statut : ouvrageAfaire.statut,
-            diffusion : false
-          })
-        }
-        
-        window.location.reload()
+        }));
+
+        window.location.reload();
       } catch (error) {
         console.log(error);
       }
+    }
+
+    let checkAllDiffusion = (entreprises)=>{
+      let i;
+
+      if(entreprises.length === 0)
+        return false;
+
+      for (i = 0; i < entreprises.length; i++) {
+        const element = entreprises[i];
+        if(!element.diffusion)
+          return false;
+      }
+
+      return true;
     }
 
     return (
@@ -120,8 +126,8 @@ function OuvrageDiffusion() {
               return (
                 <div key={index} className='mb-6'>
                   <div className='grid grid-cols-[5rem_auto_3rem] bg-white'>
-                    <span className='p-2 text-center'> <input type="checkbox" name="" id="" checked={oA.diffusion} onChange={(e)=>{
-                      setDiffusion(e, oA)
+                    <span className='p-2 text-center'> <input type="checkbox" checked={checkAllDiffusion(oA.entreprise)} onChange={(e)=>{
+                      setDiffusion(e, oA);
                     }}/> </span>
                     <span className='p-2'>{oA.ouvrage.libelle}</span>
                     <span className='p-2 cursor-pointer' onClick={()=>{

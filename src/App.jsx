@@ -13,7 +13,7 @@ function App() {
   const [modalConnection, setModalConnection] = useState(false);
 
   useEffect(() => {
-    // console.log(process.env.REACT_APP_STARTURIBACK);
+    console.log(process.env.REACT_APP_STARTURIBACK);
     const fetchData = async () => {
       try {
         let token = localStorage.getItem('key');

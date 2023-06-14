@@ -22,12 +22,6 @@ function Adresse({adress, setAdress, disabled}) {
             <LabelInput disabled={disabled} label_w="10" label="Pays" value={adress.pays} onChange={(e)=>{
                 setAdress({...adress, pays : e.target.value})
             }}/>
-            <LabelInput disabled={disabled} label_w="10" label="Departement" value={adress.departement} onChange={(e)=>{
-                setAdress({...adress, departement : e.target.value})
-            }}/>
-            <LabelInput disabled={disabled} label_w="10" label="Provice" value={adress.province} onChange={(e)=>{
-                setAdress({...adress, province : e.target.value})
-            }}/>
         </div>
     )
 }

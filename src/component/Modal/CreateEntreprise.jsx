@@ -32,8 +32,6 @@ function CreateEntreprise(props) {
         code_postal : "",
         ville : "",
         pays : "",
-        departement : "",
-        province : "",
     });
 
     useEffect(()=>{
@@ -53,7 +51,6 @@ function CreateEntreprise(props) {
     }, [props.edition]);
 
     let validate = ()=>{
-        let {cplt_geo, numero_voie, lieu_dit, code_postal, ville, pays, departement, province} = adress;
         let {raison_sociale, activite, siret} = entreprise;
         if(validator.isEmpty(raison_sociale)){
           setStringError('Entrez une raison sociale')
@@ -65,38 +62,6 @@ function CreateEntreprise(props) {
         }
         if(validator.isEmpty(siret) || !validator.isNumeric(siret)){
           setStringError('Entrez un siret valid')
-          return;
-        }
-        if(validator.isEmpty(cplt_geo)){
-          setStringError('Entrez une adresse')
-          return;
-        }
-        if(validator.isEmpty(numero_voie) || !validator.isNumeric(numero_voie)){
-          setStringError('Entrez un numero de voie valide')
-          return;
-        }
-        if(validator.isEmpty(lieu_dit)){
-          setStringError('Entrez un lieu dit')
-          return;
-        }
-        if(validator.isEmpty(code_postal) || !validator.isPostalCode(code_postal, 'FR')){
-          setStringError('Entrez un code postal valid')
-          return;
-        }
-        if(validator.isEmpty(ville)){
-          setStringError('Entrez une ville valide')
-          return;
-        }
-        if(validator.isEmpty(pays)){
-          setStringError('Entrez un pays')
-          return;
-        }
-        if(validator.isEmpty(departement)){
-          setStringError('Entrez un departement')
-          return;
-        }
-        if(validator.isEmpty(province)){
-          setStringError('Entrez une province')
           return;
         }
         setStringError('');

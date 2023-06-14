@@ -1,7 +1,5 @@
 import React from 'react';
 import LabelInput from '../../../../../component/utils/LabelInput/LabelInput';
-import LabelTextArea from '../../../../../component/utils/LabelTextArea/LabelTextArea';
-import axios from 'axios';
 
 const Detail = ({data}) => {
   return (

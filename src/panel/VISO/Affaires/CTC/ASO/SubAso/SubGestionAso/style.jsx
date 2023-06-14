@@ -118,6 +118,12 @@ const styles = StyleSheet.create({
 
     codification:{
         color : '#F00'
+    },
+
+    collaboratuer_to_send : {
+        marginHorizontal : '50px',
+        fontSize : '10px',
+        marginVertical : '100px' 
     }
 
 

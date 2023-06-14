@@ -1,20 +1,31 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Button from '../../../../../../../component/utils/Button/Button';
 
 function ListDiffusion({id}) {
 
     const [diffusions, setDiffusions] = useState([]);
-    const [ouvrageDiffusion, setOuvrageDiffusion] = useState(false);
+    const [triggerUpdate, setTriggerUpdate] = useState(false);
 
     useEffect(()=>{
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_entreprise_concerne_by_aso/${id}/`);
-            let {data: affaireOuvrage} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/affaire_ouvrage_concerne_by_aso/${id}/`)
             setDiffusions(data);
-            setOuvrageDiffusion(affaireOuvrage.diffusion)
         })();
-    }, []);
+    }, [id, triggerUpdate]);
+
+    // useCallback()
+
+    let defineDiffusionForEntreprise = async (entreprise, e)=>{
+        await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/entreprise_affaire_ouvrage/${entreprise.id}/`,
+        {
+            affaire_ouvrage : entreprise.affaire_ouvrage,
+            affaire_entreprise : entreprise.affaire_entreprise,
+            diffusion : e.target.checked,
+        });
+
+        setTriggerUpdate(prevState => !prevState);
+    }
 
     return (
         <>
@@ -33,7 +44,9 @@ function ListDiffusion({id}) {
                     {diffusions.map((diffusion, index)=>{
                         return (
                             <tr className='grid grid-cols-[3rem_15rem_12rem_12rem_auto]' key={index}>
-                                <td className='text-center'> <input type="checkbox" name="" id="" checked={diffusion.diffusion || ouvrageDiffusion} /> </td>
+                                <td className='text-center'> <input type="checkbox" name="" id="" checked={diffusion.diffusion} onChange={(e)=>{
+                                    defineDiffusionForEntreprise(diffusion, e)
+                                }}/> </td>
                                 <td> {diffusion.detail_entreprise.raison_sociale} </td>
                                 <td>{diffusion.detail_entreprise.siret}</td>
                                 <td>{diffusion.detail_entreprise.activite}</td>

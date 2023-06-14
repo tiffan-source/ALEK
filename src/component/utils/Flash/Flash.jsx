@@ -12,7 +12,7 @@ const Flash = ({ children, type, setFlash }) => {
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [setFlash]);
 
   const closeFlash = () => {
     setIsVisible(false);

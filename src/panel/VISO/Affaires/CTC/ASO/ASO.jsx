@@ -12,7 +12,6 @@ function ASO() {
     })();
   });
 
-
   return (
     <div className='w-full h-full'>
       <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>ALEATEK</h1>

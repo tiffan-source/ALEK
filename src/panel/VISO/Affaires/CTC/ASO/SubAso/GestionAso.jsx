@@ -23,7 +23,16 @@ function GestionAso(props) {
                 let {data : asoRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_aso_for_affaire_one_version/${props.aso}/`);
                 setAsoData(asoRes)
 
-                let {data: avisRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso/${asoRes.id}/`)
+                let avisRes;
+
+                if(asoRes.statut === "0"){
+                    let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso_in_current/${asoRes.id}/`)
+                    avisRes = data;
+                }else{
+                    let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso/${asoRes.id}/`)
+                    avisRes = data;
+                }
+
 
                 setAvis(avisRes.codification)
 

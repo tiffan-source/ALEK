@@ -13,7 +13,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
     const fetchData = async () => {
       const response = await axios.get(process.env.REACT_APP_STARTURIBACK + '/entreprise_and_responsable/');
       const dataEntreprise = response.data;
-      modifyField("client", dataAffaire.client || dataEntreprise[0].id);
+      modifyField("client", dataAffaire.client || (dataEntreprise.length !== 0 && dataEntreprise[0].id) || "");
       setClient(dataEntreprise);
     };
 

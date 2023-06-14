@@ -1,14 +1,19 @@
-import { Document, PDFViewer, Page, View, StyleSheet, Image, Text } from '@react-pdf/renderer'
+import { Document, PDFViewer, Page, View, Image, Text } from '@react-pdf/renderer'
 import React, { useEffect, useState } from 'react';
 import logo from '../../../../../../../assets/images/aleatek.jpeg';
 import axios from 'axios';
+import Button from '../../../../../../../component/utils/Button/Button';
 
 import styles from './style';
+
+import mailjet from 'node-mailjet';
+
+const mailjetClient = mailjet.apiConnect('25b532b83e68907160e8f3d0dbc26c8b', 'b5f03da74e92c8d22cf3abf912792a2a');
+
 
 function Livrable(props) {
 
     let [aso, setAso] = useState({});
-    let [codification, setCodification] = useState(null);
 
     useEffect(()=>{
         (async () =>{
@@ -16,9 +21,9 @@ function Livrable(props) {
 
             setAso(data)
 
-            let {data:codif} = await axios.get(process.env.REACT_APP_STARTURIBACK + ``)
         })();
     }, [props.id])
+
 
     const ASO = (asos)=>{
         let {adresse} = asos.charge;
@@ -120,14 +125,14 @@ function Livrable(props) {
 
                     {/* Mapper les avis */}
 
-                    {asos.documents.map(doc=>{
+                    {asos.documents.map((doc, index)=>{
                         return (
-                            <View style={styles.avisMain}>
+                            <View style={styles.avisMain} key={index}>
                                 <View>
                                     <Text> {">"} Plan N {doc.document.nature} {doc.document.titre} {doc.document.numero_externe} {doc.document.numero_indice}</Text>
                                     {doc.avis.map((a,index)=>{
                                         return (
-                                            <Text>{index+1}) {a.commentaire}</Text>
+                                            <Text key={index}>{index+1}) {a.commentaire}</Text>
                                         )
                                     })}
                                     <Text>-------------------------------------------------------------------------------------------------------------------------------------------------------</Text>
@@ -146,9 +151,9 @@ function Livrable(props) {
                         <Text>Examen</Text>
                     </View>
 
-                    {asos.documents.map(doc=>{
+                    {asos.documents.map((doc, index)=>{
                         return (
-                            <View style={styles.avisMainEnd}>
+                            <View style={styles.avisMainEnd} key={index}>
                                 <View>
                                     <Text> {">"} Plan N {doc.document.nature} {doc.document.titre} {doc.document.numero_externe} {doc.document.numero_indice}</Text>
                                 </View>
@@ -158,15 +163,79 @@ function Livrable(props) {
                             </View>
                         )
                     })}
+
+                    <View style={styles.collaboratuer_to_send}>
+                        {
+                            asos.collaborateurs.map((collab, index)=>{
+                                return (
+                                    <View >
+                                        <Text>{collab.raison_sociale}</Text>
+                                    </View>
+                                )
+                            })
+                        }
+                    </View>
                 </Page>
             </Document>
         )
 
+    };
+
+    let sendMail = ()=>{
+        const apiKeyPublic = '79e11e01de3f49e101e4260e07f9dec4';
+        const apiKeyPrivate = 'f7641ba38bc091b6be3f1f93cf3ac5f1';
+        const senderEmail = 'anlyounesis@gmail.com';
+        const recipientEmail = 'anlyounesis@gmail.com';
+
+        const url = 'https://api.mailjet.com/v3.1/send';
+
+        const data = {
+            Messages: [
+                {
+                From: {
+                    Email: senderEmail,
+                    Name: 'Me',
+                },
+                To: [
+                    {
+                    Email: recipientEmail,
+                    Name: 'You',
+                    },
+                ],
+                Subject: 'My first Mailjet Email!',
+                TextPart: 'Greetings from Mailjet!',
+                HTMLPart: '<h3>Dear passenger 1, welcome to <a href="https://www.mailjet.com/">Mailjet</a>!</h3><br />May the delivery force be with you!',
+                },
+            ],
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${btoa(apiKeyPublic + ':' + apiKeyPrivate)}`,
+            },
+            body: JSON.stringify(data),
+        })
+        .then((response) => response.json())
+        .then((result) => {
+            console.log(result);
+            // Traitez ici la réponse de la requête
+        })
+        .catch((error) => {
+            console.error(error);
+            // Traitez ici les erreurs de la requête
+        }); 
     }
-        
+
     
     return (
         <div>
+            <div>
+                <Button action={()=>{
+                    sendMail()
+                }}>Diffuser</Button>
+            </div>
             <h2 className='my-4 text-center font-bold text-lg'>Previsualisation du pdf</h2>
 
             <div className='h-[42rem]'>

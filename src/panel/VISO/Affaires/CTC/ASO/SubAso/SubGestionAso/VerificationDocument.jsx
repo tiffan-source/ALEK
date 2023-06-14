@@ -56,7 +56,7 @@ function VerificationDocument(props) {
             }
         })();
 
-    }, [props.affaire_ouvrage]);
+    }, [props.affaire_ouvrage, props.asoData.id, props.asoData.statut]);
     return (
         <div className='my-8'>
             {dataDocs.length!==0 && <Table datas={dataDocs}/>}

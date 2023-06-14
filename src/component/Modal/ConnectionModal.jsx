@@ -26,7 +26,8 @@ function ConnectionModal(props) {
         }, {
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
+            'X-CSRFToken': csrfToken,
+            
           },
           withCredentials: true
         });

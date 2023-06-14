@@ -19,7 +19,6 @@ function Creer() {
     const [commentaire, setCommentaire] = useState([]);
     const [ouvrages, setOuvrages] = useState([]);
     const [ouvragesSelect, setOuvragesSelect] = useState([]);
-    const [user, setUser] = useState(null)
     const [affaire, setAffaire] = useState(null);
 
     useEffect(()=>{
@@ -50,8 +49,6 @@ function Creer() {
                     setOuvragesSelect(ouvragRes[0].id);
                 }
 
-                let {data:resUser} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/utilisateur-connecte/')
-                setUser(resUser.id)
             } catch (error) {
                 console.log(error);
             }

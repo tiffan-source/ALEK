@@ -71,38 +71,7 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
       setStringError('Entrez un nombre de visite valid')
       return;
     }
-    if(validator.isEmpty(cplt_geo)){
-      setStringError('Entrez une adresse')
-      return;
-    }
-    if(validator.isEmpty(numero_voie) || !validator.isNumeric(numero_voie)){
-      setStringError('Entrez un numero de voie valide')
-      return;
-    }
-    if(validator.isEmpty(lieu_dit)){
-      setStringError('Entrez un lieu dit')
-      return;
-    }
-    if(validator.isEmpty(code_postal) || !validator.isPostalCode(code_postal, 'FR')){
-      setStringError('Entrez un code postal valid')
-      return;
-    }
-    if(validator.isEmpty(ville)){
-      setStringError('Entrez une ville valide')
-      return;
-    }
-    if(validator.isEmpty(pays)){
-      setStringError('Entrez un pays')
-      return;
-    }
-    if(validator.isEmpty(departement)){
-      setStringError('Entrez un departement')
-      return;
-    }
-    if(validator.isEmpty(province)){
-      setStringError('Entrez une province')
-      return;
-    }
+
     setStringError('');
   }
 

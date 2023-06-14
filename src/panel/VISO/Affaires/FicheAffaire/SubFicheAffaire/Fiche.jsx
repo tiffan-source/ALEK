@@ -1,6 +1,5 @@
 import React from 'react'
 import LabelInput from '../../../../../component/utils/LabelInput/LabelInput'
-import LabelCheckbox from '../../../../../component/utils/LabelCheckbox/LabelCheckbox'
 import Adresse from '../../../../../component/Adresse/Adresse'
 
 function Fiche({data}) {

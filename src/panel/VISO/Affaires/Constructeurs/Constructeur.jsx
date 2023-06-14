@@ -6,7 +6,6 @@ import Adresse from '../../../../component/Adresse/Adresse';
 import axios from 'axios';
 import CreateEntreprise from '../../../../component/Modal/CreateEntreprise';
 import AddConstructeur from '../../../../component/Modal/AddConstructeur';
-import Flash from '../../../../component/utils/Flash/Flash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModale from '../../../../component/Modal/ConfirmationModale';
