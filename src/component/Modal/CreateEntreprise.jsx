@@ -7,12 +7,17 @@ import Button from '../utils/Button/Button';
 import axios from 'axios';
 import Flash from '../utils/Flash/Flash';
 import validator from 'validator';
+import MiniLoader from '../utils/Loader/MiniLoader';
 
 function CreateEntreprise(props) {
     
+    const [load, setLoad] = useState(props.edition ? true : false);
+    const [action, setAction] = useState(false);
+
     const [stringErrors, setStringError] = useState("");
     const [flash, setFlash] = useState(false);
-    const [success, setSuccess] = useState(false)
+    const [success, setSuccess] = useState(false);
+
   
     const [lines, setLines] = useState([]);
     const [newLine, setNewLine] = useState({
@@ -46,6 +51,7 @@ function CreateEntreprise(props) {
                 });
                 setAdress(entreprise.adresse)
                 setLines(entreprise.responsables)
+                setLoad(false)
             }
         })();
     }, [props.edition]);
@@ -54,14 +60,6 @@ function CreateEntreprise(props) {
         let {raison_sociale, activite, siret} = entreprise;
         if(validator.isEmpty(raison_sociale)){
           setStringError('Entrez une raison sociale')
-          return;
-        }
-        if(validator.isEmpty(activite)){
-          setStringError('Entrez une activite')
-          return;
-        }
-        if(validator.isEmpty(siret) || !validator.isNumeric(siret)){
-          setStringError('Entrez un siret valid')
           return;
         }
         setStringError('');
@@ -76,6 +74,7 @@ function CreateEntreprise(props) {
         try {
             let resAdresse, resEntreprise;
 
+            // Creation de l'adresse du constructeur
             if(props.edition){
                 resAdresse = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/adresse/${adress.id}/`,
                 adress, {withCredentials : true});
@@ -84,14 +83,16 @@ function CreateEntreprise(props) {
                 adress, {withCredentials : true});
             }
 
+            // Creation de l'entreprise
             if(props.edition){
                 resEntreprise = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/entreprise/${props.edition}/`,
-                {...entreprise, adresse : resAdresse.data.id}, {withCredentials : true});                    
+                {...entreprise, adresse : resAdresse.data.id, siret : parseInt(entreprise.siret)}, {withCredentials : true});                    
             }else{
                 resEntreprise = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise/',
-                {...entreprise, adresse : resAdresse.data.id}, {withCredentials : true});                    
+                {...entreprise, adresse : resAdresse.data.id, siret : parseInt(entreprise.siret)}, {withCredentials : true});                    
             }
 
+            // Creation des responsables
             await Promise.all(lines.map(async line=>{
                 if(!line.id){
                     await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/responsable/',
@@ -99,6 +100,7 @@ function CreateEntreprise(props) {
                 }
             }));
 
+            // Ajout entreprise en tant que collaborateur
             if(props.isCollab && !props.edition){
                 let id = localStorage.getItem('planAffaire')
                 let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
@@ -117,6 +119,8 @@ function CreateEntreprise(props) {
                 window.location.reload();
             }, 3000)
         } catch (error) {
+            setAction(false);
+            console.log(error);
         }
     }
 
@@ -136,18 +140,24 @@ function CreateEntreprise(props) {
                 </div>
                 <div className="p-2">
                     <div className='ml-4'>
-                        <Button action={()=>{
-                            if(!stringErrors && success === false){
-                                createEntreprise();
-                                setFlash(false);
-                            }else{
-                                setFlash(true);
+                        {!load && <Button action={()=>{
+                            if(!action){
+                                setAction(true);
+                                if(!stringErrors && success === false){
+                                    createEntreprise();
+                                    setFlash(false);
+                                }else{
+                                    setFlash(true);
+                                    setAction(false);
+                                }    
                             }
-                        }}>{props.edition ? 'Editer' : 'Creer'}</Button>
+                        }}>{props.edition ? 'Editer' : 'Creer'}</Button>}
+
+                        {action && <span className='mx-4 text-orange-600'>Operation en cours de traitement</span>}
                     </div>
                     <div className='bg-gray-100 m-4'>
                         <h2 className='p-2 bg-gray-200 shadow-inner'>Details Entrepise</h2>
-                        <div className='grid grid-cols-2 gap-4 mx-4'>
+                        {!load ? <div className='grid grid-cols-2 gap-4 mx-4'>
                             <LabelInput label_w="10" label="Raison Sociale" value={entreprise.raison_sociale} onChange={(e)=>{
                                 setEntrepise({...entreprise, raison_sociale : e.target.value})
                             }}/>
@@ -157,11 +167,11 @@ function CreateEntreprise(props) {
                             <LabelInput label_w="10" label="Activite" value={entreprise.activite} onChange={(e)=>{
                                 setEntrepise({...entreprise, activite : e.target.value})
                             }}/>
-                        </div>
+                        </div> : <MiniLoader/>}
                     </div>
                     <div className='bg-gray-100 m-4'>
                         <h2 className='p-2 bg-gray-200 shadow-inner'>Adresse</h2>
-                        <Adresse adress={adress} setAdress={setAdress}/>
+                        {!load ? <Adresse adress={adress} setAdress={setAdress}/> : <MiniLoader/>}
                     </div>
                     <div className='bg-gray-100 m-4'>
                         <h2 className='p-2 bg-gray-200 shadow-inner'>Media de communication</h2>
@@ -190,7 +200,7 @@ function CreateEntreprise(props) {
                                             setNewLine({...newLine, email : e.target.value})
                                         }}/></td>
                                         <td className='text-center'>
-                                            <Button action={()=>{
+                                            {!action && !load && <Button action={()=>{
                                                 let {nom, prenom, email} = newLine
                                                 if(nom && prenom && email && validator.isEmail(email)){
                                                     setLines([...lines, newLine]);
@@ -206,21 +216,21 @@ function CreateEntreprise(props) {
                                                         setFlash(true)    
                                                     }
                                                 }
-                                            }}><FontAwesomeIcon icon={faPlus}/></Button>
+                                            }}><FontAwesomeIcon icon={faPlus}/></Button>}
                                         </td>
                                     </tr>
-                                    {lines.map((line, index)=>(
+                                    {!load && lines.map((line, index)=>(
                                         <tr key={index}>
                                             <td className='text-center'>{line.nom}</td>
                                             <td className='text-center'>{line.prenom}</td>
                                             <td className='text-center'>{line.email}</td>
                                             <td className='text-center'>
-                                                <Button action={async()=>{
+                                                {!action && <Button action={async()=>{
                                                     if(line.id){
                                                         await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/responsable/${line.id}/`)
                                                     }
                                                     setLines(lines.filter((l,i)=>i!==index))
-                                                }}><FontAwesomeIcon icon={faTrash}/></Button>
+                                                }}><FontAwesomeIcon icon={faTrash}/></Button>}
                                             </td>
                                         </tr>
                                     ))}

@@ -1,78 +1,84 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-class Etape8 extends Component {
+const Etape8 = (props) => {
+  const [missions, setMissions] = useState([]);
+  const [missionSelect, setMissionSelect] = useState([]);
+  const [isCreating, setIsCreating] = useState(false);
 
-  constructor(){
-    super()
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_STARTURIBACK}/admin/mission/`);
+        setMissions(response.data.results);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-    this.state = {
-      missions : [],
-      mission_select : []
+    fetchData();
+  }, []);
+
+  const handleCheckboxChange = (event, missionId) => {
+    if (event.target.checked) {
+      if (!missionSelect.includes(missionId)) {
+        setMissionSelect([...missionSelect, missionId]);
+      }
+    } else {
+      if (missionSelect.includes(missionId)) {
+        setMissionSelect(missionSelect.filter((id) => id !== missionId));
+      }
     }
-  }
+  };
 
-  async componentDidMount(){
+  const handleCreate = async () => {
+    setIsCreating(true);
+
     try {
-      let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/');
-      this.setState({missions : data.results});
+      await props.create(missionSelect);
     } catch (error) {
       console.log(error);
     }
-  }
 
-  render(){
-    return (
-      <div>
-          <h2 className='text-sm font-bold text-center mb-4'>Retenir ici les missions a recopier ou a selectionner</h2>
+    setIsCreating(false);
+  };
 
-          <table className='text-sm border border-gray-600 w-full'>
-            <thead>
-              <tr>
-                <td>Sel</td>
-                <td>Mission contractuelle</td>
-                <td>Libele mission contractuelle</td>
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.missions.map((mission, index)=>{
-                return (
-                  <tr key={index}>
-                    <td>
-                      <input type="checkbox" name="" id="" onClick={e=>{
-                        if(e.target.checked){
-                          if(!this.state.mission_select.includes(mission.id)){
-                            this.setState({mission_select: [...this.state.mission_select, mission.id]});
-                          }
-                        }else{
-                          if(this.state.mission_select.includes(mission.id)){
-                            this.setState({mission_select: this.state.mission_select.filter(dt=>dt!==mission.id)});
-                          }
-                        }
-                      }}/>
-                    </td>
-                    <td>
-                      {mission.code_mission}
-                    </td>
-                    <td>
-                      {mission.libelle}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+  return (
+    <div>
+      <h2 className='text-sm font-bold text-center mb-4'>Retenir ici les missions à recopier ou à sélectionner</h2>
 
-          <div className='my-2 text-end'>
-            <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={()=>{
+      <table className='text-sm border border-gray-600 w-full'>
+        <thead>
+          <tr>
+            <td>Sel</td>
+            <td>Mission contractuelle</td>
+            <td>Libellé mission contractuelle</td>
+          </tr>
+        </thead>
+        <tbody>
+          {missions.map((mission, index) => (
+            <tr key={index}>
+              <td>
+                <input
+                  type='checkbox'
+                  onClick={(e) => handleCheckboxChange(e, mission.id)}
+                  disabled={isCreating}
+                />
+              </td>
+              <td>{mission.code_mission}</td>
+              <td>{mission.libelle}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-              this.props.create(this.state.mission_select);
-
-            }}>Valider</button>
-          </div>
+      <div className='my-2 text-end'>
+        <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={handleCreate} disabled={isCreating}>
+          {isCreating ? 'En cours de création' : 'Valider'}
+        </button>
       </div>
-    )  
-  }
-}
+    </div>
+  );
+};
 
-export default Etape8
+export default Etape8;

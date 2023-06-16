@@ -6,8 +6,10 @@ import CreateEntreprise from '../../../component/Modal/CreateEntreprise';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModale from '../../../component/Modal/ConfirmationModale';
+import MiniLoader from '../../../component/utils/Loader/MiniLoader';
 
 function Client() {
+  const [load, setLoad] = useState(true)
   const [clients, setClients] = useState([]);
   const [clientsSelect, setClientsSelect] = useState(null);
   const [clientsString, setClientsString] = useState('');
@@ -18,6 +20,7 @@ function Client() {
     (async ()=>{
       let data = await axios.get(process.env.REACT_APP_STARTURIBACK + '/entreprise_and_responsable/');
       setClients(data.data);
+      setLoad(false);
     })();
   }, []);
 
@@ -66,7 +69,12 @@ function Client() {
               </tr>
             </thead>
             <tbody>
-              {clients.map((client, index)=>{
+              <tr className='w-full'>
+                <td>
+                {load && <MiniLoader/>}
+                </td>
+              </tr>
+              {!load && (clients.length > 0 ? clients.map((client, index)=>{
                 return (
                   <tr className='grid grid-cols-[2fr_2fr_2fr_2fr_1fr]' key={index}>
                     <td>{client.raison_sociale}</td>
@@ -87,7 +95,9 @@ function Client() {
                     </td>
                   </tr>
                 )
-              })}
+              }) : <tr className='text-center w-full'>
+                Aucun client enregistre
+              </tr>)}
             </tbody>
           </table>
         </div>

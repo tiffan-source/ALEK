@@ -40,7 +40,6 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
 
   let validate = () => {
     let {prix, debut_prestation, debut_chantier, fin_chantier, doc, visite} = dataPlan;
-    let {cplt_geo, numero_voie, lieu_dit, code_postal, ville, pays, departement, province} = adress
     if(validator.isEmpty(prix) || !validator.isNumeric(prix)){
       setStringError('Le prix n\'est pas valid')
       return;
