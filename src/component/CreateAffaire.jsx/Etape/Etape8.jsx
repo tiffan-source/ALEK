@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import MiniLoader from '../../utils/Loader/MiniLoader';
 
-const Etape8 = (props) => {
+const Etape8 = ({missionSelect, setMissionSelect, create}) => {
   const [missions, setMissions] = useState([]);
-  const [missionSelect, setMissionSelect] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [load, setLoad] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,6 +15,7 @@ const Etape8 = (props) => {
       } catch (error) {
         console.log(error);
       }
+      setLoad(false);
     };
 
     fetchData();
@@ -33,21 +35,18 @@ const Etape8 = (props) => {
 
   const handleCreate = async () => {
     setIsCreating(true);
-
     try {
-      await props.create(missionSelect);
+      await create(missionSelect);
     } catch (error) {
       console.log(error);
     }
-
-    setIsCreating(false);
   };
 
   return (
     <div>
       <h2 className='text-sm font-bold text-center mb-4'>Retenir ici les missions à recopier ou à sélectionner</h2>
 
-      <table className='text-sm border border-gray-600 w-full'>
+      {!load ? <table className='text-sm border border-gray-600 w-full'>
         <thead>
           <tr>
             <td>Sel</td>
@@ -60,8 +59,9 @@ const Etape8 = (props) => {
             <tr key={index}>
               <td>
                 <input
+                  checked={missionSelect.includes(mission.id)}
                   type='checkbox'
-                  onClick={(e) => handleCheckboxChange(e, mission.id)}
+                  onChange={(e) => handleCheckboxChange(e, mission.id)}
                   disabled={isCreating}
                 />
               </td>
@@ -69,8 +69,8 @@ const Etape8 = (props) => {
               <td>{mission.libelle}</td>
             </tr>
           ))}
-        </tbody>
-      </table>
+        </tbody> 
+      </table> : <MiniLoader/>}
 
       <div className='my-2 text-end'>
         <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={handleCreate} disabled={isCreating}>

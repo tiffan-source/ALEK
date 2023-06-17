@@ -6,6 +6,7 @@ import validator from 'validator';
 
 const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
   const [client, setClient] = useState([]);
+  const [load, setLoad] = useState(true);
 
   useEffect(() => {
     modifyField("statut", dataAffaire.statut || "En cours");
@@ -15,10 +16,10 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
       const dataEntreprise = response.data;
       modifyField("client", dataAffaire.client || (dataEntreprise.length !== 0 && dataEntreprise[0].id) || "");
       setClient(dataEntreprise);
+      setLoad(false);
     };
 
     fetchData();
-
     validate();
 
   }, []);
@@ -28,22 +29,13 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
   }, [dataAffaire])
 
   let validate = () => {
-    let {numero, libelle, numero_offre, date_contrat} = dataAffaire;
-    if(validator.isEmpty(numero) || !validator.isNumeric(numero)){
-      setStringError("Le numero d'affaire doit etre un nombre valid");
+    let {numero_contrat, libelle} = dataAffaire;
+    if(validator.isEmpty(numero_contrat) || !validator.isNumeric(numero_contrat)){
+      setStringError("Le numero de contrat doit etre un nombre valid");
       return;
     }
     if (validator.isEmpty(libelle)) {
       setStringError("Le libelle ne peut etre vide")    ;  
-      return;
-    }
-    if (validator.isEmpty(numero_offre) || !validator.isNumeric(numero_offre)) {
-      setStringError("Le numero d'offre n'est pas valide")    ;  
-      return;
-    }
-    console.log(validator.isEmpty(date_contrat));
-    if (validator.isEmpty(date_contrat) || !validator.isDate(date_contrat, {format: 'YYYY-MM-DD'})) {
-      setStringError("La date de contrat doit etre une date valide");  
       return;
     }
     setStringError('');
@@ -52,14 +44,12 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
   return (
     <div>
       <div className='border border-gray-400 p-2 mb-2'>
-        <LabelInput label_w="10" label="N° Contrat ALEATEK" disabled />
-
         <LabelInput
           label_w="10"
-          label="N° Affaire ALEATEK"
-          value={dataAffaire.numero}
+          label="N° Contrat ALEATEK"
+          value={dataAffaire.numero_contrat}
           onChange={(e) => {
-            modifyField("numero", e.target.value);
+            modifyField("numero_contrat", e.target.value);
           }}
         />
 
@@ -88,7 +78,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
       </div>
 
       <div className='border border-gray-400 p-2 mb-2'>
-        <LabelSelect
+        {! load ? <LabelSelect
           label_w="10"
           label="Client"
           value={dataAffaire.client}
@@ -100,7 +90,9 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
             prev[key] = curr.id;
             return prev;
           }, {})}
-        />
+        /> : <span className='text-green-600'>Donnee en cours de chargement</span>}
+
+        {dataAffaire.client === "" && <span className='text-red-600'>Vous n'avez enregistrer aucun client</span>}
       </div>
 
       <div className='border border-gray-400 p-2 mb-2'>

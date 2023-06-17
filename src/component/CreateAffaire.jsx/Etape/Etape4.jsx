@@ -9,6 +9,7 @@ import validator from 'validator';
 
 const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adress, setAdress, setStringError }) => {
   const [duree, setDuree] = useState(0);
+  const [load, setLoad] = useState(true);
   const [startChantier, setStartChantier] = useState('');
   const [endChantier, setEndChantier] = useState('');
   const [destinations, setDestinations] = useState([]);
@@ -23,11 +24,12 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
     const fetchData = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_STARTURIBACK}/admin/batiment/`);
-        setBatiment(batiment || response.data.results[0].id);
+        setBatiment(batiment || response.data.results[0].id || "");
         setDestinations(response.data.results);
       } catch (error) {
         console.log(error);
       }
+      setLoad(false);
     };
 
     fetchData();
@@ -39,38 +41,6 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
   }, [dataPlan, adress])
 
   let validate = () => {
-    let {prix, debut_prestation, debut_chantier, fin_chantier, doc, visite} = dataPlan;
-    if(validator.isEmpty(prix) || !validator.isNumeric(prix)){
-      setStringError('Le prix n\'est pas valid')
-      return;
-    }
-    if(validator.isEmpty(debut_prestation) || !validator.isDate(debut_prestation)){
-      setStringError('Entrez un debut de prestation valide')
-      return;
-    }
-    if(validator.isEmpty(debut_chantier) || !validator.isDate(debut_prestation)){
-      setStringError('Entrez une date de debut de chantier valide')
-      return;
-    }
-    if(validator.isEmpty(fin_chantier) || !validator.isDate(debut_prestation)){
-      setStringError('Entrez une date de fin de chantier valide')
-      return;
-    }
-    let start = new Date(debut_chantier);
-    let fin = new Date(fin_chantier);
-    if(start > fin){
-      setStringError("Les dates de chantiers semblent incoherentes")
-      return;
-    }
-    if(validator.isEmpty(doc) || !validator.isNumeric(doc)){
-      setStringError('Entrez un nombre de document valid')
-      return;
-    }
-    if(validator.isEmpty(visite) || !validator.isNumeric(visite)){
-      setStringError('Entrez un nombre de visite valid')
-      return;
-    }
-
     setStringError('');
   }
 
@@ -112,7 +82,7 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
     <>
       <div>
         <div className="flex gap-8">
-          <LabelInput label="N° Affaire" disabled value={dataAffaire.numero} />
+          <LabelInput label="N° Contrat ALEATEK" value={dataAffaire.numero_contrat} disabled/>
           <LabelInput label="N° Plan" disabled value={1} />
         </div>
 
@@ -164,7 +134,7 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
             }}
           />
 
-          <LabelSelect
+          {!load ? <LabelSelect
             col
             label="Destination"
             value={batiment}
@@ -176,7 +146,10 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
               prev[key] = curr.id;
               return prev;
             }, {})}
-          />
+          /> : <span className='text-green-600'>Donee en cours de chargement</span>}
+
+          {batiment === "" && <span className='text-red-600'>Aucun Batiment disponible en base de donnee</span>}
+
         </div>
 
         <LabelInput

@@ -17,13 +17,13 @@ const MainModal = ({ handleClose }) => {
   const [success, setSuccess] = useState(false)
 
   const [dataFormAffaire, setDataFormAffaire] = useState({
-    numero: '',
+    numero_contrat: '',
     libelle: '',
     statut: '',
-    numero_offre: '',
+    numero_offre: undefined,
     libelle_contrat: '',
-    date_contrat: '',
-    client: '',
+    date_contrat: undefined,
+    client: undefined,
     charge: '',
     assistant: '',
     chef: '',
@@ -35,15 +35,15 @@ const MainModal = ({ handleClose }) => {
     devise: '',
     type: '',
     type_montant: '',
-    prix: '',
-    debut_chantier: '',
-    fin_chantier: '',
-    debut_prestation : '',
-    visite: '',
-    doc : '',
+    prix: undefined,
+    debut_chantier: undefined,
+    fin_chantier: undefined,
+    debut_prestation : undefined,
+    visite: undefined,
+    doc : undefined,
     affaire: '',
   });
-  const [batiment, setBatiment] = useState('')
+  const [batiment, setBatiment] = useState(undefined)
   const [adress, setAdress] = useState({
     cplt_geo : "",
     numero_voie : "",
@@ -53,7 +53,8 @@ const MainModal = ({ handleClose }) => {
     pays : "",
     departement : "",
     province : "",
-});
+  });
+  const [missionSelect, setMissionSelect] = useState([]);
 
 
   const modifyAffaireField = (field, value) => {
@@ -130,7 +131,8 @@ const MainModal = ({ handleClose }) => {
     />,
 
     <Etape8
-      modifyField={modifyPlanField}
+      missionSelect={missionSelect}
+      setMissionSelect={setMissionSelect}
       create={createAffaireAndPlan}
     />,
   ];

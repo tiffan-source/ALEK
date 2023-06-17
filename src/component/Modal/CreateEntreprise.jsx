@@ -17,6 +17,7 @@ function CreateEntreprise(props) {
     const [stringErrors, setStringError] = useState("");
     const [flash, setFlash] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
 
   
     const [lines, setLines] = useState([]);
@@ -47,7 +48,7 @@ function CreateEntreprise(props) {
                     id : entreprise.id,
                     raison_sociale : entreprise.raison_sociale,
                     activite : entreprise.activite,
-                    siret : entreprise.siret.toString()
+                    siret : entreprise.siret ? entreprise.siret.toString() : ""
                 });
                 setAdress(entreprise.adresse)
                 setLines(entreprise.responsables)
@@ -119,9 +120,10 @@ function CreateEntreprise(props) {
                 window.location.reload();
             }, 3000)
         } catch (error) {
-            setAction(false);
             console.log(error);
+            setError(true);
         }
+        setAction(false);
     }
 
     return (
@@ -240,6 +242,7 @@ function CreateEntreprise(props) {
                     </div>
                 </div>
                 {flash && <Flash setFlash={setFlash}>{stringErrors}</Flash>}
+                {error && <Flash setFlash={setError}>Un erreur pouvant entraine un disfonctionnement de l'application est subvenu</Flash>}
                 {success && <Flash setFlash={setSuccess} type='success'>{props.edition ? 'Entreprise editer' : 'Entreprise creer avec success'}</Flash>}
             </div>
         </div>

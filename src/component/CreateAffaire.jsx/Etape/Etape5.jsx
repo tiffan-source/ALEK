@@ -10,7 +10,8 @@ class Etape5 extends Component {
 
     this.state = {
       collaborateurs : [],
-      medias : []
+      medias : [],
+      load : true
     }
   }
 
@@ -18,10 +19,10 @@ class Etape5 extends Component {
     axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/collaborateurs/',
     { withCredentials: true}).then(response=>{
       let data = response.data.results;
-      this.props.modifyField("charge", data[0].id);
-      this.props.modifyField("assistant", data[0].id);
-      this.props.modifyField("chef", data[0].id);
-      this.setState({collaborateurs : data});
+      this.props.modifyField("charge", this.props.dataAffaire.charge || data[0].id);
+      this.props.modifyField("assistant", this.props.dataAffaire.assistant || data[0].id);
+      this.props.modifyField("chef", this.props.dataAffaire.chef || data[0].id);
+      this.setState({collaborateurs : data, load: false});
     });
   }
 
@@ -31,7 +32,7 @@ class Etape5 extends Component {
         <div className='border border-gray-400 p-2 mb-2'>
   
           <div className='flex gap-6'>
-            <LabelInput label="N Affaire" disabled value={this.props.dataAffaire.numero}/>
+            <LabelInput  label="N° Contrat ALEATEK" value={this.props.dataAffaire.numero_contrat} disabled/>
             <LabelInput label="N Plan" disabled value={1}/>
           </div>
 
@@ -41,7 +42,7 @@ class Etape5 extends Component {
         </div>
   
         <div className='border border-gray-400 p-2 mb-2'>
-          <LabelSelect label="Charge Affaire" onChange={(e)=>{
+          {!this.state.load ? <LabelSelect label="Charge Affaire" onChange={(e)=>{
             this.props.modifyField("charge", e.target.value);
           }}  options={
             this.state.collaborateurs.reduce((prev, curr)=>{
@@ -49,12 +50,12 @@ class Etape5 extends Component {
               prev[key] = curr.id;
               return prev
             }, {})
-          }/>
-
-        </div>
+          } value={this.props.dataAffaire.charge}/>
+          : <span className='text-green-600'>Donnees en cours de chargement</span>}
+        </div> 
   
         <div className='border border-gray-400 p-2 mb-2'>
-          <LabelSelect label="Assistante" onChange={(e)=>{
+          {!this.state.load ? <LabelSelect label="Assistante" onChange={(e)=>{
             this.props.modifyField("assistant", e.target.value);
           }}  options={
             this.state.collaborateurs.reduce((prev, curr)=>{
@@ -62,11 +63,12 @@ class Etape5 extends Component {
               prev[key] = curr.id;
               return prev
             }, {})
-          }/>
-        </div>
+          } value={this.props.dataAffaire.assistant}/>
+          : <span className='text-green-600'>Donnees en cours de chargement</span>}
+        </div> 
   
         <div className='border border-gray-400 p-2 mb-2'>
-        <LabelSelect label="Chef de projet" onChange={(e)=>{
+        {!this.state.load ? <LabelSelect label="Chef de projet" onChange={(e)=>{
             this.props.modifyField("chef", e.target.value);
           }}  options={
             this.state.collaborateurs.reduce((prev, curr)=>{
@@ -74,8 +76,9 @@ class Etape5 extends Component {
               prev[key] = curr.id;
               return prev
             }, {})
-          }/>
-        </div>
+          } value={this.props.dataAffaire.chef}/>
+          : <span className='text-green-600'>Donnees en cours de chargement</span>}
+        </div> 
   
       </div>
     )

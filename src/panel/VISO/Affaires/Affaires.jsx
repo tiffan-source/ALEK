@@ -34,7 +34,8 @@ class Affaires extends Component {
     this.state = {
       plan : [],
       plan_for_table : [],
-      showModal : false
+      showModal : false,
+      load : true
     }
   }
 
@@ -61,7 +62,11 @@ class Affaires extends Component {
       }
     });
 
-    this.setState({plan : data, plan_for_table : table})
+    this.setState({
+      plan : data,
+      plan_for_table : table,
+      load : false
+    })
   }
 
   render(){
@@ -108,9 +113,16 @@ class Affaires extends Component {
             </div>
           </div>
           <div className='text-sm mt-6'>
-            {this.state.plan_for_table.length!==0 && <Table datas={this.state.plan_for_table} actionOnLine={(id)=>{
-              localStorage.setItem("planAffaire", id)
-            }}/>}
+            { !this.state.load ?
+
+              (this.state.plan_for_table.length!==0 ? <Table datas={this.state.plan_for_table} actionOnLine={(id)=>{
+                localStorage.setItem("planAffaire", id)
+              }}/> : "Aucun plan d'affaire")
+            
+              :
+
+              <span>Donnee en cours de chargement</span>
+            }
           </div>
         </div>
       </>
