@@ -4,11 +4,14 @@ import Button from '../../../../component/utils/Button/Button';
 import Table from '../../../../component/utils/Table/Table';
 import axios from 'axios';
 import ActiveMission from '../../../../component/ActiveMission/ActiveMission';
+import nodata from '../../../../assets/images/nodata.svg'
+import MiniLoader from '../../../../component/utils/Loader/MiniLoader';
 
 function MissionPrestation() {
 
     const [mission, setMission] = useState([]);
     const [modal, setModal] = useState(false);
+    const [load, setLoad] = useState(true)
 
     useEffect(()=>{
         (async()=>{
@@ -24,6 +27,7 @@ function MissionPrestation() {
                     }
                 }));
                 setMission(mission_for_table)
+                setLoad(false)
             }
         })();
     }, []);
@@ -46,7 +50,9 @@ function MissionPrestation() {
                     <Button action={()=>{setModal(true)}}>Fermer/Reactiver la mission</Button>
                     <h2 className='absolute left-1/2 font-bold'>Liste des missions signes</h2>
                 </div>
-                {mission.length !==0 && <Table datas={mission}/>}
+                {!load ? (mission.length !==0 ? <Table datas={mission}/> : <div className='flex justify-center'>
+                    <img src={nodata} alt="No data" srcSet="No data" className='max-w-[30rem]' />
+                </div>) : <MiniLoader/> }
             </div>
         </div>
     </>

@@ -7,6 +7,7 @@ import Button from '../../../../component/utils/Button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModale from '../../../../component/Modal/ConfirmationModale';
+import MiniLoader from '../../../../component/utils/Loader/MiniLoader';
 
 function OuvrageDiffusion() {
     const [modal, setModal] = useState(false);
@@ -14,6 +15,7 @@ function OuvrageDiffusion() {
     const [ouvrageAffaires, setOuvrageAffaires] = useState([]);
     const [eaoToDelete, setEaoToDelete] = useState(null);
     const [ouvrageAffaireToDelete, setOuvrageAffaireToDelete] = useState(null);
+    const [load, setLoad] = useState(true)
 
     useEffect(()=>{
       (async()=>{
@@ -33,6 +35,8 @@ function OuvrageDiffusion() {
         } catch (error) {
           console.log(error);          
         }
+
+        setLoad(false);
 
       })();
     }, []);
@@ -115,7 +119,7 @@ function OuvrageDiffusion() {
           </h2>
         </nav>
 
-        <div className='flex-grow'>
+      {!load ? <div className='flex-grow'>
           <div><Button action={()=>{setModal(true)}}>Ajouter un ouvrage</Button></div>
             <div className='grid grid-cols-[5rem_auto_3rem] bg-gray-900 text-white'>
               <span className='p-4'>Diffusion</span>
@@ -166,7 +170,7 @@ function OuvrageDiffusion() {
                 </div>
               )
             })}
-        </div>
+        </div> : <MiniLoader/>}
       </div>    
       </>
     )

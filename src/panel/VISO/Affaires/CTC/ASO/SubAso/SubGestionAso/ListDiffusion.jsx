@@ -29,7 +29,6 @@ function ListDiffusion({id}) {
 
     return (
         <>
-            <div className='my-4 text-end mx-4'><Button>Enregistrer</Button> </div>
             <table className='w-full'>
                 <thead>
                     <tr className='grid grid-cols-[3rem_15rem_12rem_12rem_auto]'>

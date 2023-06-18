@@ -26,7 +26,7 @@ function Panel() {
         Aleatek App Tool
         <span className='text-sm text-red-800'>{process.env.REACT_APP_URIBACK}</span>
         <span className='text-sm text-red-800'>{process.env.REACT_APP_STARTURIBACK}</span>
-        {affaire ? <span className='text-sm text-green-500'>Affaire N{affaire.numero}</span> : ''}
+        {affaire ? <span className='text-sm text-green-500'>Affaire N P{affaire.id}</span> : ''}
       </h2>
       <div className='p-4 shadow-inner'>
         {panelMaker(strutures, null)}

@@ -3,10 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../utils/Button/Button';
 import axios from 'axios';
+import MiniLoader from '../utils/Loader/MiniLoader';
+import Flash from '../utils/Flash/Flash';
 function ChooseCollabForOuvrage(props) {
 
     let [dataEntrepriseAffaire, setDataEntrepriseAffaire] = useState([]);
     let [entrepriseSelect, setEntrepriseSelect] = useState([]);
+    const [load, setLoad] = useState(true);
+    const [action, setAction] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     useEffect(()=>{
         (async()=>{
@@ -29,43 +34,52 @@ function ChooseCollabForOuvrage(props) {
             } catch (error) {
                 console.log(error);
             }
+
+            setLoad(false);
         })();
     }, [])
 
     let enregistrer = async ()=>{
-        await Promise.all(entrepriseSelect.map(async eS=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/verify_entreprise_collab_on_ouvrage/${eS}/${props.ouvrage_affaire}/`)
-            if(!data.check){
-                await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise_affaire_ouvrage/',
-                {
-                    affaire_ouvrage : props.ouvrage_affaire,
-                    affaire_entreprise : eS
-                }, {withCredentials: true})
-            }
-        }));
-        window.location.reload();
+        if(!action){
+            await Promise.all(entrepriseSelect.map(async eS=>{
+                let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/verify_entreprise_collab_on_ouvrage/${eS}/${props.ouvrage_affaire}/`)
+                if(!data.check){
+                    await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise_affaire_ouvrage/',
+                    {
+                        affaire_ouvrage : props.ouvrage_affaire,
+                        affaire_entreprise : eS
+                    }, {withCredentials: true})
+                }
+            }));
+    
+            setSuccess(true);
+            window.location.reload();
+        }
     }
 
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-3xl max-h-full">
         <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700">
+            {success && <Flash type="success" setFlash={setSuccess}>Operation reussie</Flash>}
             <div className="flex justify-between items-center pr-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pt-6">
-                    Ajouter des missions
+                    Ajouter des collaborteurs pour l'ouvrage
                 </h3>
                 <span className="text-xl cursor-pointer" onClick={props.handleClose}>
                     <FontAwesomeIcon icon={faXmark} />
                 </span>
             </div>
-                
-            <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+
+            {!load ? <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
                 <div className='mb-4'>
-                    <Button action={()=>{
+                    {dataEntrepriseAffaire.length!== 0 && <Button action={()=>{
+                        setAction(true);
                         enregistrer();
-                    }}>Enregistrer</Button>
+                    }}>Enregistrer</Button>}
+                    {action && <span className='text-green-600'>Operation en cours</span> }
                 </div>
-                <table className='w-full'>
+                {dataEntrepriseAffaire.length!== 0 ? <table className='w-full'>
                     <thead>
                         <tr>
                             <th></th>
@@ -96,9 +110,9 @@ function ChooseCollabForOuvrage(props) {
                             )
                         })}
                     </tbody>
-                </table>
+                </table> : <span className='text-red-600'>Vous ne disposez pas de constructeur pour cette affaire</span>}
 
-            </div>
+            </div> : <MiniLoader/>}
         </div>
         </div>
     </div>

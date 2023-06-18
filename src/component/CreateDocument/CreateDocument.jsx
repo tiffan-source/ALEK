@@ -5,6 +5,7 @@ import Button from '../utils/Button/Button';
 import axios from 'axios';
 import validator from 'validator';
 import Flash from '../utils/Flash/Flash';
+import MiniLoader from '../utils/Loader/MiniLoader';
 /**
  * Ma logique de selection
  * 
@@ -38,14 +39,17 @@ const CreateDocument = (props) => {
     dossier : "Execution",
     nature : "TOUS",
     indice : "",
-    date_indice : "",
-    date_reception : "",
+    date_indice : undefined,
+    date_reception : undefined,
     titre : "",
-    numero_revision : "",
-    numero_externe : ""
+    numero_revision : undefined,
+    numero_externe : undefined
   });
   const [stringErrors, setStringError] = useState("");
   const [flash, setFlash] = useState(false);
+  const [load, setLoad] = useState(true);
+  const [action, setAction] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -67,6 +71,7 @@ const CreateDocument = (props) => {
       } catch (error) {
         console.log(error);
       }
+      setLoad(false)
     })();
   }, []);
 
@@ -97,32 +102,6 @@ const CreateDocument = (props) => {
   }, [dataDocument])
 
   let validation = ()=>{
-    let {indice, date_indice, date_reception, titre, numero_externe, numero_revision} = dataDocument;
-  
-    if(validator.isEmpty(indice)){
-      setStringError('Veuillez saisir un indice')
-      return;
-    }
-    if(validator.isEmpty(date_indice) || !validator.isDate(date_indice, {format: 'YYYY-MM-DD'})){
-      setStringError('Veuillez saisir une date d\'indice')
-      return;
-    }
-    if(validator.isEmpty(date_reception) || !validator.isDate(date_reception, {format: 'YYYY-MM-DD'})){
-      setStringError('Veuillez saisir une date de reception')
-      return;
-    }
-    if(validator.isEmpty(titre)){
-      setStringError('Veuillez saisir un titre')
-      return;
-    }
-    if(validator.isEmpty(numero_externe) || !validator.isNumeric(numero_externe)){
-      setStringError('Veuillez saisir un numero externe')
-      return;
-    }
-    if(validator.isEmpty(numero_revision) || !validator.isNumeric(numero_revision)){
-      setStringError('Veuillez saisir un numero de revision')
-      return;
-    }
 
     setStringError('')
   }
@@ -169,21 +148,19 @@ const CreateDocument = (props) => {
         formData,
         {withCredentials : true})
       }))
-
-      // Devalider l'affaire ouvrage et supprimer l'ASO en cours
-
-      let {data : affaireOuvrageModifier} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvragesSelect}/`);
-      await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvragesSelect}/`,
-      {...affaireOuvrageModifier, validateur : null})
+      setSuccess(true);
   
       window.location.reload();
     }
   };
 
+  if(load)
+    return <MiniLoader/>
 
   return (
     <div className='m-2'>
       {flash && <Flash setFlash={setFlash}>{stringErrors}</Flash>}
+      {success && <Flash type={"success"} setFlash={setSuccess}>Document cree avec success</Flash>}
       <div className='flex gap-8'>
         <div>
           {id_affaire && <LabelInput label='N Affaire' disabled value={id_affaire} />}
@@ -212,6 +189,7 @@ const CreateDocument = (props) => {
             setDataDocument({...dataDocument, titre : e.target.value})
           }}/>
         </div>
+
         <div>
           <LabelInput label='N Revision' value={dataDocument.numero_revision} onChange={(e)=>{
             setDataDocument({...dataDocument, numero_revision : e.target.value})
@@ -321,7 +299,9 @@ const CreateDocument = (props) => {
 
       <div className='flex gap-6 mt-4'>
         {entrepriseAffaireOuvrageSelect !==null ?
-        <Button action={createDocument}>Creer le document</Button> :
+        (!action ? <Button action={()=>{
+          setAction(true)
+          createDocument()}}>Creer le document</Button> : <span className='text-green-600'>Operation en cours de traitement</span> ) :
         <div className='text-xs max-w-lg text-red-700'>
           Vous ne pouvez pas creer de document sans emetteur ou sans ouvrage.
           Si vous avez selectionner un ouvrage assurer vous d'avoir affecter une entreprise a cet ouvrage

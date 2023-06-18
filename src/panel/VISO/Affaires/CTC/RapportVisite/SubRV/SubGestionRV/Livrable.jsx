@@ -14,10 +14,10 @@ function Livrable(props) {
 
     useEffect(()=>{
         (async () =>{
-            // if(id !== undefined){
+            if(props.id !== undefined){
                 let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/data_for_rv/${props.id}/`)
                 setRv(data)
-            // }
+            }
         })();
     }, [props.id])
 
@@ -44,10 +44,10 @@ function Livrable(props) {
                                 </Text>
                                 <Text style={styles.blockAdress}>
                                     {
-                                    adresse.cplt_geo + " " + adresse.numero_voie +
+                                    adresse && (adresse.cplt_geo + " " + adresse.numero_voie +
                                     " " + adresse.lieu_dit + " " + adresse.code_postal + " " +
                                     adresse.ville + " " + adresse.pays + " " + adresse.departement 
-                                    + " " + adresse.province
+                                    + " " + adresse.province)
                                     }
                                 </Text>
                                 <Text style={styles.blockMail}>
@@ -168,11 +168,6 @@ function Livrable(props) {
     
     return (
         <div>
-            <div>
-                <Button action={()=>{
-                    // sendMail()
-                }}>Diffuser</Button>
-            </div>
             <h2 className='my-4 text-center font-bold text-lg'>Previsualisation du pdf</h2>
 
             <div className='h-[42rem]'>

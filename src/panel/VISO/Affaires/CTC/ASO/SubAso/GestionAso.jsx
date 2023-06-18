@@ -5,13 +5,18 @@ import VerificationDocument from './SubGestionAso/VerificationDocument';
 import Livrable from './SubGestionAso/Livrable';
 import axios from 'axios';
 import ListDiffusion from './SubGestionAso/ListDiffusion';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
+import Flash from '../../../../../../component/utils/Flash/Flash';
 
 function GestionAso(props) {
     let table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
     const [asoData, setAsoData] = useState({});
     const [avis, setAvis] = useState('');
     const [redacOrCharge, setRedacOrCharge] = useState('');
-    const [validation, setValidation] = useState(false);
+    const [load, setLoad] = useState(true);
+    const [errors, setErrors] = useState('');
+    const [success, setSuccess] = useState('');
+    const [action, setAction] = useState(false);
 
     useEffect(() => {
         (async()=>{
@@ -23,16 +28,7 @@ function GestionAso(props) {
                 let {data : asoRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_aso_for_affaire_one_version/${props.aso}/`);
                 setAsoData(asoRes)
 
-                let avisRes;
-
-                if(asoRes.statut === "0"){
-                    let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso_in_current/${asoRes.id}/`)
-                    avisRes = data;
-                }else{
-                    let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso/${asoRes.id}/`)
-                    avisRes = data;
-                }
-
+                let {data: avisRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/codification_aso/${asoRes.id}/`)
 
                 setAvis(avisRes.codification)
 
@@ -45,35 +41,57 @@ function GestionAso(props) {
                     setRedacOrCharge(charge.nom + " " + charge.prenom)
                 }
 
-                let {data : validation} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_if_can_validate_affaire_ouvrage/${asoRes.affaireouvrage}/`);
-                setValidation(validation.can_validate);
-
             } catch (error) {
                 console.log(error);
             }
+            setLoad(false)
         })();        
     }, [props.aso]);
 
     let accepter = async()=>{
-        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_document_for_affaire_ouvrage/${asoData.affaireouvrage}/`);
+        if(avis){
+            await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/aso/${asoData.id}/`, {
+                ...asoData, statut : 1
+            });
+            setSuccess("Aso valider avec success")
+            window.location.reload();    
+        }else{
+            setAction(false)
+            setErrors("Cet aso ne peut etre valider sans document associer")
+        }
 
-        await Promise.all(data.map(async dt=>{
-            await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${dt.id}/`,
-            {...dt, aso : asoData.id}, {withCredentials : true});
-        }));
+    }
 
+    let annuler = async()=>{
+        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_aso_current_for_affaire_ouvrage/${asoData.affaireouvrage}/`)
+        if(!data){
+            await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/aso/${asoData.id}/`, {
+                ...asoData, statut : 0
+            });
+            setSuccess("Aso annuler avec success")
+            window.location.reload();    
+        }else{
+            setAction(false)
+            setErrors("Un ASO est deja en cours pour cet ouvrage. Vous ne pouvez donc annuler votre ASO")
+        }
+
+    }
+
+    let classer = async ()=>{
         await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/aso/${asoData.id}/`, {
-            ...asoData, statut : 1
+            ...asoData, statut : 2
         });
-
+        setSuccess("Aso classer avec success")
         window.location.reload();
     }
 
     return (
         <div>
             <div className='bg-white my-4'>
+                {success && <Flash type={"success"} setFlash={setSuccess}>{success}</Flash>}
+                {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
                 <h2 className='bg-gray-300 shadow-inner px-4 py-1'>ASO</h2>
-                <div className='text-sm grid grid-cols-2 p-4 gap-4'>
+                {!load ? <div className='text-sm grid grid-cols-2 p-4 gap-4'>
                     <div>
                         <span className='font-bold'>Numero : </span>
                         <span>{asoData.id}</span>
@@ -98,40 +116,40 @@ function GestionAso(props) {
                         <span className='font-bold'>Avis : </span>
                         <span>{avis}</span>
                     </div>
-                </div>
-                <div className='p-4 flex justify-end'>
-                    {
-                        (validation || parseInt(asoData.statut) !== 0) ? 
-                        <>
-                            {parseInt(asoData.statut) !== 1 && <Button action={()=>{
-                                accepter()
-                            }}>Accepter</Button>}
+                </div> : <MiniLoader/>}
+                
+                {!load ? (parseInt(asoData.statut) !== 2 && (!action ? <div className='p-4 flex justify-end'>
+                    {parseInt(asoData.statut) === 0 && <Button action={()=>{
+                        setAction(true);
+                        accepter()
+                    }}>Accepter</Button>}
 
-                            <Button>Visualiser</Button>
 
-                            {parseInt(asoData.statut) !== 0 ?
-                            <>
-                                <Button>Classer</Button>
-                                <Button>Diffuser</Button>                            
-                            </> : ''
-                            }
-                        </>
-                        :
-                        <span className='text-sm text-red-600'>
-                            Cet ASO n'a pas encore ete valider. Certains document n'ont pas encore recu d'avis
-                        </span>
+                    {parseInt(asoData.statut) === 1 && <Button action={()=>{
+                        setAction(true)
+                        annuler()
+                    }}>Annuler</Button>}
+
+                    {parseInt(asoData.statut) !== 0 ?
+                    <>
+                        <Button action={()=>{
+                            setAction(true)
+                            classer()
+                        }}>Classer</Button>
+                        <Button>Diffuser</Button>                            
+                    </> : ''
                     }
-                </div>
+                </div> : <div className='p-4 text-end text-green-600'>Operation en cours</div>)) : <MiniLoader/> }
             </div>
 
             <div className='bg-white my-4'>
-                <Tabs tabs={[
+                {!load ? <Tabs tabs={[
                     {title: 'Choix Veriffication', content : <VerificationDocument affaire_ouvrage={asoData.affaireouvrage} asoData={asoData}/>},
                     {title: 'Remarque generale', content : '', disabled : true}, //En cours de Dev
                     {title: 'Corriger remarque', content : '', disabled : true}, //En cours de Dev
                     {title: 'List de diffusion', content : <ListDiffusion id={asoData.id}/>},
-                    {title: 'Livrable', content : <Livrable id={asoData.id}/>, disabled : parseInt(asoData.statut) === 0},
-                ]}/>
+                    {title: 'Livrable', content : <Livrable id={asoData.id}/>},
+                ]}/> : <MiniLoader/>}
             </div>
         </div>
     )

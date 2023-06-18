@@ -9,6 +9,7 @@ import AddConstructeur from '../../../../component/Modal/AddConstructeur';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import ConfirmationModale from '../../../../component/Modal/ConfirmationModale';
+import MiniLoader from '../../../../component/utils/Loader/MiniLoader';
 
 function Constructeur() {
     const [adress, setAdress] = useState({
@@ -38,6 +39,8 @@ function Constructeur() {
 
     const [selectForDelete, setSelectForDelete] = useState(null)
 
+    const [load, setLoad] = useState(true)
+
     useEffect(()=>{
         (async()=>{
             try {
@@ -64,6 +67,7 @@ function Constructeur() {
             } catch (error) {
                 console.log(error);
             }
+            setLoad(false)
         })();
     }, []);
 
@@ -96,7 +100,7 @@ function Constructeur() {
                     </nav>
 
                     <div className='flex-grow grid grid-cols-4 gap-2'>
-                        <div className='text-sm col-span-1 p-2 shadow-2xl border border-gray-600 m-1'>
+                        {!load ? <div className='text-sm col-span-1 p-2 shadow-2xl border border-gray-600 m-1'>
                             <div className='flex mb-4'>
                                 <Button action={()=>{setAddConstruct(true)}}>Ajouter un Constructeur</Button>
                                 <Button action={()=>{
@@ -129,7 +133,7 @@ function Constructeur() {
                                     })}
                                 </tbody>
                             </table>
-                        </div>
+                        </div> : <MiniLoader/>}
                         {constructeurSelect != null &&
                             <div className='col-span-3'>
                                 <div className='m-4 flex justify-end'>

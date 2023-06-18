@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import Table from '../../../../../../component/utils/Table/Table';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 
 function ListAso(props) {
     const [datasAsos, setDatasAso] = useState([]);
+    const [load, setLoad] = useState(true);
 
     useEffect(()=>{
 
@@ -31,9 +33,15 @@ function ListAso(props) {
             } catch (error) {
                 console.log(error);
             }
+
+            setLoad(false)
         })();
 
     }, []);
+
+    if(load){
+        return <MiniLoader/>
+    }
 
     return (
         <div className='my-4'>

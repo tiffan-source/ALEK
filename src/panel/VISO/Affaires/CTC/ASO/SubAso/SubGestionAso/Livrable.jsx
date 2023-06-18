@@ -47,10 +47,10 @@ function Livrable(props) {
                                 </Text>
                                 <Text style={styles.blockAdress}>
                                     {
-                                    adresse.cplt_geo + " " + adresse.numero_voie +
+                                    adresse && (adresse.cplt_geo + " " + adresse.numero_voie +
                                     " " + adresse.lieu_dit + " " + adresse.code_postal + " " +
                                     adresse.ville + " " + adresse.pays + " " + adresse.departement 
-                                    + " " + adresse.province
+                                    + " " + adresse.province)
                                     }
                                 </Text>
                                 <Text style={styles.blockMail}>
@@ -165,6 +165,9 @@ function Livrable(props) {
                     })}
 
                     <View style={styles.collaboratuer_to_send}>
+                            <View>
+                                <Text>Envoye a </Text>
+                            </View>
                         {
                             asos.collaborateurs.map((collab, index)=>{
                                 return (
@@ -231,11 +234,6 @@ function Livrable(props) {
     
     return (
         <div>
-            <div>
-                <Button action={()=>{
-                    // sendMail()
-                }}>Diffuser</Button>
-            </div>
             <h2 className='my-4 text-center font-bold text-lg'>Previsualisation du pdf</h2>
 
             <div className='h-[42rem]'>

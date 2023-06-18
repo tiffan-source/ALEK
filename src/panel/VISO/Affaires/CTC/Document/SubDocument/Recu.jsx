@@ -7,10 +7,12 @@ import CreateDocument from '../../../../../../component/CreateDocument/CreateDoc
 import Table from '../../../../../../component/utils/Table/Table';
 import LabelSelect from '../../../../../../component/utils/LabelSelect/LabelSelect';
 import axios from 'axios';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 
 const Recu = (props) => {
   const [newDocument, setNewDocument] = useState(false);
   const [dataForTable, setDataForTable] = useState([]);
+  const [load, setLoad] = useState(true);
 
   useEffect(()=>{
     (async()=>{
@@ -37,6 +39,7 @@ const Recu = (props) => {
         }));
 
         setDataForTable(prepare_for_table)
+        setLoad(false);
       } catch (error) {
         console.log(error);        
       }
@@ -45,7 +48,7 @@ const Recu = (props) => {
 
   let component = (dataForTable.length!==0 && <Table datas={dataForTable} actionOnLine={(id)=>{
     props.selectDocument(id)
-  }}/>) || <div>Aucun Document</div>;
+  }}/>) || (!load ? <div>Aucun Document</div> : <MiniLoader/>);
 
   if (newDocument) {
     component = <CreateDocument annuler={() => { window.location.reload() }} />;

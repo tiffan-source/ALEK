@@ -3,11 +3,13 @@ import mine from "../../../../assets/icon/mine.png";
 import axios from 'axios';
 import Button from '../../../../component/utils/Button/Button';
 import ChooseCollab from '../../../../component/ChooseCollab/ChooseCollab';
+import MiniLoader from '../../../../component/utils/Loader/MiniLoader';
 
 function IT() {
   const [missionActive, setMissionActive] = useState([]);
   const [modal, setModal] = useState(null);
   const [interventions, setInterventions] = useState({});
+  const [load, setLoad] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -25,6 +27,7 @@ function IT() {
           }
         }));
         setMissionActive(mission);
+        setLoad(false)
       }
     })();
   }, []);
@@ -67,13 +70,13 @@ function IT() {
             </h2>
           </nav>
 
-          <div className='flex-grow'>
+          {!load ? <div className='flex-grow'>
             <div className='grid grid-cols-[5rem_auto_auto] bg-gray-900 text-white'>
               <span className='p-4'>Intervenant</span>
               <span className='p-4'>Intervention</span>
               <span className='p-4'>Libelle</span>
             </div>
-            {missionActive.map((mA, index) => {
+            {missionActive.length!==0 ? missionActive.map((mA, index) => {
               const interventionData = interventions[mA.id_sign] || [];
               return (
                 <div className='mb-6' key={index}>
@@ -107,8 +110,8 @@ function IT() {
                   </div>
                 </div>
               );
-            })}
-          </div>
+            }) : <span className='text-red-600'>Vous n'avez active aucune mission</span> }
+          </div> : <MiniLoader/>}
         </div>
       </div>
     </>

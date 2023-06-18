@@ -4,16 +4,19 @@ import Button from '../../../../../../component/utils/Button/Button';
 import ListDiffusion from './SubGestionRV/ListDiffusion';
 import Tabs from '../../../../../../component/utils/Tabs/Tabs';
 import Livrable from './SubGestionRV/Livrable';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 
 const table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
 
 function Gestion(props) {
   let [result, setResult] = useState({});
+  const [load, setLoad] = useState(true)
 
   useEffect(()=>{
     (async()=>{
       let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_rapport_visite_by_affaire_one_version/${props.rv}/`)
       setResult(data)
+      setLoad(false)
     })();
   }, [props.rv]);
 
@@ -27,6 +30,9 @@ function Gestion(props) {
 
     window.location.reload();
   }
+
+  if(load)
+    return <MiniLoader/>
 
   return (
     <div>

@@ -3,16 +3,22 @@ import axios from 'axios';
 import Button from '../utils/Button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import MiniLoader from '../utils/Loader/MiniLoader';
+import Flash from '../utils/Flash/Flash';
 
 function AddMission(props) {
 
     let [missions, setMissions] = useState([]);
     let [missionsSelect, setMissionsSelect] = useState([]);
+    const [load, setLoad] = useState(true);
+    const [action, setAction] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     useEffect(()=>{
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/ouvrage/')
             setMissions(data.results.filter(result=>!props.missionSelect.includes(result.id)));
+            setLoad(false);
         })();
     }, []);
 
@@ -29,14 +35,15 @@ function AddMission(props) {
                 })
             }
         }))
-
-        window.location.reload()
+        setSuccess(true);
+        window.location.reload();
     }
 
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-3xl max-h-full">
         <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700">
+            {success && <Flash type="success" setFlash={setSuccess}>Operation reussie</Flash>}
             <div className="flex justify-between items-center pr-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pt-6">
                     Ajouter des ouvrages
@@ -47,12 +54,13 @@ function AddMission(props) {
             </div>
                 
             <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                <div className='mb-4'>
+                {!load && (!action ? <div className='mb-4'>
                     <Button action={()=>{
+                        setAction(true);
                         enregistrer();
                     }}>Enregistrer</Button>
-                </div>
-                <table className='w-full'>
+                </div> : <span className='text-green-600'>Operation en cours de traitement</span>)}
+                {!load ? <table className='w-full'>
                     <thead>
                         <tr>
                             <th></th>
@@ -80,7 +88,7 @@ function AddMission(props) {
                             )
                         })}
                     </tbody>
-                </table>
+                </table> : <MiniLoader/>}
 
             </div>
         </div>

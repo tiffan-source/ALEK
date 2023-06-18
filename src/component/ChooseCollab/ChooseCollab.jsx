@@ -5,16 +5,22 @@ import { useState } from 'react'
 import axios from 'axios';
 import Button from '../utils/Button/Button';
 import moment from 'moment';
+import MiniLoader from '../utils/Loader/MiniLoader';
+import Flash from '../utils/Flash/Flash';
 
 function ChooseCollab(props) {
 
     const [collabs, setCollabs] = useState([]);
     const [collabsSelect, setcollabsSelect] = useState([]);
+    const [load, setLoad] = useState(true);
+    const [action, setAction] = useState(false);
+    const [success, setSuccess] = useState(false);
 
     useEffect(()=>{
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/collaborateurs/')
             setCollabs(data.results);
+            setLoad(false)
         })();
     }, []);
 
@@ -37,6 +43,8 @@ function ChooseCollab(props) {
             }
         }));
 
+        setSuccess(true);
+
         window.location.reload();
     }
 
@@ -44,6 +52,7 @@ function ChooseCollab(props) {
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
       <div className="relative w-full max-w-3xl max-h-full">
         <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700">
+            {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash>}
             <div className="flex justify-between items-center pr-6">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pt-6">
                     Ajouter un ou des intervenants
@@ -54,10 +63,14 @@ function ChooseCollab(props) {
             </div>
                 
             <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                {!load ?
+                <>
                 <div className='mb-4'>
-                    <Button action={()=>{
+                    {!action && <Button action={()=>{
+                        setAction(true)
                         enregistrer();
-                    }}>Enregistrer</Button>
+                    }}>Enregistrer</Button>}
+                    {action && <span className='text-green-600'>Operation en cours</span> }
                 </div>
                 <table className='w-full'>
                     <thead>
@@ -92,6 +105,7 @@ function ChooseCollab(props) {
                         })}
                     </tbody>
                 </table>
+                </> : <MiniLoader/>}
 
             </div>
         </div>

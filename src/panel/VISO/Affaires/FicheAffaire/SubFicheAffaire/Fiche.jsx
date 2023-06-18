@@ -8,7 +8,7 @@ function Fiche({data}) {
         <>
             <div className='border border-black m-1'>
                 <div className='flex flex-wrap gap-6'>
-                    <LabelInput disabled value={data.affaire.numero} col label="N Affaire" />
+                    <LabelInput disabled value={data.affaire.id} col label="N Affaire" />
                     <LabelInput disabled value={data.affaire.libelle} col label="Libelle"/>
                     <LabelInput disabled value={data.affaire.statut} col label="Statut de l'affaire"/>
                 </div>
@@ -16,7 +16,7 @@ function Fiche({data}) {
             <div>
             <fieldset className='border border-gray-300 m-1 p-2'>
                 <legend>Administratif</legend>
-                <LabelInput disabled value={data.affaire.numero_offre} label_w="12" label="N Offre"/>
+                <LabelInput disabled value={data.affaire.numero_offre || ""} label_w="12" label="N Offre"/>
             </fieldset>
 
             <fieldset className='border border-gray-300 m-1 p-2'>

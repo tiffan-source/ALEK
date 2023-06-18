@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import AddCommentRV from '../../../../../../component/Modal/AddCommentRV';
 import image from '../../../../../../assets/icon/image.png'
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
+import Flash from '../../../../../../component/utils/Flash/Flash';
 
 function Creer() {
 
@@ -20,6 +22,10 @@ function Creer() {
     const [objet, setObjet] = useState('');
     const [modal, setModal] = useState(false);
     const [affaire, setAffaire] = useState(null);
+    const [load, setLoad] = useState(true);
+    const [action, setAction] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [errors, setErrors] = useState('')
 
     useEffect(()=>{
         (async()=>{
@@ -44,48 +50,59 @@ function Creer() {
 
             } catch (error) {
                 console.log(error);
+                setErrors(error.toString())
             }
+
+            setLoad(false)
         })();
     }, []);
 
     let create = async()=>{
-
-        let {data:resRv} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/`,
-        {
-            date : moment().format('YYYY-MM-DD'),
-            affaire : affaire,
-            objet : objet
-        }, {withCredentials : true});
-
-        await Promise.all(avis.map(async dataAvis=>{
-            let {data: resAvisOuvrage} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_ouvrage/`,
+        try {
+            let {data:resRv} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/`,
             {
-                redacteur : userConnect.id,
-                ouvrage : dataAvis.ouvrage,
-                objet : dataAvis.objet,
-                rv : resRv.id
-            }, {withCredentials :true});
+                date : moment().format('YYYY-MM-DD'),
+                affaire : affaire,
+                objet : objet
+            }, {withCredentials : true});
 
-            await Promise.all(dataAvis.commentaires.map(async commentaire=>{
-                let formData = new FormData();
-                formData.append('asuivre', commentaire.asuivre)
-                formData.append('commentaire', commentaire.commentaire)
-                if(commentaire.image){
-                    formData.append('image', commentaire.image)
-                }
-                formData.append('avis', resAvisOuvrage.id)
-                await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_commentaire/`, formData, {withCredentials : true})
+            await Promise.all(avis.map(async dataAvis=>{
+                let {data: resAvisOuvrage} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_ouvrage/`,
+                {
+                    redacteur : userConnect.id,
+                    ouvrage : dataAvis.ouvrage,
+                    objet : dataAvis.objet,
+                    rv : resRv.id
+                }, {withCredentials :true});
+
+                await Promise.all(dataAvis.commentaires.map(async commentaire=>{
+                    let formData = new FormData();
+                    formData.append('asuivre', commentaire.asuivre)
+                    formData.append('commentaire', commentaire.commentaire)
+                    if(commentaire.image){
+                        formData.append('image', commentaire.image)
+                    }
+                    formData.append('avis', resAvisOuvrage.id)
+                    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_commentaire/`, formData, {withCredentials : true})
+                }));
             }));
-        }));
 
-        // window.location.reload();
+            setSuccess(true)
+
+            window.location.reload();
+        } catch (error) {
+            setErrors(error.toString())
+        }
+        
     }
 
     return (
         <>
             {modal && <AddCommentRV avis={avis} setAvis={setAvis} ouvrage={ouvragesSelect} handleClose={()=>{setModal(false)}}/>}
+            {success && <Flash type={"success"} setFlash={setSuccess}>Rapport de visite creer avec success</Flash>}
+            {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
             <div>
-                <div className='bg-white my-4'>
+                {!load ? <div className='bg-gray-100 my-4'>
                     <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Rapport de Visite</h2>
                     <div className='text-sm grid grid-cols-2 p-4 gap-4'>
                         <div>
@@ -110,13 +127,14 @@ function Creer() {
 
                     </div>
                     <div className='p-4 flex justify-end'>
-                        <Button action={()=>{
+                        {!action ? <Button action={()=>{
+                            setAction(true)
                             create()
-                        }}>Creer</Button>
+                        }}>Creer</Button> : <span className='text-green-600'>Rapport de visite en cours de creation</span> }
                     </div>
-                </div>
+                </div> : <MiniLoader/>}
 
-                <div className='bg-white my-4 pb-6'>
+                {!load ? <div className='bg-gray-100 my-4 pb-6'>
                     <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Texte du RV</h2>
                     <div className='text-sm grid grid-cols-2 p-4 gap-4'>
                         <LabelSelect label="Ouvrage" value={ouvragesSelect} options={ouvrages.reduce((prev, curr)=>{
@@ -175,7 +193,7 @@ function Creer() {
                             }
                         </tbody>
                     </table>
-                </div>
+                </div> : <MiniLoader/>}
             </div>
         </>
     )

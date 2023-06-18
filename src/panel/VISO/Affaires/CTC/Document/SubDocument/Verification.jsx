@@ -5,8 +5,9 @@ import { faList, faPlus, faWindowMaximize, faCheck } from '@fortawesome/free-sol
 import LabelSelect from '../../../../../../component/utils/LabelSelect/LabelSelect';
 import axios from 'axios';
 import AddComment from '../../../../../../component/Modal/AddComment';
-import moment from 'moment';
 import Flash from '../../../../../../component/utils/Flash/Flash';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
+import moment from 'moment';
 
 /**
  * Principe
@@ -32,11 +33,12 @@ function Verification(props) {
 
   const [prevAvis, setPrevAvis] = useState(null);
 
-  const [affaireOuvrage, setAffaireOuvrage] = useState({});
+  const [load, setLoad] = useState(true);
 
-  const [flash, setFlash] = useState(false);
-
-  const [checkAsoEnCours, setCheckAsoEnCours] = useState(false);
+  const [codification, setCodification] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [action, setAction] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -59,91 +61,118 @@ function Verification(props) {
           setOldComments(oldCommRes)
         }
 
-        let {data : affOuvrRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_affaire_ouvrage_from_document/${props.document}/`);
-        setAffaireOuvrage(affOuvrRes);
 
-        let {data:existAso} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_aso_current_for_affaire_ouvrage/${affOuvrRes.id}/`)
-        setCheckAsoEnCours(existAso.has_current_aso);
+
+        let {data: resCodif} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/documents/avis/${props.document}/`);
+        setCodification(resCodif.codification);
+
       } catch (error) {
         console.log(error);
       }
+
+      setLoad(false);
     })();
   }, [props.document]);
 
   let enregistrer = async()=>{
-    if(prevAvis)
-    {
-      await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/avis/${prevAvis.id}/`)
+    if(!action){
+      if(prevAvis)
+      {
+        await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/avis/${prevAvis.id}/`)
+      }
+  
+      let {data: avisResponse} = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/avis/',
+      {
+        id_document : props.document,
+        codification : avis,
+        collaborateurs : user
+      }, {withCredentials: true});
+  
+      await Promise.all(comments.map(async comment=>{
+        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/commentaire/',
+        {
+          id_avis : avisResponse.id,
+          commentaire : comment.commentaire,
+          a_suivre : comment.a_suivre
+        }, {withCredentials : true});
+      }));
+  
+      await Promise.all(oldComments.map(async comment=>{
+        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/commentaire/',
+        {...comment, id_avis : avisResponse.id}, {withCredentials : true});
+      }));
+      setAction(false)
+      setSuccess(true);
+      window.location.reload()
     }
 
-    let {data: avisResponse} = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/avis/',
-    {
-      id_document : props.document,
-      codification : avis,
-      collaborateurs : user
-    }, {withCredentials: true});
-
-    await Promise.all(comments.map(async comment=>{
-      await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/commentaire/',
-      {
-        id_avis : avisResponse.id,
-        commentaire : comment.commentaire,
-        a_suivre : comment.a_suivre
-      }, {withCredentials : true});
-    }));
-
-    await Promise.all(oldComments.map(async comment=>{
-      await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/commentaire/',
-      {...comment, id_avis : avisResponse.id}, {withCredentials : true});
-    }));
-
-    window.location.reload()
   }
 
   let valider = async () => {
-    let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_if_can_validate_affaire_ouvrage/${affaireOuvrage.id}/`);
-    if(data.can_validate){
-      await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvrage.id}/`, {
-        id_affaire : affaireOuvrage.id_affaire,
-        id_ouvrage : affaireOuvrage.id_ouvrage,
-        validateur : user,
-      }, {withCredentials : true})
+    if(!action){
+      if(codification){
+        await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${document.id}/`, {
+          ...document, validateur : user
+        }, {withCredentials : true})
+        setSuccess(true);
+        window.location.reload();
+      }
+      else{
+        setError("Ce document n'a pas encore recu d'avis");
+      }
 
-      window.location.reload();
-    }else{
-      setFlash(true);
+      setAction(false)
     }
   }
 
   let devalider = async () => {
-    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvrage.id}/`, {
-      id_affaire : affaireOuvrage.id_affaire,
-      id_ouvrage : affaireOuvrage.id_ouvrage,
-      validateur : null,
-    }, {withCredentials : true})
+    if(!action){
+      if(document.aso){
+        setError("Retirer le document de son ASO avant de le devalide");
+        return;
+      }
+  
+      await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${document.id}/`, {
+        ...document, validateur : null
+      }, {withCredentials : true})
+      setSuccess(true);
 
-    window.location.reload()
+      window.location.reload()
+      setAction(false)
+
+    }
   }
 
-  let createAso = async () =>{
-    let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_if_can_validate_affaire_ouvrage/${affaireOuvrage.id}/`);
-    if(data.can_validate){
-      await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaireouvrage/${affaireOuvrage.id}/`, {
-        id_affaire : affaireOuvrage.id_affaire,
-        id_ouvrage : affaireOuvrage.id_ouvrage,
-        validateur : user,
-      }, {withCredentials : true});
+  let attacherAso = async () =>{
+    if(!action){
+      if(codification){
+        let {data : affOuvrRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_affaire_ouvrage_from_document/${props.document}/`);
+    
+        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_aso_current_for_affaire_ouvrage/${affOuvrRes.id}/`)
+  
+        if(data){
+          console.log(data);
+        }else{
+          let res = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/aso/`, {
+            date : moment().format('YYYY-MM-DD'),
+            redacteur : user,
+            affaireouvrage : affOuvrRes.id
+          }, {withCredentials: true});
+  
+          data = res.data
+        }
+  
+        await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${document.id}/`, {
+          ...document, validateur : user, aso : data.id
+        }, {withCredentials : true});
+        setSuccess(true);
 
-      await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/aso/`,
-      {
-        redacteur : user,
-        affaireouvrage : affaireOuvrage.id,
-        date : moment().format('YYYY-MM-DD')
-      }, {withCredentials: true});
+        window.location.reload()
+      }else{
+        setError("Ce document n'a pas encore recu d'avis")
+      }
+      setAction(false)
 
-      window.location.reload();
-    }else{
-      setFlash(true)
     }
   }
 
@@ -157,22 +186,21 @@ function Verification(props) {
           handleClose={()=>{setModal(false)}}/>
         }
 
-        {flash && <Flash setFlash={setFlash}>
-          Vous ne pouvez ni valider ni creer l'ASO si tous les documents n'ont pas ete verifier.
-          Enregistrer votre verification courante ou valider tous les autres documents pour l'ouvrage concerne
-          </Flash>}
-
         <div className='m-4'>
           {props.document === null && <div className='text-sm text-red-600'>Selectioner un document</div>}
+          {action && <span>Operation en cours</span>}
+          {error && <Flash setFlash={setError}>{error}</Flash>}
+          {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash>}
           <div className='flex justify-end'>
-            <Button action={()=>{
+            {!load  ? <Button action={()=>{
+              setAction(true)
               enregistrer()
-            }}>Enregistrer</Button>
+            }}>Enregistrer</Button> : <MiniLoader/>}
           </div>
 
           <div className='bg-white my-4'>
             <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Rappel Affectations</h2>
-            <table className='text-sm p-2 w-full'>
+            {!load ? <table className='text-sm p-2 w-full'>
               <thead>
                 <tr>
                   <th className='border border-gray-600'>Emetteur</th>
@@ -197,13 +225,13 @@ function Verification(props) {
                   <td>{document.id}</td>
                 </tr>}
               </tbody>
-            </table>
+            </table> : <MiniLoader/>}
             <div className='p-2'></div>
           </div>
 
           <div className='bg-white my-4'>
             <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Examen</h2>
-            <div className='mx-8 my-2 grid grid-cols-2 gap-4'>
+            {!load ? <div className='mx-8 my-2 grid grid-cols-2 gap-4'>
               <div>
                 <span className='font-bold text-sm'>Emetteur : </span>
                 <span>{document && document.entreprise.raison_sociale}</span>
@@ -231,43 +259,36 @@ function Verification(props) {
               </div>
               <div>
                 <span className='font-bold text-sm'>Valide par : </span>
-                <span>{affaireOuvrage.detail_validateur && (affaireOuvrage.detail_validateur.last_name + " " + affaireOuvrage.detail_validateur.first_name)}</span>
+                <span></span>
               </div>
               <div>
                 <span className='font-bold text-sm'>Diffuse le : </span>
                 <span></span>
               </div>
-            </div>
+            </div> : <MiniLoader/>}
 
-            {document && document.aso ? <span className='mx-8 my-2 text-green-600'>Ce document a deja ete traite dans un ASO</span> : 
+            {document && (document.aso ? <span className='mx-8 my-2 text-green-600'>Ce document a deja ete traite dans un ASO</span> : 
               <div className='mx-8 my-2'>
-
-                {!affaireOuvrage.validateur &&
+                {!document.validateur ? <div>
                   <Button action={()=>{
+                    setAction(true)
                     valider()
                   }}>Valider</Button>
-                }
-
-                {affaireOuvrage.validateur &&
                   <Button action={()=>{
-                    devalider()
-                  }}>Devalider</Button>
-                }
-
-                {checkAsoEnCours ?
-                <span className='mx-4 text-sm text-green-600'>Un ASO est deja en cours pour cet ouvrage</span>
-                :
-                <Button action={()=>{
-                  createAso()
-                }}>Creer l'ASO</Button> }
-
-              </div>
+                    setAction(true)
+                    attacherAso()
+                  }}>Valider et attacher a l'ASO</Button>
+                </div> : <Button action={()=>{
+                  setAction(true)
+                  devalider()
+                }}>Devalider</Button> }
+              </div>)
             }
 
 
           </div>
 
-          <div className='bg-white my-4'>
+          {!load ? <div className='bg-white my-4'>
             <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Remarques associes</h2>
             <div className='p-2'>
               <Button disabled={avis === 'F'} action={()=>{
@@ -306,7 +327,7 @@ function Verification(props) {
                 }
               </tbody>
             </table>
-          </div>
+          </div> : <MiniLoader/>}
         </div>
     </>
 
