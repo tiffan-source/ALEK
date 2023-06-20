@@ -16,8 +16,8 @@ function ActiveMission(props) {
 
     useEffect(()=>{
         (async()=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/');
-            setMission(data.results);
+            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/get_all_parent_mission/');
+            setMission(data);
             setMissionActive(props.mission_active);
             setLoad(false);
         })();

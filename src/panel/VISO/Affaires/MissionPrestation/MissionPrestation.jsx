@@ -22,7 +22,7 @@ function MissionPrestation() {
                     let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/' + dt.id_mission_id + '/');
                     return {
                         "id" : data.id,
-                        "Mission" : data.code_mission,
+                        "Missions" : data.code_mission,
                         "Libelle" : data.libelle,
                     }
                 }));

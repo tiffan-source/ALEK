@@ -243,9 +243,7 @@ function Verification(props) {
               <LabelSelect label="Avis" value={avis} options={{
                 "F" : "F",
                 "RMQ" : "RMQ",
-                "FA" : "FA",
                 "HM" : "HM",
-                "SO" : "SO",
                 "VI" : "VI"
               }} onChange={(e)=>{
                 if(e.target.value === 'F')

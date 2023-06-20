@@ -46,12 +46,12 @@ function App() {
   }
 
   return (
-    <div className="App grid grid-cols-[18rem_auto] h-screen w-screen">
+    <div className="App grid grid-cols-[18rem_auto] min-h-screen w-screen">
       <Router>
-        <div className="h-screen">
+        <div className="min-h-screen">
           <Panel />
         </div>
-        <div className="bg-gray-100 h-screen overflow-scroll">
+        <div className="bg-gray-100 min-h-screen overflow-scroll">
           <Switch>
             {Object.keys(strutures).map((panel, index) => (
               <Route key={index} path={`/${panel}`}>

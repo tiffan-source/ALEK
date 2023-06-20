@@ -32,7 +32,7 @@ class Etape5 extends Component {
         <div className='border border-gray-400 p-2 mb-2'>
   
           <div className='flex gap-6'>
-            <LabelInput  label="N° Contrat ALEATEK" value={this.props.dataAffaire.numero_contrat} disabled/>
+            <LabelInput  label="N° Contrat" value={this.props.dataAffaire.numero_contrat} disabled/>
             <LabelInput label="N Plan" disabled value={1}/>
           </div>
 

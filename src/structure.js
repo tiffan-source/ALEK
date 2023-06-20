@@ -2,7 +2,7 @@ export let strutures = {
     "Aleatek" : {
         "Affaires" : {
             "Fiche Affaire" : {},
-            "Mission" : {},
+            "Missions" : {},
             "IT" : {},
             "Constructeurs" : {},
             "Ouvrages Diffusion" : {},
@@ -10,7 +10,7 @@ export let strutures = {
                 "Documents" :  {},
                 "ASO" : {},
                 "Rapports Visites" : {},
-                // "CRCT" : {},
+                "RICT" : {},
                 // "Synthese des avis" : {}
             }
         },

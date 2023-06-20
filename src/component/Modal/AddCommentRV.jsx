@@ -4,6 +4,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../utils/Button/Button';
 import LabelCheckbox from '../utils/LabelCheckbox/LabelCheckbox';
 function AddCommentRV({handleClose, avis, setAvis, ouvrage}) {
+
     const [comment, setComment] = useState('')
     const [asuivre, setAsuivre] = useState(false)
     const [image, setImage] = useState(null)

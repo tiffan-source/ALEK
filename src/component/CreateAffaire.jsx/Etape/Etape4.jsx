@@ -82,7 +82,7 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
     <>
       <div>
         <div className="flex gap-8">
-          <LabelInput label="N° Contrat ALEATEK" value={dataAffaire.numero_contrat} disabled/>
+          <LabelInput label="N° Contrat" value={dataAffaire.numero_contrat} disabled/>
           <LabelInput label="N° Plan" disabled value={1} />
         </div>
 

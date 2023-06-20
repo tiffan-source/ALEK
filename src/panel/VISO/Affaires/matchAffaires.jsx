@@ -8,7 +8,7 @@ import OuvrageDiffusion from "./OuvrageDiffusion/OuvrageDiffusion";
 export let matchAffaires = {
     "CTC" : <CTCRouter/>,
     "Fiche Affaire": <FicheAffaire/>,
-    "Mission": <MissionPrestation/>,
+    "Missions": <MissionPrestation/>,
     "IT": <IT/>,
     "Constructeurs" : <Constructeur/>,
     "Ouvrages Diffusion" : <OuvrageDiffusion/>,

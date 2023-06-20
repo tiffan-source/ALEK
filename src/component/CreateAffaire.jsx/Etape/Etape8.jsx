@@ -10,8 +10,8 @@ const Etape8 = ({missionSelect, setMissionSelect, create}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_STARTURIBACK}/admin/mission/`);
-        setMissions(response.data.results);
+        const response = await axios.get(`${process.env.REACT_APP_STARTURIBACK}/get_all_parent_mission/`);
+        setMissions(response.data);
       } catch (error) {
         console.log(error);
       }

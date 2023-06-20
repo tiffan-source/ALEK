@@ -8,11 +8,12 @@ import aso from '../assets/icon/aso.png';
 import clients from '../assets/icon/clients.png';
 import ouvrage from '../assets/icon/publication.png';
 import visitor from '../assets/icon/visitor.png';
+import books from '../assets/icon/books.png'
 
 export let matchIcon = {
     "Affaires" : oilPump,
     "Fiche Affaire" : oilPump,
-    "Mission" : dealIcon,
+    "Missions" : dealIcon,
     "IT" : mine,
     "Constructeurs" : worker,
     "CTC" : folder,
@@ -20,5 +21,6 @@ export let matchIcon = {
     "ASO" : aso,
     "Clients" : clients,
     "Ouvrages Diffusion" : ouvrage,
-    "Rapports Visites" : visitor
+    "Rapports Visites" : visitor,
+    "RICT" : books
 };

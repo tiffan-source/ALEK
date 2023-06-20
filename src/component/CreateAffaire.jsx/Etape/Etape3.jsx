@@ -46,7 +46,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
       <div className='border border-gray-400 p-2 mb-2'>
         <LabelInput
           label_w="10"
-          label="N° Contrat ALEATEK"
+          label="N° Contrat"
           value={dataAffaire.numero_contrat}
           onChange={(e) => {
             modifyField("numero_contrat", e.target.value);
@@ -55,7 +55,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
 
         <LabelInput
           label_w="10"
-          label="Libele Affaire"
+        label="Libele Affaire"
           value={dataAffaire.libelle}
           onChange={(e) => {
             modifyField("libelle", e.target.value);
