@@ -221,7 +221,7 @@ const CreateDocument = (props) => {
           }, {})} onChange={(e)=>{
             setEntrepriseAffaireOuvrageSelect(e.target.value)
           }}/>}
-          <LabelInput required label_w="2" label='N externe' value={dataDocument.numero_externe} onChange={(e)=>{
+          <LabelInput required label='N externe' value={dataDocument.numero_externe} onChange={(e)=>{
             setDataDocument({...dataDocument, numero_externe : e.target.value})
           }}/>
           <LabelInput label='Indice' value={dataDocument.indice} onChange={(e)=>{

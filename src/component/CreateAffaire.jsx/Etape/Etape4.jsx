@@ -163,7 +163,6 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
 
         <div className="flex justify-between">
           <LabelInput
-            label_w="24"
             label="Date de début du chantier"
             value={dataPlan.debut_chantier || startChantier}
             type="date"

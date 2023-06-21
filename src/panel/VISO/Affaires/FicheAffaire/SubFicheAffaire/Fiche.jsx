@@ -16,20 +16,20 @@ function Fiche({data}) {
             <div>
             <fieldset className='border border-gray-300 m-1 p-2'>
                 <legend>Administratif</legend>
-                <LabelInput disabled value={data.affaire.numero_offre || ""} label_w="12" label="N Offre"/>
+                <LabelInput disabled value={data.affaire.numero_offre || ""}  label="N Offre"/>
             </fieldset>
 
             <fieldset className='border border-gray-300 m-1 p-2'>
                 <legend>Client</legend>
 
                 <div className='flex gap-1'>
-                    <LabelInput disabled value={data.affaire.numero_contrat} label_w="10"  label="N convention contrat"/>
-                    <LabelInput disabled value={data.affaire.date_contrat} label_w="10"  label="Date de contrat"/>
+                    <LabelInput disabled value={data.affaire.numero_contrat}   label="N convention contrat"/>
+                    <LabelInput disabled value={data.affaire.date_contrat}   label="Date de contrat"/>
                 </div>
 
                 <div className='flex gap-1'>
-                    <LabelInput disabled value={data.client.raison_sociale} label_w="10"  label="Raison Sociale"/>
-                    <LabelInput disabled value={data.client.id} label_w="10"  label="N Client"/>  
+                    <LabelInput disabled value={data.client.raison_sociale}   label="Raison Sociale"/>
+                    <LabelInput disabled value={data.client.id}   label="N Client"/>  
                 </div>
             </fieldset>
 

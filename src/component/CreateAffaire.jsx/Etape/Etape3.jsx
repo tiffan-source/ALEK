@@ -45,7 +45,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
     <div>
       <div className='border border-gray-400 p-2 mb-2'>
         <LabelInput
-          label_w="10"
+          
           label="N° Contrat"
           value={dataAffaire.numero_contrat}
           required
@@ -55,7 +55,6 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
         />
 
         <LabelInput
-          label_w="10"
           label="Libele Affaire"
           required
           value={dataAffaire.libelle}
@@ -65,7 +64,6 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
         />
 
         <LabelSelect
-          label_w="10"
           label="Statut Affaire"
           value={dataAffaire.statut}
           onChange={(e) => {
@@ -81,7 +79,6 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
 
       <div className='border border-gray-400 p-2 mb-2'>
         {! load ? <LabelSelect
-          label_w="10"
           label="Client"
           value={dataAffaire.client}
           onChange={(e) => {
@@ -99,7 +96,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
 
       <div className='border border-gray-400 p-2 mb-2'>
         <LabelInput
-          label_w="10"
+          
           label="N°Offre"
           value={dataAffaire.numero_offre}
           onChange={(e) => {
@@ -108,7 +105,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
         />
 
         <LabelInput
-          label_w="10"
+          
           label="Date du contrat"
           value={dataAffaire.date_contrat}
           onChange={(e) => {
