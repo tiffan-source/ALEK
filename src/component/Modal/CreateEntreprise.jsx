@@ -160,13 +160,13 @@ function CreateEntreprise(props) {
                     <div className='bg-gray-50 m-4'>
                         <h2 className='p-2 bg-gray-500 shadow-inner'>Details Entrepise</h2>
                         {!load ? <div className='grid grid-cols-2 gap-4 mx-4'>
-                            <LabelInput required label_w="10" label="Raison Sociale" value={entreprise.raison_sociale} onChange={(e)=>{
+                            <LabelInput required  label="Raison Sociale" value={entreprise.raison_sociale} onChange={(e)=>{
                                 setEntrepise({...entreprise, raison_sociale : e.target.value})
                             }}/>
-                            <LabelInput label_w="10" label="Siret" value={entreprise.siret} onChange={(e)=>{
+                            <LabelInput  label="Siret" value={entreprise.siret} onChange={(e)=>{
                                 setEntrepise({...entreprise, siret : e.target.value})
                             }}/>
-                            <LabelInput label_w="10" label="Activite" value={entreprise.activite} onChange={(e)=>{
+                            <LabelInput  label="Activite" value={entreprise.activite} onChange={(e)=>{
                                 setEntrepise({...entreprise, activite : e.target.value})
                             }}/>
                         </div> : <MiniLoader/>}
