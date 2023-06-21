@@ -5,6 +5,7 @@ import ListDiffusion from './SubGestionRV/ListDiffusion';
 import Tabs from '../../../../../../component/utils/Tabs/Tabs';
 import Livrable from './SubGestionRV/Livrable';
 import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
+import GestionRemarque from './SubGestionRV/GestionRemarque';
 
 const table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
 
@@ -40,19 +41,19 @@ function Gestion(props) {
         <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Rapport de Visite</h2>
         <div className='text-sm grid grid-cols-2 p-4 gap-4'>
             <div>
-                <span>Date : </span>
+                <span className='font-bold'>Date : </span>
                 <span>{result.date}</span>
             </div>
             <div>
-                <span>Statut : </span>
+                <span className='font-bold'>Statut : </span>
                 <span>{table_statut[result.statut]}</span>
             </div>
             <div>
-                <span>Responsable d'affaire / Redacteur : </span>
+                <span className='font-bold'>Responsable d'affaire / Redacteur : </span>
                 {/* <span>{result.redacteur_detail && (result.redacteur_detail.first_name + " " + result.redacteur_detail.last_name)}</span> */}
             </div>
             <div>
-                <span>Objet : </span>
+                <span className='font-bold'>Objet : </span>
                 <span>{result.objet}</span>
             </div>
         </div>
@@ -66,6 +67,7 @@ function Gestion(props) {
 
       <div className='bg-white my-4'>
         <Tabs tabs={[
+            {title: 'Gestion des remarques', content : <GestionRemarque id={result.id}/>},
             {title: 'List de diffusion', content : <ListDiffusion id={result.id}/>, disabled : result.id === undefined},
             {title: 'Livrable', content : <Livrable id={result.id}/>},
         ]}/>

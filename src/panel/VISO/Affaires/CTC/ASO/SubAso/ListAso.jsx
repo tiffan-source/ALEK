@@ -21,6 +21,7 @@ function ListAso(props) {
                     let statut = ["En cours", "Accepter", "Classer", "Diffuser"]
                     let {data : data_charge_affaire} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/find_charge_affaire_for_affaire/${id_affaire}/`)
                     return {
+                        "order" : aso.order_in_affaire,
                         "id" : aso.id,
                         "Date" : aso.date,
                         "Ouvrage" : aso.ouvrage.libelle,

@@ -59,11 +59,14 @@ function Creer() {
 
     let create = async()=>{
         try {
+            let {data:dataPosition} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/next_number_rv_for_affaire/${affaire}/`)
+
             let {data:resRv} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/`,
             {
                 date : moment().format('YYYY-MM-DD'),
                 affaire : affaire,
-                objet : objet
+                objet : objet,
+                order_in_affaire : dataPosition.position
             }, {withCredentials : true});
 
             await Promise.all(avis.map(async dataAvis=>{
@@ -104,24 +107,24 @@ function Creer() {
             <div>
                 {!load ? <div className='bg-gray-100 my-4'>
                     <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Rapport de Visite</h2>
-                    <div className='text-sm grid grid-cols-2 p-4 gap-4'>
+                    <div className='grid grid-cols-2 p-4 gap-4'>
                         <div>
-                            <span>Date : </span>
+                            <span className='font-bold'>Date : </span>
                             <span>{moment().format('YYYY-MM-DD')}</span>
                         </div>
 
                         { userConnect &&
                         <div>
-                            <span>Redacteur : </span>
+                            <span className='font-bold'>Redacteur : </span>
                             <span>{userConnect.last_name + " " + userConnect.first_name}</span>
                         </div> }
 
                         <div>
-                            <span>Statut : </span>
+                            <span className='font-bold'>Statut : </span>
                             <span>En cours</span>
                         </div>
 
-                        <LabelInput label="objet" value={objet} onChange={(e)=>{
+                        <LabelInput label="Objet" value={objet} onChange={(e)=>{
                             setObjet(e.target.value)
                         }}/>
 
@@ -137,7 +140,7 @@ function Creer() {
                 {!load ? <div className='bg-gray-100 my-4 pb-6'>
                     <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Texte du RV</h2>
                     <div className='text-sm grid grid-cols-2 p-4 gap-4'>
-                        <LabelSelect label="Ouvrage" value={ouvragesSelect} options={ouvrages.reduce((prev, curr)=>{
+                        <LabelSelect col label="Ouvrage" value={ouvragesSelect} options={ouvrages.reduce((prev, curr)=>{
                             let key = curr.ouvrage.libelle;
                             prev[key] = curr.id;
                             return prev;
@@ -145,7 +148,7 @@ function Creer() {
                             setOuvragesSelect(e.target.value);
                         }}/>
 
-                        <LabelInput label="objet du controle" value={avis.find(data=>{return data.ouvrage == ouvragesSelect})?.objet || ""} onChange={(e)=>{
+                        <LabelInput label="Objet du controle" value={avis.find(data=>{return data.ouvrage == ouvragesSelect})?.objet || ""} onChange={(e)=>{
                             let avisToSet = avis.findIndex((data)=>{
                                 return data.ouvrage == ouvragesSelect;
                             })

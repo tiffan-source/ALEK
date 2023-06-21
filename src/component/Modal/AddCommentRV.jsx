@@ -17,7 +17,7 @@ function AddCommentRV({handleClose, avis, setAvis, ouvrage}) {
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-2xl max-h-full">
-            <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700">
+            <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
                 <div className='flex justify-between items-center pr-6'>
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
                         Ajouter un commentaire

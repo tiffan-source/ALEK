@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "cross-env REACT_APP_STARTURIBACK=https://aleatek-api-8m5n.onrender.com/api REACT_APP_URIBACK=https://aleatek-api-8m5n.onrender.com/ react-scripts build",
+    "build": "cross-env REACT_APP_STARTURIBACK=https://aleatek-api-8m5n.onrender.com/api REACT_APP_URIBACK=https://aleatek-api-8m5n.onrender.com react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

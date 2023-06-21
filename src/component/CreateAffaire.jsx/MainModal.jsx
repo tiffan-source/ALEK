@@ -14,7 +14,8 @@ const MainModal = ({ handleClose }) => {
   const [index, setIndex] = useState(0);
   const [stringErrors, setStringError] = useState("");
   const [flash, setFlash] = useState(false);
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   const [dataFormAffaire, setDataFormAffaire] = useState({
     numero_contrat: '',
@@ -73,6 +74,11 @@ const MainModal = ({ handleClose }) => {
 
   const createAffaireAndPlan = async (missions) => {
     try {
+        if(stringErrors){
+          setFlash(true);
+          return;
+        }
+        setCreating(true)
         // Creer l'affaire
         let resAffaire = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/affaire/',
         dataFormAffaire, {withCredentials : true})
@@ -131,9 +137,11 @@ const MainModal = ({ handleClose }) => {
     />,
 
     <Etape8
+      setStringError={setStringError}
       missionSelect={missionSelect}
       setMissionSelect={setMissionSelect}
       create={createAffaireAndPlan}
+      creating={creating}
     />,
   ];
 
@@ -158,7 +166,7 @@ const MainModal = ({ handleClose }) => {
   return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
       <div className="relative w-full max-w-4xl max-h-full">
-        <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700">
+        <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
           <div className="flex justify-between items-center pr-6">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
               Assistant de création d'un nouveau "Plan d'Affaire "

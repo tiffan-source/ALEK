@@ -14,6 +14,7 @@ function Liste(props) {
 
       let pre_table = await Promise.all(resRapport.map(async rapport=>{
         return {
+          "order" : rapport.order_in_affaire,
           "id" : rapport.id,
           "Date" : rapport.date,
           "Object" : rapport.objet,

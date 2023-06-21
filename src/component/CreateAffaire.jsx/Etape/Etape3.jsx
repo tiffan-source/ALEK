@@ -48,6 +48,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
           label_w="10"
           label="N° Contrat"
           value={dataAffaire.numero_contrat}
+          required
           onChange={(e) => {
             modifyField("numero_contrat", e.target.value);
           }}
@@ -55,7 +56,8 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
 
         <LabelInput
           label_w="10"
-        label="Libele Affaire"
+          label="Libele Affaire"
+          required
           value={dataAffaire.libelle}
           onChange={(e) => {
             modifyField("libelle", e.target.value);

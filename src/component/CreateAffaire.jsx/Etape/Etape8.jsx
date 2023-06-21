@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MiniLoader from '../../utils/Loader/MiniLoader';
 
-const Etape8 = ({missionSelect, setMissionSelect, create}) => {
+const Etape8 = ({missionSelect, setMissionSelect, create, setStringError, creating}) => {
   const [missions, setMissions] = useState([]);
-  const [isCreating, setIsCreating] = useState(false);
   const [load, setLoad] = useState(true);
 
   useEffect(() => {
@@ -21,6 +20,19 @@ const Etape8 = ({missionSelect, setMissionSelect, create}) => {
     fetchData();
   }, []);
 
+  useEffect(()=>{
+    validate()
+  }, [missionSelect]);
+
+  let validate = () => {
+    if(missionSelect.length === 0){
+      setStringError("Choisissez au mois une mission");
+      return;
+    }
+    setStringError('');
+  }
+
+
   const handleCheckboxChange = (event, missionId) => {
     if (event.target.checked) {
       if (!missionSelect.includes(missionId)) {
@@ -34,12 +46,12 @@ const Etape8 = ({missionSelect, setMissionSelect, create}) => {
   };
 
   const handleCreate = async () => {
-    setIsCreating(true);
     try {
       await create(missionSelect);
     } catch (error) {
       console.log(error);
     }
+
   };
 
   return (
@@ -62,7 +74,7 @@ const Etape8 = ({missionSelect, setMissionSelect, create}) => {
                   checked={missionSelect.includes(mission.id)}
                   type='checkbox'
                   onChange={(e) => handleCheckboxChange(e, mission.id)}
-                  disabled={isCreating}
+                  disable={creating}
                 />
               </td>
               <td>{mission.code_mission}</td>
@@ -73,8 +85,8 @@ const Etape8 = ({missionSelect, setMissionSelect, create}) => {
       </table> : <MiniLoader/>}
 
       <div className='my-2 text-end'>
-        <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={handleCreate} disabled={isCreating}>
-          {isCreating ? 'En cours de création' : 'Valider'}
+        <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={handleCreate} disabled={creating}>
+          {creating ? 'En cours de creation' : 'Creer'}
         </button>
       </div>
     </div>

@@ -39,6 +39,7 @@ function Verification(props) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [action, setAction] = useState(false);
+  const [authorize, setAuthorize] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -51,20 +52,25 @@ function Verification(props) {
         let {data: userResponse} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/utilisateur-connecte/`)
         setuser(userResponse.id);
 
-        let {data: previousAvis} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_avis_on_document_by_collaborateur/${props.document}/${userResponse.id}/`);
-        if(previousAvis.avis)
-        {
-          setAvis(previousAvis.avis.codification)
-          setPrevAvis(previousAvis.avis)
+        let {data: userOnDoc} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_collaborateur_affect_on_document/${props.document}/`)
 
-          let {data:oldCommRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_comment_for_avis/${previousAvis.avis.id}/`)
-          setOldComments(oldCommRes)
+        let canVerif = userOnDoc.includes(userResponse.id)
+        setAuthorize(canVerif)
+
+        if(canVerif){
+          let {data: previousAvis} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_avis_on_document_by_collaborateur/${props.document}/${userResponse.id}/`);
+          if(previousAvis.avis)
+          {
+            setAvis(previousAvis.avis.codification)
+            setPrevAvis(previousAvis.avis)
+  
+            let {data:oldCommRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_comment_for_avis/${previousAvis.avis.id}/`)
+            setOldComments(oldCommRes)
+          }
+  
+          let {data: resCodif} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/documents/avis/${props.document}/`);
+          setCodification(resCodif.codification);
         }
-
-
-
-        let {data: resCodif} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/documents/avis/${props.document}/`);
-        setCodification(resCodif.codification);
 
       } catch (error) {
         console.log(error);
@@ -105,7 +111,6 @@ function Verification(props) {
       setSuccess(true);
       window.location.reload()
     }
-
   }
 
   let valider = async () => {
@@ -153,12 +158,15 @@ function Verification(props) {
         if(data){
           console.log(data);
         }else{
+          let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/next_number_aso_for_affaire/${affOuvrRes.id_affaire}/`);
+          console.log(data);
           let res = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/aso/`, {
             date : moment().format('YYYY-MM-DD'),
             redacteur : user,
-            affaireouvrage : affOuvrRes.id
+            affaireouvrage : affOuvrRes.id,
+            order_in_affaire : data.position
           }, {withCredentials: true});
-  
+
           data = res.data
         }
   
@@ -192,14 +200,14 @@ function Verification(props) {
           {error && <Flash setFlash={setError}>{error}</Flash>}
           {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash>}
           <div className='flex justify-end'>
-            {!load  ? <Button action={()=>{
+            {!load  ? (authorize && <Button action={()=>{
               setAction(true)
               enregistrer()
-            }}>Enregistrer</Button> : <MiniLoader/>}
+            }}>Enregistrer</Button>) : <MiniLoader/>}
           </div>
 
           <div className='bg-white my-4'>
-            <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Rappel Affectations</h2>
+            <h2 className='bg-gray-300 text-sm p-2 shadow-inner'>Rappel Affectations</h2>
             {!load ? <table className='text-sm p-2 w-full'>
               <thead>
                 <tr>
@@ -229,8 +237,8 @@ function Verification(props) {
             <div className='p-2'></div>
           </div>
 
-          <div className='bg-white my-4'>
-            <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Examen</h2>
+          {authorize ? <div className='bg-white my-4'>
+            <h2 className='bg-gray-300 text-sm p-2 shadow-inner'>Examen</h2>
             {!load ? <div className='mx-8 my-2 grid grid-cols-2 gap-4'>
               <div>
                 <span className='font-bold text-sm'>Emetteur : </span>
@@ -257,7 +265,7 @@ function Verification(props) {
               </div>
               <div>
                 <span className='font-bold text-sm'>Valide par : </span>
-                <span></span>
+                <span>{document.validateur && (document.validateur.first_name + " " + document.validateur.last_name)}</span>
               </div>
               <div>
                 <span className='font-bold text-sm'>Diffuse le : </span>
@@ -284,10 +292,10 @@ function Verification(props) {
             }
 
 
-          </div>
+          </div> : <div className='border border-red-600 bg-red-100 p-2 rounded-lg text-red-600'>Vous n'etes pas affecter au document</div>}
 
           {!load ? <div className='bg-white my-4'>
-            <h2 className='bg-gray-200 text-sm p-2 shadow-inner'>Remarques associes</h2>
+            <h2 className='bg-gray-300 text-sm p-2 shadow-inner'>Remarques associes</h2>
             <div className='p-2'>
               <Button disabled={avis === 'F'} action={()=>{
                 setModal(true)

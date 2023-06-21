@@ -8,8 +8,12 @@ import styles from './style';
 
 import mailjet from 'node-mailjet';
 
-const mailjetClient = mailjet.apiConnect('25b532b83e68907160e8f3d0dbc26c8b', 'b5f03da74e92c8d22cf3abf912792a2a');
-
+const matchAvis = {
+    "F" : "Favorable",
+    "RMQ" : "Remarque",
+    "HM" : "Hors Mission",
+    "VI" : "Vu pour Info"
+}
 
 function Livrable(props) {
 
@@ -28,6 +32,17 @@ function Livrable(props) {
     const ASO = (asos)=>{
         let {adresse} = asos.charge;
         let {charge} = asos
+        let {codification} = asos
+        let styleCodif;
+
+        if(codification === 'F' || codification === 'RMQ'){
+            styleCodif = codification === 'F' ? styles.codificationF : styles.codificationRMQ
+        }else{
+            styleCodif = styles.codification
+        }
+
+        console.log(styleCodif);
+
         return (
             <Document>
                 <Page size="A4" >
@@ -65,7 +80,7 @@ function Livrable(props) {
                                     
                                 </Text>
                                 <Text>
-                                    ASO N{asos.aso.id}
+                                    ASO N{asos.aso.order_in_affaire}
                                 </Text>
                                 <Text>
                                     N° affaire : {asos.affaire.numero}
@@ -107,14 +122,14 @@ function Livrable(props) {
                                     <Text>
                                         Ouvrage examnie : {asos.ouvrage.libelle}
                                     </Text>
-                                    <Text style={styles.codification}>{asos.codification}</Text>
+                                    <Text style={styleCodif}>{matchAvis[codification]}</Text>
                                 </View>
                             </View>
                         </View>
                     </View>
                     {/* sous entete */}
                     <View style={styles.asoTitleFirstSection}>
-                        <Text style={styles.titleAso}>ASO n°{asos.aso.id} | Avis sur Ouvrage| du {asos.aso.date}</Text>
+                        <Text style={styles.titleAso}>ASO n°{asos.aso.order_in_affaire} | Avis sur Ouvrage| du {asos.aso.date}</Text>
                         <Text style={styles.constanteMiniSection}>
                             Dans le cadre de la mission qui nous a été confiée, veuillez trouver l'avis formulé sur l'ouvrage ou élément d'équipement faisant suite à
                             l'examen des documents d'exécution référencés ci-dessous.

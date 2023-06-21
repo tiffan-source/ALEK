@@ -116,8 +116,16 @@ const styles = StyleSheet.create({
         justifyContent : 'space-between'
     },
 
-    codification:{
+    codificationRMQ:{
         color : '#F00'
+    },
+
+    codificationF:{
+        color : '#0F0'
+    },
+
+    codification:{
+        color : '#000'
     },
 
     collaboratuer_to_send : {

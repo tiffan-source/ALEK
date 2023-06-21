@@ -62,7 +62,7 @@ function Livrable(props) {
                                     
                                 </Text>
                                 <Text>
-                                    Rapport de visite N{rv.rv.id}
+                                    Rapport de visite N{rv.rv.order_in_affaire}
                                 </Text>
                                 <Text>
                                     N° affaire : {rv.affaire.numero}
@@ -106,7 +106,7 @@ function Livrable(props) {
                     </View>
                     {/* sous entete */}
                     <View style={styles.asoTitleFirstSection}>
-                        <Text style={styles.titleAso}>RV n°{rv.rv.id} | Rapport de visite | du {rv.rv.date}</Text>
+                        <Text style={styles.titleAso}>RV n°{rv.rv.order_in_affaire} | Rapport de visite | du {rv.rv.date}</Text>
                         <Text style={styles.constanteMiniSection}>
                         Veuillez trouver ci-après les avis formulés sur les ouvrages ou éléments d'équipement suite à nos examens
                          sur chantier de la réalisation

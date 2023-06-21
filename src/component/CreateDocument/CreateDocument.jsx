@@ -66,6 +66,21 @@ const CreateDocument = (props) => {
         }else{
           setAffaireOuvragesSelect(null);
         }
+
+        if(props.edition){
+          let edition = props.edition;
+          setDataDocument({
+            dossier : edition.dossier || "Execution",
+            nature : edition.nature || "TOUS",
+            indice : edition.indice || "",
+            date_indice : edition.date_indice || undefined,
+            date_reception : edition.date_reception || undefined,
+            titre : edition.titre || "",
+            numero_revision : edition.numero_revision || undefined,
+            numero_externe : edition.numero_externe || undefined
+          })
+        }
+
         validation()
 
       } catch (error) {
@@ -102,7 +117,11 @@ const CreateDocument = (props) => {
   }, [dataDocument])
 
   let validation = ()=>{
-
+    let {titre, numero_externe} = dataDocument;
+    if(validator.isEmpty(titre || '') && validator.isEmpty(numero_externe || '')){
+      setStringError('Le titre et le numero externe ne peuvent etre simultanement vide');
+      return;
+    }
     setStringError('')
   }
 
@@ -132,10 +151,25 @@ const CreateDocument = (props) => {
   const createDocument = async () => {
     if(stringErrors){
       setFlash(true)
+      setAction(false)
     }else{
-      let {data} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/documents/`,{
-        ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect
-      }, {withCredentials : true})
+      let {data:userData} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/utilisateur-connecte/`);
+
+      let data;
+
+      if(props.edition){
+        let {data:dataEdit} = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${props.edition.id}/`,{
+          ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect, createur : userData.id
+        }, {withCredentials : true});
+
+        data = dataEdit;
+      }else{
+        let {data:dataCreate} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/documents/`,{
+          ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect, createur : userData.id
+        }, {withCredentials : true});  
+
+        data = dataCreate;
+      }
   
       await Promise.all(pdfFiles.map(async pdfFile=>{
         let formData = new FormData();
@@ -147,8 +181,16 @@ const CreateDocument = (props) => {
         await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichierattacher/',
         formData,
         {withCredentials : true})
-      }))
+      }));
       setSuccess(true);
+
+      if(!props.edition){
+        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/document_affectation/',
+        {
+          document : data.id,
+          collaborateur : userData.id
+        });  
+      }
   
       window.location.reload();
     }
@@ -161,7 +203,7 @@ const CreateDocument = (props) => {
     <div className='m-2'>
       {flash && <Flash setFlash={setFlash}>{stringErrors}</Flash>}
       {success && <Flash type={"success"} setFlash={setSuccess}>Document cree avec success</Flash>}
-      <div className='flex gap-8'>
+      <div className='grid grid-cols-2 gap-x-10'>
         <div>
           {id_affaire && <LabelInput label='N Affaire' disabled value={id_affaire} />}
           {affaireOuvragesSelect && <LabelSelect label='Ouvrage' value={affaireOuvragesSelect} options={affaireOuvrages.reduce((prev, curr)=>{
@@ -179,14 +221,11 @@ const CreateDocument = (props) => {
           }, {})} onChange={(e)=>{
             setEntrepriseAffaireOuvrageSelect(e.target.value)
           }}/>}
-          <LabelInput label='N externe' value={dataDocument.numero_externe} onChange={(e)=>{
+          <LabelInput required label_w="2" label='N externe' value={dataDocument.numero_externe} onChange={(e)=>{
             setDataDocument({...dataDocument, numero_externe : e.target.value})
           }}/>
-          <LabelInput type='date' label='Date reception' value={dataDocument.date_reception} onChange={(e)=>{
-            setDataDocument({...dataDocument, date_reception : e.target.value})
-          }}/>
-          <LabelInput label='Titre' value={dataDocument.titre} onChange={(e)=>{
-            setDataDocument({...dataDocument, titre : e.target.value})
+          <LabelInput label='Indice' value={dataDocument.indice} onChange={(e)=>{
+            setDataDocument({...dataDocument, indice:e.target.value})
           }}/>
         </div>
 
@@ -199,6 +238,9 @@ const CreateDocument = (props) => {
             "Conception" : "Conception",
           }} onChange={(e)=>{
             setDataDocument({...dataDocument, dossier : e.target.value})
+          }}/>
+          <LabelInput type='date' label='Date reception' value={dataDocument.date_reception} onChange={(e)=>{
+            setDataDocument({...dataDocument, date_reception : e.target.value})
           }}/>
           <LabelSelect label='Nature' value={dataDocument.nature} options={{
             'TOUS': 'TOUS',
@@ -222,13 +264,16 @@ const CreateDocument = (props) => {
           }} onChange={(e)=>{
             setDataDocument({...dataDocument, nature : e.target.value})
           }}/>
-          <LabelInput label='Indice' value={dataDocument.indice} onChange={(e)=>{
-            setDataDocument({...dataDocument, indice:e.target.value})
-          }}/>
           <LabelInput type='date' label='Date indice'  value={dataDocument.date_indice} onChange={(e)=>{
             setDataDocument({...dataDocument, date_indice : e.target.value})
           }}/>
         </div>
+
+          <div className='col-span-2'>
+            <LabelInput required input_max label='Titre' value={dataDocument.titre} onChange={(e)=>{
+              setDataDocument({...dataDocument, titre : e.target.value})
+            }}/>
+          </div>
       </div>
 
       <div className='flex gap-6 items-center bg-gray-400 p-2'>
@@ -301,7 +346,7 @@ const CreateDocument = (props) => {
         {entrepriseAffaireOuvrageSelect !==null ?
         (!action ? <Button action={()=>{
           setAction(true)
-          createDocument()}}>Creer le document</Button> : <span className='text-green-600'>Operation en cours de traitement</span> ) :
+          createDocument()}}>{props.edition ? 'Editer le document' : 'Creer le document'}</Button> : <span className='text-green-600'>Operation en cours de traitement</span> ) :
         <div className='text-xs max-w-lg text-red-700'>
           Vous ne pouvez pas creer de document sans emetteur ou sans ouvrage.
           Si vous avez selectionner un ouvrage assurer vous d'avoir affecter une entreprise a cet ouvrage

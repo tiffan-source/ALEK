@@ -60,8 +60,8 @@ function CreateEntreprise(props) {
     let validate = ()=>{
         let {raison_sociale, activite, siret} = entreprise;
         if(validator.isEmpty(raison_sociale)){
-          setStringError('Entrez une raison sociale')
-          return;
+            setStringError('Entrez une raison sociale')
+            return;
         }
         setStringError('');
     }
@@ -129,7 +129,7 @@ function CreateEntreprise(props) {
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-4xl max-h-full">
-            <div className="relative bg-gray-200 rounded-lg shadow dark:bg-gray-700 text-sm">
+            <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700 text-sm">
                 <div className='flex justify-between items-center pr-6'>
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
                         Assistant de création d'une entreprise
@@ -157,10 +157,10 @@ function CreateEntreprise(props) {
 
                         {action && <span className='mx-4 text-orange-600'>Operation en cours de traitement</span>}
                     </div>
-                    <div className='bg-gray-100 m-4'>
-                        <h2 className='p-2 bg-gray-200 shadow-inner'>Details Entrepise</h2>
+                    <div className='bg-gray-50 m-4'>
+                        <h2 className='p-2 bg-gray-500 shadow-inner'>Details Entrepise</h2>
                         {!load ? <div className='grid grid-cols-2 gap-4 mx-4'>
-                            <LabelInput label_w="10" label="Raison Sociale" value={entreprise.raison_sociale} onChange={(e)=>{
+                            <LabelInput required label_w="10" label="Raison Sociale" value={entreprise.raison_sociale} onChange={(e)=>{
                                 setEntrepise({...entreprise, raison_sociale : e.target.value})
                             }}/>
                             <LabelInput label_w="10" label="Siret" value={entreprise.siret} onChange={(e)=>{
@@ -171,12 +171,12 @@ function CreateEntreprise(props) {
                             }}/>
                         </div> : <MiniLoader/>}
                     </div>
-                    <div className='bg-gray-100 m-4'>
-                        <h2 className='p-2 bg-gray-200 shadow-inner'>Adresse</h2>
+                    <div className='bg-gray-50 m-4'>
+                        <h2 className='p-2 bg-gray-500 shadow-inner'>Adresse</h2>
                         {!load ? <Adresse adress={adress} setAdress={setAdress}/> : <MiniLoader/>}
                     </div>
-                    <div className='bg-gray-100 m-4'>
-                        <h2 className='p-2 bg-gray-200 shadow-inner'>Media de communication</h2>
+                    <div className='bg-gray-50 m-4'>
+                        <h2 className='p-2 bg-gray-500 shadow-inner'>Media de communication</h2>
                         <div className='p-4'>
                             <table className='w-full'>
                                 <thead>
@@ -189,15 +189,15 @@ function CreateEntreprise(props) {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td className=''><input type="text" value={newLine.nom}
+                                        <td className=''><input className='border border-blue-300 shadow-xl' type="text" value={newLine.nom}
                                         onChange={(e)=>{
                                             setNewLine({...newLine, nom : e.target.value})
                                         }}/></td>
-                                        <td className=''><input type="text" value={newLine.prenom}
+                                        <td className=''><input className='border border-blue-300 shadow-xl' type="text" value={newLine.prenom}
                                         onChange={(e)=>{
                                             setNewLine({...newLine, prenom : e.target.value})
                                         }}/></td>
-                                        <td className=''><input type="email" value={newLine.email}
+                                        <td className=''><input className='border border-blue-300 shadow-xl' type="email" value={newLine.email}
                                         onChange={(e)=>{
                                             setNewLine({...newLine, email : e.target.value})
                                         }}/></td>

@@ -40,7 +40,7 @@ function DescriptionBatiment({rict}) {
 					{
 						criteres.filter(critere=>critere.mission===1||critere.mission===23||critere.mission===2).map((critere, index)=>{
 							return (
-								<div className={`grid grid-cols-[2rem_10rem_20rem_auto] ${index%2===0 ? 'bg-gray-300' : 'bg-gray-200'}`} key={index}>
+								<div className={`grid grid-cols-[2rem_10rem_20rem_auto] ${index%2===0 ? 'bg-gray-300' : 'bg-gray-300'}`} key={index}>
 									<span className='p-2'> <input type="checkbox" checked={critere.select} onChange={(e)=>{
 										handleCritereSelect(e, critere);
 									}}/> </span>
