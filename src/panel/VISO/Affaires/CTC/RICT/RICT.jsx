@@ -9,11 +9,15 @@ import axios from 'axios';
 import MiniLoader from '../../../../../component/utils/Loader/MiniLoader';
 import moment from 'moment';
 import DescriptionBatiment from './SubStepRICT/DescriptionBatiment';
+import Flash from '../../../../../component/utils/Flash/Flash';
 
 function RICT() {
 
   const [rict, setRict] = useState(null);
-  const [load, setLoad] = useState(true)
+  const [load, setLoad] = useState(true);
+  const [action, setAction] = useState(false);
+  const [errors, setErrors] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -32,9 +36,11 @@ function RICT() {
         affaire : data.affaire,
         statut : 0
       })
+      setSuccess(true)
       window.location.reload();
     } catch (error) {
-      
+      setAction(false)
+      setErrors(error.toString())
     }
   }
 
@@ -43,6 +49,8 @@ function RICT() {
 
   return (
     <div className='w-full h-full'>
+      {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
+      {success && <Flash type="success" setFlash={setSuccess}>RICT cree avec success</Flash>}
       <h1 className='border-t border-gray-400 p-1 bg-green-200 font-bold'>ALEATEK</h1>
       <nav className='flex justify-between border-t border-gray-400 p-1 bg-green-200'>
         <h2 className='text-blue-800 flex items-center'>
@@ -70,7 +78,10 @@ function RICT() {
             <span> : {["En cours", "Accepte", "Classe", "Diffuse"][rict.statut]}</span>
           </div>
         </div>
-        : <Button action={()=>{create()}}>Creer RICT</Button>
+        : (!action ? <Button action={()=>{
+          setAction(true)
+          create()
+        }}>Creer RICT</Button> : <span className='text-orange-600'>RICT en cours de creation</span> )
         }
       </div>
 

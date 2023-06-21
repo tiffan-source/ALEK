@@ -4,11 +4,13 @@ import axios from 'axios';
 import { unix } from 'moment';
 import React, { useEffect, useState } from 'react'
 import EditeChapitre from './EditeChapitre';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 
 function Chapitre({rict}) {
 
     const [chapites, setChapitres] = useState([]);
     const [chapitreSelect, setChapitreSelect] = useState(null);
+    const [load, setLoad] = useState(true);
 
     useEffect(()=>{
         (async()=>{
@@ -17,9 +19,13 @@ function Chapitre({rict}) {
             let {data: dataChapitre} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_mission_view_by_chapitre/${data.affaire}/`);
 
             setChapitres(dataChapitre)
-            
+            setLoad(false)
         })()
     }, []);
+
+
+    if(load)
+        return <MiniLoader/>
     
     return (
         <div className='my-6'>

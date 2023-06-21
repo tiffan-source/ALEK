@@ -1,11 +1,13 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 
 function DescriptionBatiment({rict}) {
 
 	const [criteres, setCriteres] = useState([]);
 	const [handleCheck, setHandleCheck] = useState(true);
 	const [affaire, setAffaire] = useState(null);
+	const [load, setLoad] = useState(true);
 
 	useEffect(()=>{
 		(async()=>{
@@ -13,6 +15,7 @@ function DescriptionBatiment({rict}) {
 			let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_critere_for_affaire/${dataPlan.affaire}/`);
 			setAffaire(dataPlan.affaire)
 			setCriteres(data);
+			setLoad(false)
 		})()
 	}, [handleCheck])
 
@@ -25,6 +28,9 @@ function DescriptionBatiment({rict}) {
 
 		setHandleCheck(!handleCheck);
 	}
+
+	if(load)
+		return <MiniLoader/>
 
 	return (
 		<div className='p-3'>

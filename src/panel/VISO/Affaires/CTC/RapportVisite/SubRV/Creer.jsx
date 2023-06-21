@@ -25,7 +25,7 @@ function Creer() {
     const [load, setLoad] = useState(true);
     const [action, setAction] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [errors, setErrors] = useState('')
+    const [errors, setErrors] = useState('');
 
     useEffect(()=>{
         (async()=>{

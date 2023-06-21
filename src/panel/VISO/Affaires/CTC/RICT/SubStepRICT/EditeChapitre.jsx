@@ -4,6 +4,8 @@ import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretRight, faPlus } from '@fortawesome/free-solid-svg-icons'
 import AddCommentAvisArticle from '../../../../../../component/Modal/AddCommentAvisArticle'
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader'
+import Flash from '../../../../../../component/utils/Flash/Flash'
 
 function EditeChapitre({chapitre, retour, rict}) {
 
@@ -13,6 +15,10 @@ function EditeChapitre({chapitre, retour, rict}) {
     const [dispositions, setDispositions] = useState([]);
     const [avis, setAvis] = useState([]);
     const [articleSelect, setArticleSelect] = useState(null);
+    const [load, setLoad] = useState(true);
+    const [action, setAction] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [errors, setErrors] = useState(false);
 
     useEffect(()=>{
         (async ()=>{
@@ -36,49 +42,59 @@ function EditeChapitre({chapitre, retour, rict}) {
 
             let {data:dataAvis} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_avis_by_RICT_and_mission/${rict.id}/${chapitre.chapitre.id}/`)
             setAvis(dataAvis)
+
+            setLoad(false)
         })()
     }, [chapitre]);
     
     let enregistrer = async()=>{
-        await Promise.all(dispositions.map(async dispo=>{
-            if(dispo.id){
-                await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/disposition/${dispo.id}/`,
-                dispo, {withCredentials: true})
-            }else{
-                await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/disposition/`,
-                dispo, {withCredentials: true})
-            }
-        }));
-
-        await Promise.all(avis.map(async avis=>{
-            if(avis.id){
-                if(avis.codification !== "false"){
-                    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/avis_article/${avis.id}/`,
-                    avis, {withCredentials: true})
-
-                    await Promise.all(avis.commentaires.map(async commentaire=>{
-                        if(!commentaire.id){
-                            await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/commentaire_avis_article/`,
-                            {...commentaire, id_avis : avis.id})
-                        }
-                    }))
+        try {
+            await Promise.all(dispositions.map(async dispo=>{
+                if(dispo.id){
+                    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/disposition/${dispo.id}/`,
+                    dispo, {withCredentials: true})
                 }else{
-                    await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/avis_article/${avis.id}/`, {withCredentials: true})    
+                    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/disposition/`,
+                    dispo, {withCredentials: true})
                 }
-            }else{
-                if(avis.codification !== "false"){
-                    let {data} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_article/`,
-                    avis, {withCredentials: true})
-                    
-                    await Promise.all(avis.commentaires.map(async commentaire=>{
-                        if(!commentaire.id){
-                            await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/commentaire_avis_article/`,
-                            {...commentaire, id_avis : data.id})
-                        }
-                    }))
+            }));
+    
+            await Promise.all(avis.map(async avis=>{
+                if(avis.id){
+                    if(avis.codification !== "false"){
+                        await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/avis_article/${avis.id}/`,
+                        avis, {withCredentials: true})
+    
+                        await Promise.all(avis.commentaires.map(async commentaire=>{
+                            if(!commentaire.id){
+                                await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/commentaire_avis_article/`,
+                                {...commentaire, id_avis : avis.id})
+                            }
+                        }))
+                    }else{
+                        await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/avis_article/${avis.id}/`, {withCredentials: true})    
+                    }
+                }else{
+                    if(avis.codification !== "false"){
+                        let {data} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_article/`,
+                        avis, {withCredentials: true})
+                        
+                        await Promise.all(avis.commentaires.map(async commentaire=>{
+                            if(!commentaire.id){
+                                await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/commentaire_avis_article/`,
+                                {...commentaire, id_avis : data.id})
+                            }
+                        }))
+                    }
                 }
-            }
-        }));
+            }));
+            setSuccess(true)
+            window.location.reload()
+            
+        } catch (error) {
+            setErrors(error.toString())
+            setAction(false)
+        }
     }
 
     let handleAvis = (e, article)=>{
@@ -126,14 +142,20 @@ function EditeChapitre({chapitre, retour, rict}) {
         }
     }
 
+    if(load)
+        return <MiniLoader/>
+
     return (
         <div>
+            {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash> }
             {articleSelect && <AddCommentAvisArticle handleClose={()=>{setArticleSelect(null)}} avis={avis} setAvis={setAvis} article={articleSelect}/>}
+            {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
             <div>
                 <Button action={()=>{retour()}}>Retour</Button>
-                <Button action={()=>{
+                {!action ? <Button action={()=>{
+                    setAction(true)
                     enregistrer()
-                }}>Valider</Button>
+                }}>Valider</Button> : <span className='text-green-600'>Opertation en cours de traitement</span> }
             </div>
             <div className='mt-6'>
                 {/* En tete du systeme */}

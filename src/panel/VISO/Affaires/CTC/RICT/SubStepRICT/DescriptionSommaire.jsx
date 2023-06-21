@@ -3,15 +3,23 @@ import constante from './constante'
 import Button from '../../../../../../component/utils/Button/Button'
 import { useState } from 'react'
 import axios from 'axios';
+import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
+import Flash from '../../../../../../component/utils/Flash/Flash';
 
 function DescriptionSommaire({rict}) {
 
-    const [descriptions, setDescriptions] = useState([])
+    const [descriptions, setDescriptions] = useState([]);
+    const [load, setLoad] = useState(true);
+    const [action, setAction] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [errors, setErrors] = useState(false);
+
 
     useEffect(()=>{
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_desription_sommaire_by_RICT/${rict.id}/`)
             setDescriptions(data)
+            setLoad(false)
         })()
     }, []);
 
@@ -38,20 +46,32 @@ function DescriptionSommaire({rict}) {
     }
 
     let enregistrer = async ()=>{
-        await Promise.all(descriptions.map(async descri=>{
-            if(descri.id){
-                await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/${descri.id}/`, descri, {withCredentials:true})
-            }else{
-                await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/`, descri, {withCredentials : true})
-            }
-        }))
+        try {
+            await Promise.all(descriptions.map(async descri=>{
+                if(descri.id){
+                    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/${descri.id}/`, descri, {withCredentials:true})
+                }else{
+                    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/`, descri, {withCredentials : true})
+                }
+            }))
+            setSuccess(true);
+            window.location.reload()
+        } catch (error) {
+            setErrors(error.toString())
+            setAction(false)
+        }
     }
+
+    if(load)
+        return <MiniLoader/>
     
     return (
         <div className='p-4'>
-            <div><Button action={()=>{
+            {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash> }
+            {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
+            <div>{!action ? <Button action={()=>{
                 enregistrer()
-            }}>Enregistrer</Button></div>
+            }}>Enregistrer</Button> : <span className='text-green-600'>Opertation en cours de traitement</span>}</div>
             <div className='grid grid-cols-[20rem_auto] gap-6 bg-gray-900 text-white p-2 mt-4'>
                 <div className='font-bold'>Type description</div>
                 <div className='font-bold'>Description</div>

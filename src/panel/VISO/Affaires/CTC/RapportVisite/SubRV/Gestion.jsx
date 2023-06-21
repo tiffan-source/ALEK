@@ -6,6 +6,7 @@ import Tabs from '../../../../../../component/utils/Tabs/Tabs';
 import Livrable from './SubGestionRV/Livrable';
 import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 import GestionRemarque from './SubGestionRV/GestionRemarque';
+import AjouterRemarque from './SubGestionRV/AjouterRemarque';
 
 const table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
 
@@ -14,11 +15,17 @@ function Gestion(props) {
   const [load, setLoad] = useState(true)
 
   useEffect(()=>{
-    (async()=>{
-      let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_rapport_visite_by_affaire_one_version/${props.rv}/`)
-      setResult(data)
-      setLoad(false)
-    })();
+    if(props.rv){
+      (async()=>{
+        try {
+          let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_rapport_visite_by_affaire_one_version/${props.rv}/`)
+          setResult(data)
+        } catch (error) {
+          console.log(error);
+        }
+        setLoad(false)
+      })();  
+    }
   }, [props.rv]);
 
   let valider = async ()=>{
@@ -31,6 +38,9 @@ function Gestion(props) {
 
     window.location.reload();
   }
+
+  if(!props.rv)
+    return <span className='text-red-600'>Veuillez selectionne un avis</span>
 
   if(load)
     return <MiniLoader/>
@@ -67,6 +77,7 @@ function Gestion(props) {
 
       <div className='bg-white my-4'>
         <Tabs tabs={[
+            {title: 'Ajouter des remarques', content : <AjouterRemarque id={result.id}/>},
             {title: 'Gestion des remarques', content : <GestionRemarque id={result.id}/>},
             {title: 'List de diffusion', content : <ListDiffusion id={result.id}/>, disabled : result.id === undefined},
             {title: 'Livrable', content : <Livrable id={result.id}/>},

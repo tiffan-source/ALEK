@@ -4,13 +4,18 @@ import axios from 'axios';
 import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 
 function Renseignement() {
-    const [plan, setPlan] = useState(null)
+    const [plan, setPlan] = useState(null);
+    const [load, setLoad] = useState(true);
     useEffect(()=>{
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/detail_plan_affaire_for_plan_affaire/${localStorage.getItem("planAffaire")}/`)
             setPlan(data)
+            setLoad(false);
         })();
     }, []);
+
+    if(load)
+        return <MiniLoader/>
 
     if(plan)
         return (
