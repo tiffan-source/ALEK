@@ -4,6 +4,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../utils/Button/Button';
 import LabelInput from '../utils/LabelInput/LabelInput';
 import axios from 'axios';
+import MiniLoader from '../utils/Loader/MiniLoader';
 
 
 function ConnectionModal(props) {
@@ -13,7 +14,8 @@ function ConnectionModal(props) {
         password : ""
     });
 
-    const [error, setError] = useState('')
+    const [error, setError] = useState('');
+    const [action, setAction] = useState(false);
 
     let connection = async () => {
       try {
@@ -38,7 +40,8 @@ function ConnectionModal(props) {
         setError('')
         props.exit();
       } catch (error) {
-        setError(error.toString());
+        setError("Echec d'authentification");
+        setAction(false);
       }
     };
     
@@ -64,7 +67,10 @@ function ConnectionModal(props) {
                     <div className='text-red-600'>
                       {error}
                     </div>
-                    <Button action={()=>{connection()}}>Se connecter</Button>
+                    {!action ? <Button action={()=>{
+                      setAction(true)
+                      connection()
+                      }}>Se connecter</Button> : <MiniLoader/>}
                 </div>
             </div>
         </div>
