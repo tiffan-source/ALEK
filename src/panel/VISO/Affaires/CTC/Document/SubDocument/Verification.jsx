@@ -158,13 +158,13 @@ function Verification(props) {
         if(data){
           console.log(data);
         }else{
-          let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/next_number_aso_for_affaire/${affOuvrRes.id_affaire}/`);
-          console.log(data);
+          let {data:numberAsoRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/next_number_aso_for_affaire/${affOuvrRes.id_affaire}/`);
+          console.log(numberAsoRes);
           let res = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/aso/`, {
             date : moment().format('YYYY-MM-DD'),
             redacteur : user,
             affaireouvrage : affOuvrRes.id,
-            order_in_affaire : data.position
+            order_in_affaire : numberAsoRes.position
           }, {withCredentials: true});
 
           data = res.data
