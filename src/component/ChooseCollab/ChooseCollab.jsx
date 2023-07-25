@@ -25,23 +25,11 @@ function ChooseCollab(props) {
     }, []);
 
     let enregistrer = async()=>{
-        // Verifier que on a pas deja une IT pour se collab et la mission active
-        // si oui on fait rien
-        // sinon on ajout
-        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/utilisateur-connecte/');
-        let user = data.id
-        await Promise.all(collabsSelect.map(async collab=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/it_mission_collab/' + collab + '/' + props.missonSign + '/')
-            if(!data.check){
-                await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/intervention/technique/',
-                {
-                    affecteur : user,
-                    date: moment().format('YYYY-MM-DD'),
-                    id_mission_active : props.missonSign,
-                    id_collaborateur : collab
-                }, {withCredentials : true})
-            }
-        }));
+
+        await axios.post(process.env.REACT_APP_STARTURIBACK + `/add_intervention_technique/`,{
+            mission_sign : props.missonSign,
+            collaborateurs : collabsSelect,
+        }, {withCredentials:true})
 
         setSuccess(true);
 
@@ -51,10 +39,10 @@ function ChooseCollab(props) {
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
       <div className="relative w-full max-w-3xl max-h-full">
-        <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
+        <div className="relative bg-gray-300 rounded-lg shadow ">
             {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash>}
             <div className="flex justify-between items-center pr-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pt-6">
+                <h3 className="text-xl font-semibold text-gray-900  px-6 pt-6">
                     Ajouter un ou des intervenants
                 </h3>
                 <span className="text-xl cursor-pointer" onClick={props.handleClose}>
@@ -62,7 +50,7 @@ function ChooseCollab(props) {
                 </span>
             </div>
                 
-            <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+            <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b ">
                 {!load ?
                 <>
                 <div className='mb-4'>

@@ -4,6 +4,8 @@ import axios from 'axios';
 import Button from '../../../../component/utils/Button/Button';
 import ChooseCollab from '../../../../component/ChooseCollab/ChooseCollab';
 import MiniLoader from '../../../../component/utils/Loader/MiniLoader';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 function IT() {
   const [missionActive, setMissionActive] = useState([]);
@@ -15,7 +17,8 @@ function IT() {
     (async () => {
       let id = localStorage.getItem("planAffaire");
       if (id) {
-        let { data } = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_sign/' + id + '/');
+        let {data:dataAffaire} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/planaffaire/${id}/`)
+        let { data } = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_sign/' + dataAffaire.affaire + '/');
 
         let mission = await Promise.all(data.map(async dt => {
           let { data } = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/' + dt.id_mission_id + '/');
@@ -56,6 +59,11 @@ function IT() {
     }
   }, [missionActive]);
 
+  let deleteIntervenant = async (intervenant)=>{
+    await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/intervention/technique/${intervenant.id}/`)
+    window.location.reload()
+  }
+
   return (
     <>
       {modal !== null && <ChooseCollab missonSign={modal} handleClose={() => { setModal(null) }} />}
@@ -91,17 +99,23 @@ function IT() {
                   <div className='flex justify-end'>
                     <table className='mr-4 bg-white'>
                       <thead>
-                        <tr className='grid grid-cols-[12rem_24rem]'>
+                        <tr className='grid grid-cols-[12rem_24rem_2rem]'>
                           <th className='border border-gray-400 px-2'>Collaborateur</th>
                           <th className='border border-gray-400 px-2'>Tracabilite</th>
+                          <th className='border border-gray-400 px-2'></th>
                         </tr>
                       </thead>
                       <tbody>
                         {interventionData.map((dt, index) => {
                           return (
-                            <tr key={index} className='grid grid-cols-[12rem_24rem]'>
+                            <tr key={index} className='grid grid-cols-[12rem_24rem_2rem]'>
                               <td className='text-center'>{dt.collaborateur.first_name + " " + dt.collaborateur.last_name}</td>
                               <td className='px-2'>Affecte le {dt.date} par {dt.affecteur.first_name + " " + dt.affecteur.last_name}</td>
+                              <td>
+                                <span className='text-red-600 cursor-pointer' onClick={()=>{deleteIntervenant(dt)}}>
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </span>
+                              </td>
                             </tr>
                           );
                         })}

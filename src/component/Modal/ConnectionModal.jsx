@@ -48,9 +48,9 @@ function ConnectionModal(props) {
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-2xl max-h-full">
-            <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
+            <div className="relative bg-gray-300 rounded-lg shadow ">
                 <div className='flex justify-between items-center pr-6'>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
+                    <h3 className="text-xl font-semibold text-gray-900  p-6">
                         Connectez vous
                     </h3>
                     <span className='text-xl cursor-pointer' onClick={()=>{
@@ -67,10 +67,13 @@ function ConnectionModal(props) {
                     <div className='text-red-600'>
                       {error}
                     </div>
-                    {!action ? <Button action={()=>{
+                    {!action ? 
+                    <Button action={()=>{
+                      console.log("connection");
                       setAction(true)
                       connection()
-                      }}>Se connecter</Button> : <MiniLoader/>}
+                    }}>Se connecter</Button>
+                    : <MiniLoader/>}
                 </div>
             </div>
         </div>

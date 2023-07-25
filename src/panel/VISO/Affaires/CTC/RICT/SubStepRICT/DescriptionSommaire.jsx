@@ -30,7 +30,7 @@ function DescriptionSommaire({rict}) {
             setDescriptions([...descriptions, {
                 type : type,
                 content : e.target.value,
-                rict : rict.id
+                rict_id : rict.id
             }])
         }else{
             setDescriptions(descriptions.map((descri, index)=>{
@@ -47,13 +47,17 @@ function DescriptionSommaire({rict}) {
 
     let enregistrer = async ()=>{
         try {
-            await Promise.all(descriptions.map(async descri=>{
-                if(descri.id){
-                    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/${descri.id}/`, descri, {withCredentials:true})
-                }else{
-                    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/`, descri, {withCredentials : true})
-                }
-            }))
+            // await Promise.all(descriptions.map(async descri=>{
+            //     if(descri.id){
+            //         await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/${descri.id}/`, descri, {withCredentials:true})
+            //     }else{
+            //         await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/`, descri, {withCredentials : true})
+            //     }
+            // }))
+
+            await axios.put(process.env.REACT_APP_STARTURIBACK + `/save_decription_sommaire/`, {
+                descriptions : descriptions
+            }, {withCredentials:true});
             setSuccess(true);
             window.location.reload()
         } catch (error) {
@@ -82,7 +86,7 @@ function DescriptionSommaire({rict}) {
                     <div key={index} className='grid grid-cols-[20rem_auto] my-4 gap-6'>
                         <div>{type}</div>
                         <div>
-                            <textarea className='w-full border border-gray-400'
+                            <textarea className='w-full border border-gray-400 p-1'
                             value={descriptions.find(descri=>descri.type === type)?.content || ""} onChange={(e)=>{
                                 handleDescription(e, type)
                             }}></textarea>

@@ -26,9 +26,7 @@ const Recu = (props) => {
   useEffect(()=>{
     (async()=>{
       try {
-        let id = localStorage.getItem('planAffaire')
-        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
-        let id_affaire = data.affaire;
+        let id_affaire = props.affaire;
         let {data: docDetail} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_document/${id_affaire}/`);
         let prepare_for_table = await Promise.all(docDetail.map(async doc=>{
           let {data: avis_doc} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/documents/avis/${doc.id}/`)
@@ -52,7 +50,7 @@ const Recu = (props) => {
         console.log(error);        
       }
     })();
-  }, []);
+  }, [props.affaire]);
 
   let editionAction = (dataDoc)=>{
     if (user === charge || user === dataDoc.createur){
@@ -83,43 +81,42 @@ const Recu = (props) => {
   let table = (
     <table className='text-sm w-full'>
       <thead className='w-full'>
-        <tr className='w-full grid grid-cols-[1rem_auto_4rem_3rem_5rem_4rem_8rem_5rem_7rem_8rem_2rem_2rem]'>
-          <th className='border border-gray-400'>id</th>
-          <th className='border border-gray-400'>Titre</th>
-          <th className='border border-gray-400'>N externe</th>
-          <th className='border border-gray-400'>Indice</th>
-          <th className='border border-gray-400'>Dossier</th>
-          <th className='border border-gray-400'>N revision</th>
-          <th className='border border-gray-400'>Date Reception</th>
-          <th className='border border-gray-400'>Nature</th>
-          <th className='border border-gray-400'>Emetteur</th>
-          <th className='border border-gray-400'>Ouvrage</th>
-          <th className='border border-gray-400'>Avis</th>
-          <th className='border border-gray-400'></th>
+        <tr className='w-full grid grid-cols-[1rem_auto_4rem_3rem_5rem_8rem_5rem_7rem_8rem_2rem_2rem] bg-gray-600 text-white'>
+          <th className='border-r border-white'>id</th>
+          <th className='border-r border-white'>Titre</th>
+          <th className='border-r border-white'>N externe</th>
+          <th className='border-r border-white'>Indice</th>
+          <th className='border-r border-white'>Dossier</th>
+          <th className='border-r border-white'>Date Reception</th>
+          <th className='border-r border-white'>Nature</th>
+          <th className='border-r border-white'>Emetteur</th>
+          <th className='border-r border-white'>Ouvrage</th>
+          <th className='border-r border-white'>Avis</th>
+          <th className='border-r border-white'></th>
         </tr>
       </thead>
       <tbody>
         {
           dataForTable.map((data, index)=>{
             return (
-              <tr key={index} className={'cursor-pointer grid grid-cols-[1rem_auto_4rem_3rem_5rem_4rem_8rem_5rem_7rem_8rem_2rem_2rem] ' + (index%2===0 ? 'bg-gray-400' : 'bg-slate-100')}
+              <tr key={index} className={'cursor-pointer grid grid-cols-[1rem_auto_4rem_3rem_5rem_8rem_5rem_7rem_8rem_2rem_2rem] border-b border-gray-400 ' + 
+            (data.id===props.document && 'bg-cyan-200')}
                 onClick={()=>{
                   props.selectDocument(data.id)
                   setFlashSelection(true)
                 }}
               >
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.id}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.titre}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.numero_externe}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.indice}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.dossier}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.numero_revision}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.date_reception}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.nature}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.emetteur}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.ouvrage}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>{data.avis}</td>
-                <td className='overflow-x-hidden border-r-2 border-gray-300'>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.order}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.titre}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.numero_externe}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.indice}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.dossier}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.date_reception}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.nature}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.emetteur}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.ouvrage}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>{data.avis}</td>
+                <td className='overflow-x-hidden border-r border-gray-400'>
                   <span className='cursor-pointer' onClick={()=>{
                     editionAction(data)
                   }}>

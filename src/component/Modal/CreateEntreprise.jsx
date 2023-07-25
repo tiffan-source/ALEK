@@ -73,45 +73,23 @@ function CreateEntreprise(props) {
 
     let createEntreprise = async () => {
         try {
-            let resAdresse, resEntreprise;
-
-            // Creation de l'adresse du constructeur
             if(props.edition){
-                resAdresse = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/adresse/${adress.id}/`,
-                adress, {withCredentials : true});
-            }else{
-                resAdresse = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/adresse/',
-                adress, {withCredentials : true});
-            }
-
-            // Creation de l'entreprise
-            if(props.edition){
-                resEntreprise = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/entreprise/${props.edition}/`,
-                {...entreprise, adresse : resAdresse.data.id, siret : parseInt(entreprise.siret)}, {withCredentials : true});                    
-            }else{
-                resEntreprise = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise/',
-                {...entreprise, adresse : resAdresse.data.id, siret : parseInt(entreprise.siret)}, {withCredentials : true});                    
-            }
-
-            // Creation des responsables
-            await Promise.all(lines.map(async line=>{
-                if(!line.id){
-                    await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/responsable/',
-                    {...line, entreprise : resEntreprise.data.id}, {withCredentials: true})    
-                }
-            }));
-
-            // Ajout entreprise en tant que collaborateur
-            if(props.isCollab && !props.edition){
-                let id = localStorage.getItem('planAffaire')
-                let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
-                let id_affaire = data.affaire;
-
-                await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise_affaire/', 
+                entreprise.siret = parseInt(entreprise.siret)
+                await axios.put(process.env.REACT_APP_STARTURIBACK + `/edite_data_entreprise/`,
                 {
-                    entreprise : resEntreprise.data.id,
-                    affaire : id_affaire
-                }, {withCredentials: true})
+                    adress : adress,
+                    id_entreprise : props.edition,
+                    entreprise : entreprise,
+                    responsables : lines
+                });
+            }else{
+                entreprise.siret = parseInt(entreprise.siret)
+                await axios.post(process.env.REACT_APP_STARTURIBACK + `/create_entreprise/`, {
+                    adress : adress,
+                    entreprise : entreprise,
+                    responsables : lines,
+                    affaire : props.isCollab || null
+                })
             }
 
             setSuccess(true);
@@ -130,9 +108,9 @@ function CreateEntreprise(props) {
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-4xl max-h-full">
-            <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700 text-sm">
+            <div className="relative bg-gray-300 rounded-lg shadow  text-sm">
                 <div className='flex justify-between items-center pr-6'>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
+                    <h3 className="text-xl font-semibold text-gray-900  p-6">
                         Assistant de création d'une entreprise
                     </h3>
                     <span className='text-xl cursor-pointer' onClick={()=>{
@@ -178,10 +156,10 @@ function CreateEntreprise(props) {
                     </div>
                     <div className='bg-gray-50 m-4'>
                         <h2 className='p-2 bg-gray-500 shadow-inner'>Media de communication</h2>
-                        <div className='p-4'>
+                        <div className='p-1'>
                             <table className='w-full'>
                                 <thead>
-                                    <tr>
+                                    <tr className='grid grid-cols-[1fr_1fr_1fr_3rem]'>
                                         <th className='text-start'>Nom</th>
                                         <th className='text-start'>Prenom</th>
                                         <th className='text-start'>Email</th>
@@ -189,16 +167,16 @@ function CreateEntreprise(props) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td className=''><input className='border border-blue-300 shadow-xl' type="text" value={newLine.nom}
+                                    <tr className='grid grid-cols-[1fr_1fr_1fr_3rem]'>
+                                        <td className=''><input className='p-1 border border-blue-300 shadow-xl' type="text" value={newLine.nom}
                                         onChange={(e)=>{
                                             setNewLine({...newLine, nom : e.target.value})
                                         }}/></td>
-                                        <td className=''><input className='border border-blue-300 shadow-xl' type="text" value={newLine.prenom}
+                                        <td className=''><input className='p-1 border border-blue-300 shadow-xl' type="text" value={newLine.prenom}
                                         onChange={(e)=>{
                                             setNewLine({...newLine, prenom : e.target.value})
                                         }}/></td>
-                                        <td className=''><input className='border border-blue-300 shadow-xl' type="email" value={newLine.email}
+                                        <td className=''><input className='p-1 border border-blue-300 shadow-xl' type="email" value={newLine.email}
                                         onChange={(e)=>{
                                             setNewLine({...newLine, email : e.target.value})
                                         }}/></td>
@@ -223,7 +201,7 @@ function CreateEntreprise(props) {
                                         </td>
                                     </tr>
                                     {!load && lines.map((line, index)=>(
-                                        <tr key={index}>
+                                        <tr key={index} className='grid grid-cols-[1fr_1fr_1fr_3rem]'>
                                             <td className='text-center'>{line.nom}</td>
                                             <td className='text-center'>{line.prenom}</td>
                                             <td className='text-center'>{line.email}</td>

@@ -155,7 +155,7 @@ function EditeChapitre({chapitre, retour, rict}) {
                 {!action ? <Button action={()=>{
                     setAction(true)
                     enregistrer()
-                }}>Valider</Button> : <span className='text-green-600'>Opertation en cours de traitement</span> }
+                }}>Enregistrer</Button> : <span className='text-green-600'>Opertation en cours de traitement</span> }
             </div>
             <div className='mt-6'>
                 {/* En tete du systeme */}
@@ -175,7 +175,7 @@ function EditeChapitre({chapitre, retour, rict}) {
                             <div className='grid grid-cols-[30rem_16rem_auto_8rem]'>
                                 <div className='inline-block'>{article.parent.titre}</div>
                                 <div className='inline-block p-3'>
-                                    <textarea className='w-full border border-gray-600' type="text" onChange={(e)=>{handleDisposition(e, article.parent)}}
+                                    <textarea className='w-full border border-gray-600 p-1' type="text" onChange={(e)=>{handleDisposition(e, article.parent)}}
                                     value={dispositions.find(dispo=>dispo.article===article.parent.id)?.commentaire || ""}></textarea>
                                 </div>
                                 <div className='inline-block p-3'>
@@ -228,7 +228,7 @@ function EditeChapitre({chapitre, retour, rict}) {
                                                 {child.parent.titre}
                                             </div>
                                             <div className='inline-block p-3'>
-                                                <textarea className='w-full border border-gray-600' type="text" onChange={(e)=>{handleDisposition(e, child.parent)}}
+                                                <textarea className='w-full border border-gray-600 p-1' type="text" onChange={(e)=>{handleDisposition(e, child.parent)}}
                                                 value={dispositions.find(dispo=>dispo.article===child.parent.id)?.commentaire || ""}></textarea>
                                             </div>
                                             <div className='inline-block p-3'>
@@ -266,7 +266,7 @@ function EditeChapitre({chapitre, retour, rict}) {
                                                     <div className='grid grid-cols-[30rem_16rem_auto_8rem]'>
                                                         <div className='inline-block pl-8'>{child.parent.titre}</div>
                                                         <div className='inline-block p-3'>
-                                                            <textarea className='w-full border border-gray-600' type="text" onChange={(e)=>{handleDisposition(e, child.parent)}}
+                                                            <textarea className='w-full border border-gray-600 p-1' type="text" onChange={(e)=>{handleDisposition(e, child.parent)}}
                                                             value={dispositions.find(dispo=>dispo.article===child.parent.id)?.commentaire || ""}></textarea>
                                                         </div>
                                                         <div className='inline-block p-3'>
@@ -303,7 +303,7 @@ function EditeChapitre({chapitre, retour, rict}) {
                                                             <div key={index} className='grid grid-cols-[30rem_16rem_auto_8rem]'>
                                                                 <div className='inline-block pl-12'>{child.parent.titre}</div>
                                                                 <div className='inline-block p-3'>
-                                                                    <textarea className='w-full border border-gray-600' type="text" onChange={(e)=>{handleDisposition(e, child.parent)}}
+                                                                    <textarea className='w-full border border-gray-600 p-1' type="text" onChange={(e)=>{handleDisposition(e, child.parent)}}
                                                                     value={dispositions.find(dispo=>dispo.article===child.parent.id)?.commentaire || ""}></textarea>
                                                                 </div>
                                                                 <div className='inline-block p-3'>

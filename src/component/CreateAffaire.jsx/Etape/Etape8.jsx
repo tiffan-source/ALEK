@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MiniLoader from '../../utils/Loader/MiniLoader';
+import Button from '../../utils/Button/Button';
 
 const Etape8 = ({missionSelect, setMissionSelect, create, setStringError, creating}) => {
   const [missions, setMissions] = useState([]);
@@ -74,7 +75,7 @@ const Etape8 = ({missionSelect, setMissionSelect, create, setStringError, creati
                   checked={missionSelect.includes(mission.id)}
                   type='checkbox'
                   onChange={(e) => handleCheckboxChange(e, mission.id)}
-                  disable={creating}
+                  disabled={creating}
                 />
               </td>
               <td>{mission.code_mission}</td>
@@ -88,6 +89,7 @@ const Etape8 = ({missionSelect, setMissionSelect, create, setStringError, creati
         <button className='bg-green-600 rounded-lg shadow p-2 text-white' onClick={handleCreate} disabled={creating}>
           {creating ? 'En cours de creation' : 'Creer'}
         </button>
+        {/* <Button action={handleCreate}>Creer</Button> */}
       </div>
     </div>
   );

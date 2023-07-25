@@ -59,36 +59,13 @@ function Creer() {
 
     let create = async()=>{
         try {
-            let {data:dataPosition} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/next_number_rv_for_affaire/${affaire}/`)
-
-            let {data:resRv} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/`,
-            {
-                date : moment().format('YYYY-MM-DD'),
-                affaire : affaire,
-                objet : objet,
-                order_in_affaire : dataPosition.position
-            }, {withCredentials : true});
-
-            await Promise.all(avis.map(async dataAvis=>{
-                let {data: resAvisOuvrage} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_ouvrage/`,
-                {
-                    redacteur : userConnect.id,
-                    ouvrage : dataAvis.ouvrage,
-                    objet : dataAvis.objet,
-                    rv : resRv.id
-                }, {withCredentials :true});
-
-                await Promise.all(dataAvis.commentaires.map(async commentaire=>{
-                    let formData = new FormData();
-                    formData.append('asuivre', commentaire.asuivre)
-                    formData.append('commentaire', commentaire.commentaire)
-                    if(commentaire.image){
-                        formData.append('image', commentaire.image)
-                    }
-                    formData.append('avis', resAvisOuvrage.id)
-                    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_commentaire/`, formData, {withCredentials : true})
-                }));
-            }));
+            await axios.post(process.env.REACT_APP_STARTURIBACK + `/create_rv/`, {
+                'affaire' : affaire,
+                'objet' : objet,
+                'aviss' : avis
+            }, {withCredentials:true, headers:{
+                'Content-Type': 'multipart/form-data'
+            }});
 
             setSuccess(true);
 
@@ -96,7 +73,7 @@ function Creer() {
         } catch (error) {
             setErrors(error.toString())
         }
-        
+        setAction(false)
     }
 
     return (
@@ -148,9 +125,9 @@ function Creer() {
                             setOuvragesSelect(e.target.value);
                         }}/>
 
-                        <LabelInput label="Objet du controle" value={avis.find(data=>{return data.ouvrage == ouvragesSelect})?.objet || ""} onChange={(e)=>{
+                        <LabelInput label="Objet du controle" value={avis.find(data=>{return data.ouvrage === ouvragesSelect})?.objet || ""} onChange={(e)=>{
                             let avisToSet = avis.findIndex((data)=>{
-                                return data.ouvrage == ouvragesSelect;
+                                return data.ouvrage === ouvragesSelect;
                             })
                             if(avisToSet === -1){
                                 setAvis([...avis, {
@@ -184,7 +161,7 @@ function Creer() {
                         <tbody>
 
                             {
-                                avis.find(data=>{return data.ouvrage == ouvragesSelect})?.commentaires?.map((comm, index)=>{
+                                avis.find(data=>{return data.ouvrage === ouvragesSelect})?.commentaires?.map((comm, index)=>{
                                     return (
                                     <tr className='grid grid-cols-6' key={index}>
                                         <td className='flex justify-center col-span-1'><input type="checkbox" name="" id="" checked={comm.asuivre} disabled/></td>

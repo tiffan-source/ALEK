@@ -6,7 +6,7 @@ import Button from '../utils/Button/Button';
 import MiniLoader from '../utils/Loader/MiniLoader';
 import Flash from '../utils/Flash/Flash';
 
-function ActiveMission(props) {
+function ActiveMission({mission_active, handleClose, affaire}) {
 
     const [missions, setMission] = useState([])
     const [activeMission, setMissionActive] = useState([])
@@ -18,33 +18,17 @@ function ActiveMission(props) {
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/get_all_parent_mission/');
             setMission(data);
-            setMissionActive(props.mission_active);
+            setMissionActive(mission_active);
             setLoad(false);
         })();
     }, []);
 
     let enregistrer = async ()=>{
-        let id = localStorage.getItem('planAffaire')
-        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
-        let id_affaire = data.affaire;
-        await Promise.all(activeMission.map(async aM=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_affaire/' + id_affaire + '/' + aM + '/')
-            if(data.check === false){
-                await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/missions/active/', {
-                    id_mission : aM,
-                    id_affaire : id_affaire
-                })
-            }
-        }));
 
-        let to_remove = props.mission_active.filter(data=>{
-            return !activeMission.includes(data);
-        })
-
-        await Promise.all(to_remove.map(async toRm=>{
-            let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_affaire/' + id_affaire + '/' + toRm + '/')
-            await axios.delete(process.env.REACT_APP_STARTURIBACK + `/admin/missions/active/${data.check}/`)
-        }))
+        await axios.post(process.env.REACT_APP_STARTURIBACK + '/add_mission_active/', {
+            affaire : affaire,
+            missions : activeMission,
+        });
 
         setSuccess(true)
 
@@ -54,17 +38,17 @@ function ActiveMission(props) {
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-4xl max-h-full">
-            <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
+            <div className="relative bg-gray-300 rounded-lg shadow ">
                 {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussi</Flash>}
                 <div className="flex justify-between items-center pr-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
+                    <h3 className="text-xl font-semibold text-gray-900  p-6">
                         Activer ou desactiver les mission
                     </h3>
-                    <span className="text-xl cursor-pointer" onClick={props.handleClose}>
+                    <span className="text-xl cursor-pointer" onClick={handleClose}>
                         <FontAwesomeIcon icon={faXmark} />
                     </span>
                 </div>
-                <div className="flex items-center justify-between p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+                <div className="flex items-center justify-between p-6 space-x-2 border-t border-gray-200 rounded-b ">
                     {!load && (!action ? <Button action={()=>{
                         setAction(true)
                         enregistrer()

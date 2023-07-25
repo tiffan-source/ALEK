@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import LabelInput from '../../utils/LabelInput/LabelInput';
 import LabelSelect from '../../utils/LabelSelect/LabelSelect';
 import validator from 'validator';
+import Datepicker from 'tailwind-datepicker-react';
+import moment from 'moment';
 
 const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
   const [client, setClient] = useState([]);
   const [load, setLoad] = useState(true);
+  const [datepicker, setDatePicker] = useState(false);
 
   useEffect(() => {
     modifyField("statut", dataAffaire.statut || "En cours");
@@ -14,7 +17,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
     const fetchData = async () => {
       const response = await axios.get(process.env.REACT_APP_STARTURIBACK + '/entreprise_and_responsable/');
       const dataEntreprise = response.data;
-      modifyField("client", dataAffaire.client || (dataEntreprise.length !== 0 && dataEntreprise[0].id) || "");
+      modifyField("client_id", dataAffaire.client_id || (dataEntreprise.length !== 0 && dataEntreprise[0].id) || "");
       setClient(dataEntreprise);
       setLoad(false);
     };
@@ -80,9 +83,9 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
       <div className='border border-gray-400 p-2 mb-2'>
         {! load ? <LabelSelect
           label="Client"
-          value={dataAffaire.client}
+          value={dataAffaire.client_id}
           onChange={(e) => {
-            modifyField("client", e.target.value);
+            modifyField("client_id", e.target.value);
           }}
           options={client.reduce((prev, curr) => {
             let key = curr.raison_sociale;
@@ -91,7 +94,7 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
           }, {})}
         /> : <span className='text-green-600'>Donnee en cours de chargement</span>}
 
-        {dataAffaire.client === "" && <span className='text-red-600'>Vous n'avez enregistrer aucun client</span>}
+        {dataAffaire.client_id === "" && <span className='text-red-600'>Vous n'avez enregistrer aucun client</span>}
       </div>
 
       <div className='border border-gray-400 p-2 mb-2'>
@@ -104,15 +107,16 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
           }}
         />
 
-        <LabelInput
-          
-          label="Date du contrat"
-          value={dataAffaire.date_contrat}
-          onChange={(e) => {
-            modifyField("date_contrat", e.target.value);
-          }}
-          type="date"
-        />
+        <div>
+          <label htmlFor="">Date du contrat</label>
+          <Datepicker options={{
+            language:'fr',
+            defaultDate: dataAffaire.date_contrat && new Date(dataAffaire.date_contrat)
+          }} show={datepicker} setShow={()=>{setDatePicker(!datepicker)}} onChange={(date) => {
+            modifyField("date_contrat", moment(date).format('YYYY-MM-DD'));
+          }}/>
+        </div>
+
       </div>
     </div>
   );

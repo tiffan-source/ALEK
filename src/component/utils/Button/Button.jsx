@@ -1,9 +1,12 @@
 import React from 'react'
 
-function Button(props) {
+function Button({disabled, action, children}) {
+
   return (
-    <button disabled={props.disabled} onClick={props.action} className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1'>
-        {props.children}
+    <button disabled={disabled} onClick={()=>{
+      action();
+      }} className='border border-gray-400 shadow-lg text-sm bg-white px-3 py-1'>
+        {children}
     </button>
   )
 }

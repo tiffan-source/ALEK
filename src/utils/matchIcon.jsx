@@ -9,6 +9,7 @@ import clients from '../assets/icon/clients.png';
 import ouvrage from '../assets/icon/publication.png';
 import visitor from '../assets/icon/visitor.png';
 import books from '../assets/icon/books.png'
+import advice from '../assets/icon/advice.png'
 
 export let matchIcon = {
     "Affaires" : oilPump,
@@ -22,5 +23,8 @@ export let matchIcon = {
     "Clients" : clients,
     "Ouvrages Diffusion" : ouvrage,
     "Rapports Visites" : visitor,
-    "RICT" : books
+    "RICT" : books,
+    "Synthese des avis" : advice,
+    "Gestion Commentaire" : advice
+
 };

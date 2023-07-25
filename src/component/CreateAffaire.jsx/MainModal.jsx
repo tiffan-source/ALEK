@@ -24,11 +24,12 @@ const MainModal = ({ handleClose }) => {
     numero_offre: undefined,
     libelle_contrat: '',
     date_contrat: undefined,
-    client: undefined,
-    charge: '',
-    assistant: '',
-    chef: '',
+    client_id: undefined,
+    charge_id: '',
+    assistant_id: '',
+    chef_id: '',
   });
+
   const [dataFormPlanAffaire, setDataFormPlanAffaire] = useState({
     numero: '',
     risque: '',
@@ -42,7 +43,6 @@ const MainModal = ({ handleClose }) => {
     debut_prestation : undefined,
     visite: undefined,
     doc : undefined,
-    affaire: '',
   });
   const [batiment, setBatiment] = useState(undefined)
   const [adress, setAdress] = useState({
@@ -52,8 +52,6 @@ const MainModal = ({ handleClose }) => {
     code_postal : "",
     ville : "",
     pays : "",
-    departement : "",
-    province : "",
   });
   const [missionSelect, setMissionSelect] = useState([]);
 
@@ -78,34 +76,18 @@ const MainModal = ({ handleClose }) => {
           setFlash(true);
           return;
         }
-        setCreating(true)
-        // Creer l'affaire
-        let resAffaire = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/affaire/',
-        dataFormAffaire, {withCredentials : true})
 
-        // Creer le plan d'affaire
-        let resPlanAffaire = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/',
-        {...dataFormPlanAffaire, affaire: resAffaire.data.id}, {withCredentials : true})
-
-        // Creer l'adress du chantier
-        let resAdress = await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/adresse/',
-        adress, {withCredentials: true})
-
-        // Creer le chantier
-        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/chantier/',
-        {batiment : batiment, plan_affaire : resPlanAffaire.data.id, adresse : resAdress.data.id})
-
-        // Creer les missions actives
-        await Promise.all(missions.map(async mission=>{
-            await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/missions/active/',
-            {id_mission : mission, id_affaire : resAffaire.data.id})
-        }))
+        let res = await axios.post(process.env.REACT_APP_STARTURIBACK + '/create_affaire_and_plan_affaire/', {
+          dataAffaire : dataFormAffaire,
+          dataPlanAffaire : dataFormPlanAffaire,
+          dataAdresseChantier : adress,
+          dataBatiment : batiment,
+          dataMissions : missions
+        })
 
         setSuccess(true);
 
-        setTimeout(()=>{
-          window.location.reload();
-        }, 2000)
+        window.location.reload();
         
     } catch (error) {
         console.log(error);
@@ -166,9 +148,9 @@ const MainModal = ({ handleClose }) => {
   return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
       <div className="relative w-full max-w-4xl max-h-full">
-        <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
+        <div className="relative bg-gray-300 rounded-lg shadow ">
           <div className="flex justify-between items-center pr-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white p-6">
+            <h3 className="text-xl font-semibold text-gray-900  p-6">
               Assistant de création d'un nouveau "Plan d'Affaire "
             </h3>
             <span className="text-xl cursor-pointer" onClick={handleClose}>
@@ -176,7 +158,7 @@ const MainModal = ({ handleClose }) => {
             </span>
           </div>
           <div className="px-6 space-y-6">{stages[index]}</div>
-          <div className="flex items-center justify-between p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+          <div className="flex items-center justify-between p-6 space-x-2 border-t border-gray-200 rounded-b ">
             <span>
               {index + 1} / {stages.length}
             </span>

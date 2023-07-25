@@ -11,7 +11,8 @@ export let strutures = {
                 "ASO" : {},
                 "Rapports Visites" : {},
                 "RICT" : {},
-                // "Synthese des avis" : {}
+                "Synthese des avis" : {},
+                "Gestion Commentaire" : {}
             }
         },
         "Clients" : {},

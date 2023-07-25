@@ -16,11 +16,9 @@ function Affectation(props) {
   useEffect(() => {
     (async ()=>{
       try {
-        let id = localStorage.getItem('planAffaire')
-        let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
-        let id_affaire = data.affaire;
+        let id_affaire = props.affaire;
 
-        let {data: charger} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/find_charge_affaire_for_affaire/${data.affaire}/`);
+        let {data: charger} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/find_charge_affaire_for_affaire/${id_affaire}/`);
 
         let {data : singleDoc} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_detail_document/${id_affaire}/${props.document}/`);
 
@@ -44,7 +42,6 @@ function Affectation(props) {
             "Ouvrage" : ft.ouvrage.libelle,
             "Nature" : ft.nature,
             "Dossier" : ft.dossier,
-            "Revision" : ft.numero_revision
           }
         }));
 
@@ -59,7 +56,7 @@ function Affectation(props) {
 
       setLoad(false)
     })();
-  }, [props.document]);
+  }, [props.document, props.affaire]);
 
   useEffect(()=>{
     (async()=>{

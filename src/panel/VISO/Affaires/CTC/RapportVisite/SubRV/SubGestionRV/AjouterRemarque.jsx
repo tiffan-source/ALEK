@@ -10,39 +10,21 @@ import image from '../../../../../../../assets/icon/image.png';
 import MiniLoader from '../../../../../../../component/utils/Loader/MiniLoader';
 import Flash from '../../../../../../../component/utils/Flash/Flash';
 
-function AjouterRemarque({id}) {
+function AjouterRemarque({id, statut}) {
 	const [avis, setAvis] = useState([]);
 	const [ouvrages, setOuvrages] = useState([]);
     const [ouvragesSelect, setOuvragesSelect] = useState('');
 	const [modal, setModal] = useState(false);
     const [load, setLoad] = useState(true);
     const [errors, setErrors] = useState('');
-    const [userConnect, setUserConnect] = useState(null);
 	const [success, setSuccess] = useState(false);
     const [action, setAction] = useState(false);
 
 	let enregistrer = async()=>{
 		try {
-            await Promise.all(avis.map(async dataAvis=>{
-                let {data: resAvisOuvrage} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_ouvrage/`,
-                {
-                    redacteur : userConnect.id,
-                    ouvrage : dataAvis.ouvrage,
-                    objet : dataAvis.objet,
-                    rv : id
-                }, {withCredentials :true});
-
-                await Promise.all(dataAvis.commentaires.map(async commentaire=>{
-                    let formData = new FormData();
-                    formData.append('asuivre', commentaire.asuivre)
-                    formData.append('commentaire', commentaire.commentaire)
-                    if(commentaire.image){
-                        formData.append('image', commentaire.image)
-                    }
-                    formData.append('avis', resAvisOuvrage.id)
-                    await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/avis_commentaire/`, formData, {withCredentials : true})
-                }));
-            }));
+			await axios.post(process.env.REACT_APP_STARTURIBACK + `/add_avis_on_rv/${id}`,{
+				aviss : avis
+			}, {withCredentials:true, headers : {'Content-Type' : 'multipart/form-data'}})
 
 			setSuccess(true)
 
@@ -60,12 +42,6 @@ function AjouterRemarque({id}) {
                 let id = localStorage.getItem("planAffaire")
                 let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/planaffaire/${id}/`)
                 let id_affaire = data.affaire;
-
-                let {data:user} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/utilisateur-connecte/`);
-
-                let {data: userDetail} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/collaborateurs/${user.id}/`);
-
-                setUserConnect(userDetail);
 
                 let {data: ouvragRes} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_ouvrage_affaire/${id_affaire}/`)
 
@@ -85,6 +61,9 @@ function AjouterRemarque({id}) {
 
 	if(load)
 		return <MiniLoader/>
+    else if(parseInt(statut) > 1)
+        return <div className='p-4 text-red-600'>Rapport de visite classer</div>
+
 
 	return (
 	<div className='bg-gray-100 my-4 pb-6'>

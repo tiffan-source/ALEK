@@ -21,7 +21,8 @@ function RICT() {
 
   useEffect(()=>{
     (async()=>{
-      let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_RICT_for_affaire/${localStorage.getItem("planAffaire")}/`);
+      let {data:dataAffaire} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/planaffaire/${localStorage.getItem("planAffaire")}/`)
+      let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/check_RICT_for_affaire/${dataAffaire.affaire}/`);
       setRict(data)
       setLoad(false);
     })();

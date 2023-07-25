@@ -6,6 +6,7 @@ import LabelSelect from '../../utils/LabelSelect/LabelSelect';
 import LabelCheckbox from '../../utils/LabelCheckbox/LabelCheckbox';
 import Adresse from '../../Adresse/Adresse';
 import validator from 'validator';
+import Datepicker from 'tailwind-datepicker-react';
 
 const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adress, setAdress, setStringError }) => {
   const [duree, setDuree] = useState(0);
@@ -13,6 +14,10 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
   const [startChantier, setStartChantier] = useState('');
   const [endChantier, setEndChantier] = useState('');
   const [destinations, setDestinations] = useState([]);
+
+  const [datePickerPrestation, setDatePickerPrestation] = useState(false)
+  const [datePickerDebut, setDatePickerDebut] = useState(false)
+  const [datePickerFin, setDatePickerFin] = useState(false)
 
   useEffect(() => {
     modifyField('devise', '€');
@@ -43,40 +48,6 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
   let validate = () => {
     setStringError('');
   }
-
-  const setDebutChantier = (e) => {
-    const debut = new Date(e.target.value);
-    const formattedDate = moment(debut.toLocaleDateString()).format('YYYY-MM-DD');
-    setStartChantier(formattedDate);
-    modifyField('debut_chantier', formattedDate);
-  };
-
-  const setFinChantier = (e) => {
-    const value = parseInt(e.target.value);
-    const start = new Date(dataPlan.debut_chantier);
-    const startDate = moment(start.toLocaleDateString());
-
-    if (value < 0) {
-      setDuree(0);
-      setEndChantier(startDate.format('YYYY-MM-DD'));
-    } else {
-      const end = startDate.clone().add(value, 'month');
-      setDuree(value);
-      setEndChantier(end.format('YYYY-MM-DD'));
-      modifyField('fin_chantier', end.format('YYYY-MM-DD'));
-    }
-  };
-
-  const setDureeChantier = (e) => {
-    const end = new Date(e.target.value);
-    const endDate = moment(end.toLocaleDateString());
-    const start = moment(startChantier);
-
-    const duree = Math.ceil(Math.abs(start.diff(endDate, 'M')));
-    setDuree(duree);
-    setEndChantier(endDate.format('YYYY-MM-DD'));
-    modifyField('fin_chantier', endDate.format('YYYY-MM-DD'));
-  };
 
   return (
     <>
@@ -152,37 +123,36 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
 
         </div>
 
-        <LabelInput
-          label="Date début Prestation"
-          value={dataPlan.debut_prestation}
-          type="date"
-          onChange={(e) => {
-            modifyField('debut_prestation', e.target.value);
-          }}
-        />
-
-        <div className="flex justify-between">
-          <LabelInput
-            label="Date de début du chantier"
-            value={dataPlan.debut_chantier || startChantier}
-            type="date"
-            onChange={setDebutChantier}
-          />
-          <LabelInput
-            label="Duree"
-            type="number"
-            value={duree}
-            onChange={setFinChantier}
-            span_info="Mois"
-          />
+        <div>
+          <label htmlFor="">Date debut prestation</label>
+          <Datepicker options={{
+            language:'fr',
+            defaultDate: dataPlan.debut_prestation && new Date(dataPlan.debut_prestation)
+          }} show={datePickerPrestation} setShow={()=>{setDatePickerPrestation(!datePickerPrestation)}} onChange={(date) => {
+            modifyField("debut_prestation", moment(date).format('YYYY-MM-DD'));
+          }}/>
         </div>
 
-        <LabelInput
-          label="Date de fin"
-          type="date"
-          value={dataPlan.fin_chantier || endChantier}
-          onChange={setDureeChantier}
-        />
+
+        <div>
+          <label htmlFor="">Date de debut du chantier</label>
+          <Datepicker options={{
+            language:'fr',
+            defaultDate: dataPlan.debut_chantier && new Date(dataPlan.debut_chantier)
+          }} show={datePickerDebut} setShow={()=>{setDatePickerDebut(!datePickerDebut)}} onChange={(date) => {
+            modifyField("debut_chantier", moment(date).format('YYYY-MM-DD'));
+          }}/>
+        </div>
+
+        <div>
+          <label htmlFor="">Date de fin du chantier</label>
+          <Datepicker options={{
+            language:'fr',
+            defaultDate: dataPlan.fin_chantier && new Date(dataPlan.fin_chantier)
+          }} show={datePickerFin} setShow={()=>{setDatePickerFin(!datePickerFin)}} onChange={(date) => {
+            modifyField("fin_chantier", moment(date).format('YYYY-MM-DD'));
+          }}/>
+        </div>
 
         <div className="flex justify-between">
           <LabelInput
@@ -235,7 +205,7 @@ const Etape4 = ({ modifyField, setBatiment, batiment, dataAffaire, dataPlan, adr
       <div>
         <span>Adresse du Chantier</span>
         <div className="grid grid-cols-2 gap-2">
-          <div className="border border-gray-600 p-1">
+          <div className="border border-gray-400 p-1">
             <Adresse adress={adress} setAdress={setAdress} />
           </div>
         </div>

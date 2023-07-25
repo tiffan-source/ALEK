@@ -12,6 +12,7 @@ function ChooseCollabForOuvrage(props) {
     const [load, setLoad] = useState(true);
     const [action, setAction] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
 
     useEffect(()=>{
         (async()=>{
@@ -40,30 +41,27 @@ function ChooseCollabForOuvrage(props) {
     }, [])
 
     let enregistrer = async ()=>{
-        if(!action){
-            await Promise.all(entrepriseSelect.map(async eS=>{
-                let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/verify_entreprise_collab_on_ouvrage/${eS}/${props.ouvrage_affaire}/`)
-                if(!data.check){
-                    await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/entreprise_affaire_ouvrage/',
-                    {
-                        affaire_ouvrage : props.ouvrage_affaire,
-                        affaire_entreprise : eS
-                    }, {withCredentials: true})
-                }
-            }));
-    
+        try {
+            await axios.post(process.env.REACT_APP_STARTURIBACK + '/add_entreprise_on_ouvrage/', {
+                ouvrage_affaire : props.ouvrage_affaire,
+                entreprises : entrepriseSelect
+            })
             setSuccess(true);
             window.location.reload();
+        } catch (error) {
+            setError(error.toString())
         }
+        setAction(false)
     }
 
     return (
     <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 w-full overflow-x-hidden overflow-y-auto h-full flex justify-center items-center bg-[#000a]">
         <div className="relative w-full max-w-3xl max-h-full">
-        <div className="relative bg-gray-300 rounded-lg shadow dark:bg-gray-700">
+        <div className="relative bg-gray-300 rounded-lg shadow ">
+            {error && <Flash setFlash={setError}>{error}</Flash>}
             {success && <Flash type="success" setFlash={setSuccess}>Operation reussie</Flash>}
             <div className="flex justify-between items-center pr-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white px-6 pt-6">
+                <h3 className="text-xl font-semibold text-gray-900  px-6 pt-6">
                     Ajouter des collaborteurs pour l'ouvrage
                 </h3>
                 <span className="text-xl cursor-pointer" onClick={props.handleClose}>
@@ -71,7 +69,7 @@ function ChooseCollabForOuvrage(props) {
                 </span>
             </div>
 
-            {!load ? <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+            {!load ? <div className="px-6 py-4 space-x-2 border-t border-gray-200 rounded-b ">
                 <div className='mb-4'>
                     {dataEntrepriseAffaire.length!== 0 && <Button action={()=>{
                         setAction(true);

@@ -33,7 +33,33 @@ function Gestion(props) {
       date : result.date,
       affaire : result.affaire,
       objet : result.objet,
+      order_in_affaire : result.order_in_affaire, 
       statut : 1
+    }, {withCredentials: true})
+
+    window.location.reload();
+  }
+
+  let devalider = async ()=>{
+    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/${result.id}/`,{
+      date : result.date,
+      affaire : result.affaire,
+      objet : result.objet,
+      order_in_affaire : result.order_in_affaire, 
+      statut : 0
+    }, {withCredentials: true})
+
+    window.location.reload();
+  }
+
+
+  let classer = async ()=>{
+    await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/rapport/visite/${result.id}/`,{
+      date : result.date,
+      affaire : result.affaire,
+      objet : result.objet,
+      order_in_affaire : result.order_in_affaire, 
+      statut : 2
     }, {withCredentials: true})
 
     window.location.reload();
@@ -59,26 +85,29 @@ function Gestion(props) {
                 <span>{table_statut[result.statut]}</span>
             </div>
             <div>
-                <span className='font-bold'>Responsable d'affaire / Redacteur : </span>
-                {/* <span>{result.redacteur_detail && (result.redacteur_detail.first_name + " " + result.redacteur_detail.last_name)}</span> */}
-            </div>
-            <div>
                 <span className='font-bold'>Objet : </span>
                 <span>{result.objet}</span>
             </div>
         </div>
-        <div className='p-4'>
-          {result.statut == 0 && <Button action={()=>{
+        {parseInt(result.statut) <= 1 && <div className='p-4'>
+          {parseInt(result.statut) === 0 ? <Button action={()=>{
             valider()
-          }}>Valider</Button>}
-        </div>
+          }}>Valider</Button> : <div>
+            <Button action={()=>{
+                devalider()
+            }}>Devalider</Button>
+            <Button action={()=>{
+                classer()
+            }}>Classer</Button>
+          </div> }
+        </div>}
       </div>
 
 
       <div className='bg-white my-4'>
         <Tabs tabs={[
-            {title: 'Ajouter des remarques', content : <AjouterRemarque id={result.id}/>},
-            {title: 'Gestion des remarques', content : <GestionRemarque id={result.id}/>},
+            {title: 'Ajouter des remarques', content : <AjouterRemarque id={result.id} statut={result.statut}/>},
+            {title: 'Gestion des remarques', content : <GestionRemarque id={result.id} statut={result.statut}/>},
             {title: 'List de diffusion', content : <ListDiffusion id={result.id}/>, disabled : result.id === undefined},
             {title: 'Livrable', content : <Livrable id={result.id}/>},
         ]}/>

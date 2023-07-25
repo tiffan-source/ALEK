@@ -11,13 +11,17 @@ function MissionPrestation() {
 
     const [mission, setMission] = useState([]);
     const [modal, setModal] = useState(false);
-    const [load, setLoad] = useState(true)
+    const [load, setLoad] = useState(true);
+    const [affaire, setAffaire] = useState(null);
 
     useEffect(()=>{
         (async()=>{
             let id = localStorage.getItem("planAffaire");
             if(id){
-                let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_sign/' + id + '/');
+                let {data:dataAffaire} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
+
+                let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/mission_sign/' + dataAffaire.affaire + '/');
+
                 let mission_for_table = await Promise.all(data.map(async dt=>{
                     let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/mission/' + dt.id_mission_id + '/');
                     return {
@@ -26,6 +30,7 @@ function MissionPrestation() {
                         "Libelle" : data.libelle,
                     }
                 }));
+                setAffaire(dataAffaire.affaire)
                 setMission(mission_for_table)
                 setLoad(false)
             }
@@ -34,7 +39,7 @@ function MissionPrestation() {
 
     return (
     <>
-        {modal && <ActiveMission mission_active={mission.map(m=>m.id)} handleClose={()=>{setModal(false)}}/>}
+        {modal && <ActiveMission mission_active={mission.map(m=>m.id)} handleClose={()=>{setModal(false)}} affaire={affaire}/>}
         <div className='w-full h-full text-sm min-h-screen flex flex-col'>
             <h1 className='border-t border-gray-400 p-1 MissionPrestationbg-green-200 font-bold'>Aleatek</h1>
 

@@ -81,8 +81,8 @@ function Constructeur() {
         <>
             {modal && <CreateEntreprise edition={edition} close={()=>{
                 setModal(false)
-            }} isCollab/>}
-            {addConstruct && <AddConstructeur entrepriseEnroll={idEntreprise} handleClose={()=>{setAddConstruct(false)}}/>}
+            }} isCollab={affaire}/>}
+            {addConstruct && <AddConstructeur affaire={affaire} entrepriseEnroll={idEntreprise} handleClose={()=>{setAddConstruct(false)}}/>}
             {selectForDelete && <ConfirmationModale action={()=>{
                 deleteCollab(selectForDelete)
             }} abort={()=>{

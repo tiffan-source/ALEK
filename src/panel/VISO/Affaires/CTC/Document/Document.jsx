@@ -8,13 +8,15 @@ import document from '../../../../../assets/icon/documents.png';
 function Document() {
 
   const [documentSelect, setdocumentSelect] = useState(null);
+  const [affaire, setAffaire] = useState(null);
 
   useEffect(()=>{
     (async()=>{
       try {
         let id = localStorage.getItem("planAffaire");
         if(id){    
-          await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/')
+          let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + '/admin/planaffaire/' + id + '/');
+          setAffaire(data.affaire)
         }
       } catch (error) {
         localStorage.removeItem("planAffaire")        
@@ -34,9 +36,9 @@ function Document() {
         </nav>
 
         <Tabs tabs={[
-          {title : "Documents recus", content : <Recu document={documentSelect} selectDocument={setdocumentSelect}/>},
-          {title : "Affectations", content : <Affectation document={documentSelect}/>},
-          {title : "Verification", content : <Verification document={documentSelect}/>}
+          {title : "Documents recus", content : <Recu affaire={affaire} document={documentSelect} selectDocument={setdocumentSelect}/>},
+          {title : "Affectations", content : <Affectation affaire={affaire} document={documentSelect}/>},
+          {title : "Verification", content : <Verification affaire={affaire} document={documentSelect}/>}
         ]}/>
       </div>
     </>

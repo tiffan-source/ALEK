@@ -7,6 +7,8 @@ import axios from 'axios';
 import ListDiffusion from './SubGestionAso/ListDiffusion';
 import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
 import Flash from '../../../../../../component/utils/Flash/Flash';
+import RemarqueGenerale from './SubGestionAso/RemarqueGenerale';
+import CorrigerRemarque from './SubGestionAso/CorrigerRemarque';
 
 function GestionAso(props) {
     let table_statut = ["En cours", "Accepter", "Classer", "Diffuser"]
@@ -145,8 +147,8 @@ function GestionAso(props) {
             <div className='bg-white my-4'>
                 {!load ? <Tabs tabs={[
                     {title: 'Choix Veriffication', content : <VerificationDocument affaire_ouvrage={asoData.affaireouvrage} asoData={asoData}/>},
-                    {title: 'Remarque generale', content : '', disabled : true}, //En cours de Dev
-                    {title: 'Corriger remarque', content : '', disabled : true}, //En cours de Dev
+                    {title: 'Remarque generale', content : <RemarqueGenerale id={asoData.id}/>}, //En cours de Dev
+                    {title: 'Corriger remarque', content : <CorrigerRemarque id={asoData.id}/>}, //En cours de Dev
                     {title: 'List de diffusion', content : <ListDiffusion id={asoData.id}/>},
                     {title: 'Livrable', content : <Livrable id={asoData.id}/>},
                 ]}/> : <MiniLoader/>}

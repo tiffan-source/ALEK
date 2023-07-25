@@ -6,6 +6,9 @@ import axios from 'axios';
 import validator from 'validator';
 import Flash from '../utils/Flash/Flash';
 import MiniLoader from '../utils/Loader/MiniLoader';
+import Datepicker from 'tailwind-datepicker-react';
+import moment from 'moment';
+
 /**
  * Ma logique de selection
  * 
@@ -42,7 +45,6 @@ const CreateDocument = (props) => {
     date_indice : undefined,
     date_reception : undefined,
     titre : "",
-    numero_revision : undefined,
     numero_externe : undefined
   });
   const [stringErrors, setStringError] = useState("");
@@ -50,6 +52,9 @@ const CreateDocument = (props) => {
   const [load, setLoad] = useState(true);
   const [action, setAction] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const [datePickerReception, setDatePickerReception] = useState(false);
+  const [datePickerIndice, setDatePickerIndice] = useState(false);
 
   useEffect(()=>{
     (async()=>{
@@ -76,7 +81,6 @@ const CreateDocument = (props) => {
             date_indice : edition.date_indice || undefined,
             date_reception : edition.date_reception || undefined,
             titre : edition.titre || "",
-            numero_revision : edition.numero_revision || undefined,
             numero_externe : edition.numero_externe || undefined
           })
         }
@@ -149,50 +153,48 @@ const CreateDocument = (props) => {
   };
 
   const createDocument = async () => {
-    if(stringErrors){
-      setFlash(true)
-      setAction(false)
-    }else{
-      let {data:userData} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/utilisateur-connecte/`);
-
-      let data;
-
-      if(props.edition){
-        let {data:dataEdit} = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${props.edition.id}/`,{
-          ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect, createur : userData.id
-        }, {withCredentials : true});
-
-        data = dataEdit;
+    try {
+      if(stringErrors){
+        setFlash(true)
+        setAction(false)
       }else{
-        let {data:dataCreate} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/documents/`,{
-          ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect, createur : userData.id
-        }, {withCredentials : true});  
-
-        data = dataCreate;
+  
+        let data;
+  
+        if(props.edition){
+          let {data:dataEdit} = await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${props.edition.id}/`,{
+            ...dataDocument, emetteur : entrepriseAffaireOuvrageSelect
+          }, {withCredentials : true});
+  
+          data = dataEdit;
+        }else{
+          let {data:dataCreate} = await axios.post(process.env.REACT_APP_STARTURIBACK + `/document_create/`,{
+            ...dataDocument, emetteur_id : entrepriseAffaireOuvrageSelect, affaire : id_affaire
+          }, {withCredentials : true});  
+  
+          data = dataCreate;
+        }
+  
+        await Promise.all(pdfFiles.map(async pdfFile=>{
+          let formData = new FormData();
+          formData.append('nom', pdfFile.nom)
+          formData.append('date', pdfFile.date)
+          formData.append('fichier', pdfFile.fichier)
+          formData.append('document', data.id)
+    
+          await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichierattacher/',
+          formData,
+          {withCredentials : true})
+        }));
+        setSuccess(true);
+    
+        window.location.reload();
       }
-  
-      await Promise.all(pdfFiles.map(async pdfFile=>{
-        let formData = new FormData();
-        formData.append('nom', pdfFile.nom)
-        formData.append('date', pdfFile.date)
-        formData.append('fichier', pdfFile.fichier)
-        formData.append('document', data.id)
-  
-        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/fichierattacher/',
-        formData,
-        {withCredentials : true})
-      }));
-      setSuccess(true);
-
-      if(!props.edition){
-        await axios.post(process.env.REACT_APP_STARTURIBACK + '/admin/document_affectation/',
-        {
-          document : data.id,
-          collaborateur : userData.id
-        });  
-      }
-  
-      window.location.reload();
+      
+    } catch (error) {
+      setStringError(error.toString())
+      setAction(false);
+      setFlash(true)
     }
   };
 
@@ -230,18 +232,27 @@ const CreateDocument = (props) => {
         </div>
 
         <div>
-          <LabelInput label='N Revision' value={dataDocument.numero_revision} onChange={(e)=>{
-            setDataDocument({...dataDocument, numero_revision : e.target.value})
-          }}/>
           <LabelSelect label='Dossier' value={dataDocument.dossier} options={{
             "Execution" : "Execution",
             "Conception" : "Conception",
           }} onChange={(e)=>{
             setDataDocument({...dataDocument, dossier : e.target.value})
           }}/>
-          <LabelInput type='date' label='Date reception' value={dataDocument.date_reception} onChange={(e)=>{
+
+          {/* <LabelInput type='date' label='Date reception' value={dataDocument.date_reception} onChange={(e)=>{
             setDataDocument({...dataDocument, date_reception : e.target.value})
-          }}/>
+          }}/> */}
+            
+          <div>
+            <label htmlFor="">Date reception</label>
+            <Datepicker options={{
+              language:'fr',
+              defaultDate: dataDocument.date_reception && new Date(dataDocument.date_reception)
+            }} show={datePickerReception} setShow={()=>{setDatePickerReception(!datePickerReception)}} onChange={(date) => {
+              setDataDocument({...dataDocument, date_reception : moment(date).format('YYYY-MM-DD')})
+            }}/>
+          </div>
+
           <LabelSelect label='Nature' value={dataDocument.nature} options={{
             'TOUS': 'TOUS',
             'Descriptif': 'Descriptif',
@@ -264,9 +275,20 @@ const CreateDocument = (props) => {
           }} onChange={(e)=>{
             setDataDocument({...dataDocument, nature : e.target.value})
           }}/>
+{/* 
           <LabelInput type='date' label='Date indice'  value={dataDocument.date_indice} onChange={(e)=>{
             setDataDocument({...dataDocument, date_indice : e.target.value})
-          }}/>
+          }}/> */}
+
+          <div>
+            <label htmlFor="">Date indice</label>
+            <Datepicker options={{
+              language:'fr',
+              defaultDate: dataDocument.date_indice && new Date(dataDocument.date_indice)
+            }} show={datePickerIndice} setShow={()=>{setDatePickerIndice(!datePickerIndice)}} onChange={(date) => {
+              setDataDocument({...dataDocument, date_indice : moment(date).format('YYYY-MM-DD')})
+            }}/>
+          </div>
         </div>
 
           <div className='col-span-2'>

@@ -8,28 +8,28 @@ function Table(props) {
     return (
         <table className='table-auto w-full'>
             <thead>
-                <tr>
-                    <th className='border-2 border-gray-600 shadow-lg w-[1rem]'></th>
+                <tr className='bg-gray-600 text-white'>
+                    <th className='shadow-lg w-[1rem] p-1 border-r border-white'></th>
                     {Object.keys(props.datas[0]).map((head, index)=>{
-                        return <th key={index} className='border-2 border-gray-600'>{head}</th>
+                        return <th key={index} className='p-1 border-r border-white'>{head}</th>
                     })}
                 </tr>
             </thead>
             <tbody>
                 {props.datas.map((data, index)=>{
                     return (
-                        <tr key={index} className='cursor-pointer border-b-2 border-gray-600' onClick={()=>{
+                        <tr key={index} className={'cursor-pointer border-b border-gray-400 ' + (cursor===index && 'bg-cyan-200')} onClick={()=>{
                             setCursor(index)
                             if(props.actionOnLine){
                                 props.actionOnLine(data.id)
                             }
                         }}>
-                            <td className='shadow-lg w-[1rem]'>
+                            <td className='shadow-lg w-[1rem] border-r border-gray-400'>
                                 {cursor === index && <FontAwesomeIcon icon={faCaretRight}/>}
                             </td>
                             {
                                 Object.values(data).map((dt, index)=>{
-                                    return <td key={index} className={'p-1 ' + (index % 2 === 0 ? 'bg-white' : 'bg-gray-300')}>{dt}</td>
+                                    return <td key={index} className='border-r border-gray-400'>{dt}</td>
                                 })
                             }
                         </tr>

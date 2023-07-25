@@ -19,20 +19,22 @@ const Detail = ({data}) => {
         <LabelInput disabled value={data.charge_affaire.first_name + " " + data.charge_affaire.last_name} label="Charge affaire"/>
 
         <div className='flex justify-between my-1'>
-          <div className='flex items-center'>
+          <div className=''>
             <LabelInput disabled value={data.prix} label="Montant des travaux"/>
-            <span>{data.devise}</span>
-            <span>{data.type_montant}</span>
+            <div className='flex gap-6 text-md ml-1'>
+              <span>{data.devise}</span>
+              <span>{data.type_montant}</span>
+            </div>
           </div>
         </div>
       </div>
 
       <div className='m-1 grid grid-cols-3 gap-2'>
         <div className='border border-gray-600 col-span-1 p-1'>
-          <LabelInput disabled value={data.date_prestation} type="date" label="Date début Prestation BV"/>
-          <LabelInput disabled value={data.debut_prestation} type="date" label="Date de début du chantier"/>                    
+          <LabelInput disabled value={data.debut_prestation} type="date" label="Date début Prestation BV"/>
+          <LabelInput disabled value={data.debut_chantier} type="date" label="Date de début du chantier"/>                    
 
-          <LabelInput disabled value={data.fin_prestation} type="date" label="Date de fin"/>
+          <LabelInput disabled value={data.fin_chantier} type="date" label="Date de fin"/>
           <LabelInput disabled value={data.doc} type="number" label="Nb document a examiner"/>
         </div>
 

@@ -1,20 +1,29 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import MiniLoader from '../../../../../../../component/utils/Loader/MiniLoader';
 
-function GestionRemarque({id}) {
+function GestionRemarque({id, statut}) {
 
-	let [ouvrages, setOuvrages] = useState([])
+	const [ouvrages, setOuvrages] = useState([]);
+    const [load, setLoad] = useState(true)
 
 	useEffect(()=>{
 		(async()=>{
 			try {
 				let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_avis_from_RV/${id}/`);
 				setOuvrages(data);
+                setLoad(false)
 			} catch (error) {
 				
 			}
 		})()
 	}, []);
+
+    if(load)
+        return <MiniLoader/>
+    else if(parseInt(statut) > 1)
+        return <div className='p-4 text-red-600'>Rapport de visite classer</div>
+
 
 	return (
 		<div className='bg-white p-4'>
