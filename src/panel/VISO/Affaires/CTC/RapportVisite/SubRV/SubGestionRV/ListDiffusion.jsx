@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react'
 import Button from '../../../../../../../component/utils/Button/Button';
 
-function ListDiffusion({id}) {
+function ListDiffusion({id, statut}) {
 
     const [diffusions, setDiffusions] = useState([]);
     const [triggerUpdate, setTriggerUpdate] = useState(false);
@@ -45,7 +45,7 @@ function ListDiffusion({id}) {
                     {diffusions.map((diffusion, index)=>{
                         return (
                             <tr className='grid grid-cols-[3rem_15rem_12rem_12rem_auto]' key={index}>
-                                <td className='text-center'> <input type="checkbox" name="" id="" checked={diffusion.diffusion} onChange={(e)=>{
+                                <td className='text-center'> <input disabled={parseInt(statut) > 1} type="checkbox" name="" id="" checked={diffusion.diffusion} onChange={(e)=>{
                                     defineDiffusionForEntreprise(diffusion, e)
                                 }}/> </td>
                                 <td> {diffusion.detail_entreprise.raison_sociale} </td>

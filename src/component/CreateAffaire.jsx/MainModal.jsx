@@ -77,6 +77,8 @@ const MainModal = ({ handleClose }) => {
           return;
         }
 
+        setCreating(true);
+
         let res = await axios.post(process.env.REACT_APP_STARTURIBACK + '/create_affaire_and_plan_affaire/', {
           dataAffaire : dataFormAffaire,
           dataPlanAffaire : dataFormPlanAffaire,

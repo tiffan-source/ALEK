@@ -5,7 +5,7 @@ import LabelSelect from '../../../../../../component/utils/LabelSelect/LabelSele
 import LabelInput from '../../../../../../component/utils/LabelInput/LabelInput';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import AddCommentRV from '../../../../../../component/Modal/AddCommentRV';
 import image from '../../../../../../assets/icon/image.png'
 import MiniLoader from '../../../../../../component/utils/Loader/MiniLoader';
@@ -18,6 +18,8 @@ function Creer() {
     const [ouvragesSelect, setOuvragesSelect] = useState('');
     const [avis, setAvis] = useState([]);
 
+    const [avisToEdit, setAvisToEdit] = useState(null);
+    const [commentToEdit, setCommentToEdit] = useState(null)
 
     const [objet, setObjet] = useState('');
     const [modal, setModal] = useState(false);
@@ -78,7 +80,7 @@ function Creer() {
 
     return (
         <>
-            {modal && <AddCommentRV avis={avis} setAvis={setAvis} ouvrage={ouvragesSelect} handleClose={()=>{setModal(false)}}/>}
+            {modal && <AddCommentRV avis={avis} setAvis={setAvis} ouvrage={ouvragesSelect} handleClose={()=>{setModal(false)}} avisToEdit={avisToEdit} commentToEdit={commentToEdit}/>}
             {success && <Flash type={"success"} setFlash={setSuccess}>Rapport de visite creer avec success</Flash>}
             {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
             <div>
@@ -114,7 +116,8 @@ function Creer() {
                     </div>
                 </div> : <MiniLoader/>}
 
-                {!load ? <div className='bg-gray-100 my-4 pb-6'>
+                {!load ? 
+                <div className='bg-gray-100 my-4 pb-6'>
                     <h2 className='bg-gray-300 shadow-inner px-4 py-1'>Texte du RV</h2>
                     <div className='text-sm grid grid-cols-2 p-4 gap-4'>
                         <LabelSelect col label="Ouvrage" value={ouvragesSelect} options={ouvrages.reduce((prev, curr)=>{
@@ -122,7 +125,7 @@ function Creer() {
                             prev[key] = curr.id;
                             return prev;
                         }, {})} onChange={(e)=>{
-                            setOuvragesSelect(e.target.value);
+                            setOuvragesSelect(parseInt(e.target.value));
                         }}/>
 
                         <LabelInput label="Objet du controle" value={avis.find(data=>{return data.ouvrage === ouvragesSelect})?.objet || ""} onChange={(e)=>{
@@ -145,28 +148,60 @@ function Creer() {
                         }}/>
                         <div>
                             <Button action={()=>{
-                                setModal(true)
+                                setAvisToEdit(null);
+                                setCommentToEdit(null);
+                                setModal(true);
                             }}> <FontAwesomeIcon icon={faPlus}/> </Button>
 
                         </div>
                     </div>
                     <table className='text-sm w-full'>
                         <thead>
-                            <tr className='grid grid-cols-6'>
-                                <th className='col-span-1'>A suivre</th>
-                                <th className='col-span-4'>Remarque</th>
-                                <th className='col-span-1'>Photos</th>
+                            <tr className='grid grid-cols-[4rem_auto_5rem_5rem] bg-gray-800 text-white'>
+                                <th className='border-r border-white py-2'>A suivre</th>
+                                <th className='border-r border-white py-2'>Remarque</th>
+                                <th className='border-r border-white py-2'>Photos</th>
+                                <th className='border-r border-white py-2'></th>
                             </tr>
                         </thead>
                         <tbody>
 
                             {
-                                avis.find(data=>{return data.ouvrage === ouvragesSelect})?.commentaires?.map((comm, index)=>{
+                                avis.find(data=>{return data.ouvrage == ouvragesSelect})?.commentaires?.map((comm, index)=>{
                                     return (
-                                    <tr className='grid grid-cols-6' key={index}>
-                                        <td className='flex justify-center col-span-1'><input type="checkbox" name="" id="" checked={comm.asuivre} disabled/></td>
-                                        <td className='flex justify-center col-span-4'>{comm.commentaire}</td>
-                                        <td className='flex justify-center col-span-1'>{comm.image && <img className='w-[2rem]' src={image} alt='my_default_icon'/>}</td>
+                                    <tr className='grid grid-cols-[4rem_auto_5rem_5rem] border-b border-gray-800' key={index}>
+                                        <td className='flex justify-center border-r border-gray-800 py-2'><input type="checkbox" name="" id="" checked={comm.asuivre} disabled/></td>
+                                        <td className='flex justify-center border-r border-gray-800 py-2'>{comm.commentaire}</td>
+                                        <td className='flex justify-center border-r border-gray-800 py-2'>{comm.image && <img className='w-[2rem]' src={image} alt='my_default_icon'/>}</td>
+                                        <td className='flex justify-evenly border-r border-gray-800 py-2'>
+                                            
+                                            <span className='cursor-pointer' onClick={()=>{
+                                                setAvisToEdit(avis.findIndex((data)=>{
+                                                    return data.ouvrage == ouvragesSelect;
+                                                }));
+                                                setCommentToEdit({
+                                                    index: index,
+                                                    ...comm
+                                                });
+                                                setModal(true);
+                                            }}>
+                                                <FontAwesomeIcon icon={faPen}/>
+                                            </span>
+
+                                            <span className='cursor-pointer'
+                                            onClick={()=>{
+                                                setAvis(avis.map((oneAvis)=>{
+                                                    if(oneAvis.ouvrage === ouvragesSelect){
+                                                        console.log(oneAvis);
+                                                        oneAvis.commentaires = oneAvis.commentaires.filter((comm, indexCom)=>indexCom!==index)
+                                                    }
+                                                    return oneAvis;
+                                                }));
+                                            }}
+                                            >
+                                                <FontAwesomeIcon icon={faTrash}/>
+                                            </span>
+                                        </td>
                                     </tr>
                                     )
                                 })

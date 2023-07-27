@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../utils/Button/Button';
 import LabelCheckbox from '../utils/LabelCheckbox/LabelCheckbox';
-function AddCommentRV({handleClose, avis, setAvis, ouvrage, avisToEdit, commentToEdit}) {
+function AddCommentRVSimple({handleClose, commentaires, setCommentaires, commentEdit}) {
 
     const [comment, setComment] = useState('')
     const [asuivre, setAsuivre] = useState(false)
@@ -11,13 +11,12 @@ function AddCommentRV({handleClose, avis, setAvis, ouvrage, avisToEdit, commentT
     const [editionMode, setEditionMode] = useState(false)
 
     useEffect(()=>{
-        if ((avisToEdit && avisToEdit != -1) || avisToEdit == 0) {
+        if (commentEdit) {
             setEditionMode(true);
-            setComment(commentToEdit.commentaire)
-            setAsuivre(commentToEdit.asuivre);
-            console.log(commentToEdit);
+            setComment(commentEdit.commentaire)
+            setAsuivre(commentEdit.asuivre);
         }
-    }, [avisToEdit, commentToEdit]);
+    }, [commentEdit]);
 
     const handleFileUpload = (event) => {
         let newFile = event.target.files[0];
@@ -25,55 +24,24 @@ function AddCommentRV({handleClose, avis, setAvis, ouvrage, avisToEdit, commentT
     };
 
     let creer = ()=>{
-        let avisToSet = avis.findIndex((data)=>{
-            return data.ouvrage == ouvrage;
-        })
-
-        if(avisToSet === -1){
-            setAvis([...avis, {
-                ouvrage : ouvrage,
-                commentaires: [{
-                    asuivre : asuivre,
-                    commentaire : comment,
-                    image : image
-                }]
-            }])
-        }else{
-            setAvis(avis.map((av, index)=>{
-                if(index === avisToSet){
-                    if(av.commentaires){
-                        av.commentaires.push({
-                            asuivre : asuivre,
-                            commentaire : comment,
-                            image : image
-                        })    
-                    }else{
-                        av.commentaires = [{
-                            asuivre : asuivre,
-                            commentaire : comment,
-                            image : image
-                        }]
-                    }
-                }
-                return av;
-            }))
-        }
-        
-        handleClose();
+        setCommentaires([...commentaires, {
+            asuivre : asuivre,
+            commentaire : comment,
+            image : image
+        }])
+        handleClose()
     }
 
     let editer = ()=>{
-        setAvis(avis.map((av, index)=>{
-            if(index === avisToEdit){
-                av.commentaires[commentToEdit.index] = {
-                    asuivre : asuivre,
-                    commentaire : comment,
-                    image : image
-                }
+        setCommentaires(commentaires.map((comm, index)=>{
+            if (index == commentEdit.index) {
+                comm.asuivre = asuivre
+                comm.commentaire = comment
+                comm.image = image
             }
-            return av;
+            return comm;
         }))
-        handleClose();
+        handleClose()
     }
 
     return (
@@ -128,4 +96,4 @@ function AddCommentRV({handleClose, avis, setAvis, ouvrage, avisToEdit, commentT
   )
 }
 
-export default AddCommentRV
+export default AddCommentRVSimple

@@ -14,10 +14,11 @@ function CreateEntreprise(props) {
     const [load, setLoad] = useState(props.edition ? true : false);
     const [action, setAction] = useState(false);
 
-    const [stringErrors, setStringError] = useState("");
-    const [flash, setFlash] = useState(false);
+    const [flash, setFlash] = useState(false)
+    const [stringErrors, setStringError] = useState(null);
     const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(false);
+
+    const [errorRespo, setErrorRespo] = useState(null);
 
   
     const [lines, setLines] = useState([]);
@@ -94,12 +95,10 @@ function CreateEntreprise(props) {
 
             setSuccess(true);
 
-            setTimeout(()=>{
-                window.location.reload();
-            }, 3000)
+            window.location.reload();
         } catch (error) {
             console.log(error);
-            setError(true);
+            setStringError("Une erreur pouvant entrainee un disfonctionnement de l'application est survenue");
         }
 
         setAction(false);
@@ -126,9 +125,7 @@ function CreateEntreprise(props) {
                                 setAction(true);
                                 if(!stringErrors && success === false){
                                     createEntreprise();
-                                    setFlash(false);
                                 }else{
-                                    setFlash(true);
                                     setAction(false);
                                 }    
                             }
@@ -190,12 +187,9 @@ function CreateEntreprise(props) {
                                                         prenom : "",
                                                         email : ""
                                                     })     ;
-                                                    setFlash(false);                                           
+                                                    setStringError(null);
                                                 }else{
-                                                    if(nom || prenom || email){
-                                                        setStringError('Les informations renseigne sur le responsable semblent etre incorrect');
-                                                        setFlash(true)    
-                                                    }
+                                                    setErrorRespo("Information du responsable incorrecte");
                                                 }
                                             }}><FontAwesomeIcon icon={faPlus}/></Button>}
                                         </td>
@@ -221,8 +215,8 @@ function CreateEntreprise(props) {
                     </div>
                 </div>
                 {flash && <Flash setFlash={setFlash}>{stringErrors}</Flash>}
-                {error && <Flash setFlash={setError}>Un erreur pouvant entraine un disfonctionnement de l'application est subvenu</Flash>}
-                {success && <Flash setFlash={setSuccess} type='success'>{props.edition ? 'Entreprise editer' : 'Entreprise creer avec success'}</Flash>}
+                {errorRespo && <Flash setFlash={setErrorRespo}>{errorRespo}</Flash>}
+                {success && <Flash setFlash={setSuccess} type='success'>{props.edition ? 'Entreprise editée' : 'Entreprise créée avec succes'}</Flash>}
             </div>
         </div>
     </div>

@@ -19,9 +19,9 @@ function RapportVisite() {
 
       <div className='m-4'>
           <Tabs tabs={[
-            {title: "Creer un RV", content: <Creer rv={rv} setRv={setRv}/>},
             {title: "Liste des RV", content: <Liste rv={rv} setRv={setRv}/>},
-            {title: "Gestion du RV", content : <Gestion rv={rv} setRv={setRv}/>}
+            {title: "Gestion du RV", content : <Gestion rv={rv} setRv={setRv}/>},
+            {title: "Creer un RV", content: <Creer rv={rv} setRv={setRv}/>},
           ]}/>
       </div>
     </div>

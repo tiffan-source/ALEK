@@ -18,6 +18,7 @@ function Liste(props) {
           "id" : rapport.id,
           "Date" : rapport.date,
           "Object" : rapport.objet,
+          "Statut" : ["En cours", "Valider", "Classer", "Diffuser"][rapport.statut]
         }
       }));
 
