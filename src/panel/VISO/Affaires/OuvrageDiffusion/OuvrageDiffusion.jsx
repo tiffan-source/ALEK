@@ -82,7 +82,7 @@ function OuvrageDiffusion() {
 
     return (
       <>
-      {modal && <AddOuvrage affaire={affaire} ouvrageSelectBefore={ouvrageAffaires.map(oA=>oA.id_ouvrage_id)} handleClose={()=>{setModal(false)}}/>}
+      {modal && <AddOuvrage affaire={affaire} ouvrageSelectBefore={ouvrageAffaires.map(oA=>oA.id_ouvrage)} handleClose={()=>{setModal(false)}}/>}
       
       {modalCreation && <CreateOuvrage handleClose={()=>{setModalCreation(false)}}/>}
       

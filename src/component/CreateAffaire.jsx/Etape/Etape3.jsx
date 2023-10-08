@@ -99,7 +99,6 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
 
       <div className='border border-gray-400 p-2 mb-2'>
         <LabelInput
-          
           label="N°Offre"
           value={dataAffaire.numero_offre}
           onChange={(e) => {

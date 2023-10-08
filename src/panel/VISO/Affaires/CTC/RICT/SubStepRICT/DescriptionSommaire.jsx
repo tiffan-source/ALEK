@@ -47,14 +47,6 @@ function DescriptionSommaire({rict}) {
 
     let enregistrer = async ()=>{
         try {
-            // await Promise.all(descriptions.map(async descri=>{
-            //     if(descri.id){
-            //         await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/${descri.id}/`, descri, {withCredentials:true})
-            //     }else{
-            //         await axios.post(process.env.REACT_APP_STARTURIBACK + `/admin/description_sommaire/`, descri, {withCredentials : true})
-            //     }
-            // }))
-
             await axios.put(process.env.REACT_APP_STARTURIBACK + `/save_decription_sommaire/`, {
                 descriptions : descriptions
             }, {withCredentials:true});
@@ -73,9 +65,14 @@ function DescriptionSommaire({rict}) {
         <div className='p-4'>
             {success && <Flash type={"success"} setFlash={setSuccess}>Operation reussie</Flash> }
             {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
-            <div>{!action ? <Button action={()=>{
-                enregistrer()
-            }}>Enregistrer</Button> : <span className='text-green-600'>Opertation en cours de traitement</span>}</div>
+            <div>
+				{
+				parseInt(rict.statut) < 1 && 
+				(!action ? <Button action={()=>{
+					enregistrer()
+				}}>Enregistrer</Button> : <span className='text-green-600'>Opertation en cours de traitement</span>)
+				}
+			</div>
             <div className='grid grid-cols-[20rem_auto] gap-6 bg-gray-900 text-white p-2 mt-4'>
                 <div className='font-bold'>Type description</div>
                 <div className='font-bold'>Description</div>

@@ -91,7 +91,7 @@ function SyntheAvis() {
                                 >
                                     <td className='text-center'>{synthese.order}</td>
                                     <td className='text-center'>{synthese.date}</td>
-                                    <td className='text-center'>{synthese.createur.last_name} {synthese.createur.first_name}</td>
+                                    <td className='text-center'>{synthese.createur_detail.last_name} {synthese.createur_detail.first_name}</td>
                                     <td className='text-center'>{table_statut[synthese.statut]}</td>
                                 </tr>
                             )

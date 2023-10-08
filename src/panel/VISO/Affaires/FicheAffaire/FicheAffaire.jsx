@@ -34,9 +34,9 @@ const FicheAffaire = () => {
         </h2>
       </nav>
       <Tabs tabs={[
-          {title : "Fiche Affaire", content : <Fiche data={dataAffaire}/>},
-          {title : "Detail du Plan d'Affaire", content : <Detail data={dataAffaire}/>},
-          {title : "Complement du Plan d'Affaire", content : <Complement data={dataAffaire}/>},
+          {title : "Fiche Affaire", content : <Fiche setData={setDataAffaire} data={dataAffaire}/>},
+          {title : "Detail du Plan d'Affaire", content : <Detail setData={setDataAffaire} data={dataAffaire}/>},
+          {title : "Complement du Plan d'Affaire", content : <Complement setData={setDataAffaire} data={dataAffaire}/>},
       ]}/>
     </div>
   );

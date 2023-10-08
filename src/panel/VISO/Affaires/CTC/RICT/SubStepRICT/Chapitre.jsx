@@ -16,7 +16,7 @@ function Chapitre({rict}) {
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/admin/planaffaire/${localStorage.getItem("planAffaire")}/`);
 
-            let {data: dataChapitre} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_mission_view_by_chapitre/${data.affaire}/`);
+            let {data: dataChapitre} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/get_all_mission_view_by_chapitre/${data.affaire}/${rict.id}/`);
 
             setChapitres(dataChapitre)
             setLoad(false)
@@ -28,7 +28,7 @@ function Chapitre({rict}) {
         return <MiniLoader/>
     
     return (
-        <div className='my-6'>
+        <div className='my-6 w-full'>
             {chapitreSelect ? <EditeChapitre chapitre={chapitreSelect} retour={()=>{setChapitreSelect(null)}} rict={rict}/> : 
             <table className='w-full text-sm'>
                 <thead>
@@ -44,17 +44,17 @@ function Chapitre({rict}) {
                 <tbody>
                     {chapites.map((chapitre, index)=>{
                         return (
-                            <tr key={index}>
-                                <td></td>
-                                <td>{chapitre.mission.code_mission}</td>
-                                <td>{chapitre.chapitre.code_mission}</td>
-                                <td></td>
-                                <td></td>
-                                <td className='text-center cursor-pointer' onClick={()=>{
-                                    setChapitreSelect(chapitre)
+                            <tr key={index} className='border-b border-gray-400'>
+                                <td className='text-center'> <input readOnly type="checkbox" checked={chapitre.chapitre.check} /> </td>
+                                <td className='text-center'>{chapitre.mission.code_mission}</td>
+                                <td className='text-center'>{chapitre.chapitre.code_mission}</td>
+                                <td className='text-center'>{chapitre.chapitre.libelle}</td>
+                                <td className='text-center'></td>
+                                {parseInt(rict.statut) < 1 && <td className='text-center cursor-pointer' onClick={()=>{
+                                    setChapitreSelect(chapitre.chapitre)
                                 }}>
                                     <FontAwesomeIcon icon={faPen}/>
-                                </td>
+                                </td>}
                             </tr>
                         )
                     })}

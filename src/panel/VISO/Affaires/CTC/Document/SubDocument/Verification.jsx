@@ -94,14 +94,20 @@ function Verification(props) {
 
   let valider = async () => {
     try {
-      await enregistrer();
+        await axios.post(process.env.REACT_APP_STARTURIBACK + `/add_avis_on_doc/`, {
+            document : props.document,
+            codification : avis,
+            comments : comments,
+            oldComments : oldComments,
+            prevAvis : prevAvis && prevAvis.id
+        }, {withCredentials:true});
 
-      await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${document.id}/`, {
-        ...document, validateur : user
-      }, {withCredentials : true});
+        await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/documents/${document.id}/`, {
+            ...document, validateur : user
+        }, {withCredentials : true});
 
-      setSuccess(true);
-      window.location.reload()
+        setSuccess(true);
+        window.location.reload()
       
     } catch (error) {
       setError(error.toString())
@@ -129,12 +135,18 @@ function Verification(props) {
 
   let attacherAso = async () =>{
     try {
-      await enregistrer();
-      await axios.put(process.env.REACT_APP_STARTURIBACK + `/attach_doc_on_aso/`, {
-        document : props.document,
-      }, {withCredentials:true})
-      setSuccess(true);
-      window.location.reload();
+        await axios.post(process.env.REACT_APP_STARTURIBACK + `/add_avis_on_doc/`, {
+            document : props.document,
+            codification : avis,
+            comments : comments,
+            oldComments : oldComments,
+            prevAvis : prevAvis && prevAvis.id
+          }, {withCredentials:true});
+        await axios.put(process.env.REACT_APP_STARTURIBACK + `/attach_doc_on_aso/`, {
+            document : props.document,
+        }, {withCredentials:true})
+        setSuccess(true);
+        window.location.reload();
     } catch (error) {
       setError(error.toString())
     }

@@ -19,6 +19,7 @@ function AddOuvrage({handleClose, ouvrageSelectBefore, affaire}) {
     useEffect(()=>{
         (async()=>{
             let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_ouvrage_available_for_affaire/${affaire}/`)
+            console.log(ouvrageSelectBefore);
             setOuvrages(data.filter(result=>!ouvrageSelectBefore.includes(result.id)));
             setLoad(false);
         })();

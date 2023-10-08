@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import Button from '../../../../../component/utils/Button/Button'
 import axios from 'axios'
-import MiniLoader from '../../../../../component/utils/Loader/MiniLoader';
-import Flash from '../../../../../component/utils/Flash/Flash';
+import Button from '../../../../../component/utils/Button/Button'
+import Flash from '../../../../../component/utils/Flash/Flash'
+import MiniLoader from '../../../../../component/utils/Loader/MiniLoader'
 
 function GestionSynthese({dataSynthese, retour, table_statut, affaire}) {
 
@@ -11,7 +11,6 @@ function GestionSynthese({dataSynthese, retour, table_statut, affaire}) {
     const [action, setAction] = useState(false);
     const [errors, setErrors] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [handle, setHandle] = useState(true);
 
     useEffect(()=>{
         (async()=>{
@@ -22,44 +21,44 @@ function GestionSynthese({dataSynthese, retour, table_statut, affaire}) {
                 let {data} = await axios.get(process.env.REACT_APP_STARTURIBACK + `/all_avis_of_synthese/${dataSynthese.id}/`);
                 setCommentaires(data)    
             }
-			//     await axios.get(process.env.REACT_APP_STARTURIBACK + `/devalidate_synthese_avis/${dataSynthese.id}/${affaire}/`);
-			//     setSuccess(true)
-			//     setHandle(!handle)
-			// } catch (error) {
-			//     setErrors("Une erreur est survenue")
-			// }
-			// setAction(false);
-			// window.location.reload();
             setLoad(false)
         })()
-    }, [handle])
+    }, [])
 
     let valider = async()=>{
-        // try {
-        //     await axios.get(process.env.REACT_APP_STARTURIBACK + `/validate_synthese_avis/${dataSynthese.id}/${affaire}/`);
-        //     setSuccess(true)
-        //     setHandle(!handle)
-        // } catch (error) {
-        //     setErrors("Une erreur est survenue")
-        // }
-        // setAction(false);
-		// window.location.reload();
+        try {
+            await axios.post(process.env.REACT_APP_STARTURIBACK + `/validate_synthese_avis/${dataSynthese.id}/${affaire}/`);
+            setSuccess(true)
+            window.location.reload()
+        } catch (error) {
+            setErrors("Une erreur est survenue")
+        }
+        setAction(false);
     }
 
     let devalider = async()=>{
-        // try {
-        //     await axios.get(process.env.REACT_APP_STARTURIBACK + `/devalidate_synthese_avis/${dataSynthese.id}/${affaire}/`);
-        //     setSuccess(true)
-        //     setHandle(!handle)
-        // } catch (error) {
-        //     setErrors("Une erreur est survenue")
-        // }
-        // setAction(false);
-		// window.location.reload();
+        try {
+            await axios.post(process.env.REACT_APP_STARTURIBACK + `/devalidate_synthese_avis/${dataSynthese.id}/`);
+            setSuccess(true)
+            window.location.reload()
+        } catch (error) {
+            setErrors("Une erreur est survenue")
+        }
+        setAction(false);
     }
 
     let classer = async()=>{
-
+        try {
+            await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/synthese_avis/${dataSynthese.id}/`, {
+                ...dataSynthese,
+                statut: 2
+            });
+            setSuccess(true)
+            window.location.reload()
+        } catch (error) {
+            setErrors("Une erreur est survenue")
+        }
+        setAction(false);
     }
 
     if (load) {
@@ -87,7 +86,7 @@ function GestionSynthese({dataSynthese, retour, table_statut, affaire}) {
                 </div>
                 <div>
                     <span className='font-bold'>Createur : </span>
-                    <span>{dataSynthese.createur.last_name} {dataSynthese.createur.first_name}</span>
+                    <span>{dataSynthese.createur_detail.last_name} {dataSynthese.createur_detail.first_name}</span>
                 </div>
             </div>
 
@@ -98,9 +97,11 @@ function GestionSynthese({dataSynthese, retour, table_statut, affaire}) {
                     valider()
                 }}>Valider</Button> : <div>
                     <Button action={()=>{
+                        setAction(true)
                         devalider()
                     }}>Devalider</Button>
                     <Button action={()=>{
+                        setAction(true)
                         classer()
                     }}>Classer</Button>
                 </div> }
@@ -111,22 +112,22 @@ function GestionSynthese({dataSynthese, retour, table_statut, affaire}) {
         <div className='bg-white m-4 p-4'>
             <h2 className='font-bold'>Commentaire des documents</h2>
             <ul className='list-disc pl-4'>
-                {/* {commentaires['commentaires_documents'].map((comment, index)=>{
+                {commentaires['document'].map((comment, index)=>{
                     return (
                         <li key={index}>{comment.commentaire}</li>
                     )
-                })} */}
+                })}
             </ul>
         </div>
         
         <div className='bg-white m-4 p-4'>
             <h2 className='font-bold'>Commentaire des rapports de visite</h2>
             <ul className='list-disc pl-4'>
-                {/* {commentaires['commentaires_rv'].map((comment, index)=>{
+                {commentaires['rv'].map((comment, index)=>{
                     return (
                         <li key={index}>{comment.commentaire}</li>
                     )
-                })} */}
+                })}
             </ul>
         </div>
         

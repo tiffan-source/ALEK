@@ -149,9 +149,9 @@ function Livrable(props) {
                             })
                         }
                     </View>
-                    {/* <View style={styles.collaboratuer_to_send}>
+                    <View style={styles.collaboratuer_to_send}>
                         {
-                            rv.collaborateurs.map((collab, index)=>{
+                            rv.collaborateurs && rv.collaborateurs.map((collab, index)=>{
                                 return (
                                     <View >
                                         <Text>{collab.raison_sociale}</Text>
@@ -159,7 +159,7 @@ function Livrable(props) {
                                 )
                             })
                         }
-                    </View> */}
+                    </View>
                 </Page>
             </Document>
         )
