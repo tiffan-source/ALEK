@@ -8,9 +8,6 @@ import styles from './style.jsx';
 import mailjet from 'node-mailjet';
 
 function checkAvis(article) {
-    if (article.parent.id == 3038) {
-        console.log(article);
-    }
 
     if (article.data.avis && article.data.avis.commentaires && article.data.avis.commentaires.length > 0) {
         // Si des commentaires existent, vérifie s'il y en a un à suivre (a_suivre === true)
@@ -26,6 +23,32 @@ function checkAvis(article) {
     }
 
     return false; // Si aucun commentaire à suivre n'est trouvé, renvoie false
+}
+
+function checkAvisLow(article) {
+
+    console.log(article);
+
+    // if (article.parent.id==15053) {
+    //     console.log("fond avis");
+    // }
+    if (article.data.avis) {
+        // il y a un avis
+        // console.log("fond");
+        return true;
+    }
+
+    // Parcourez les enfants récursivement
+    for (let i = 0; article.childs && (i < article.childs.length); i++) {
+        // console.log("child process");
+        // console.log(article.childs[i]);
+        if (checkAvisLow(article.childs[i])) {
+            return true; // Si un enfant a un avis, renvoie true
+        }
+        // return checkAvis(article.childs[i]);
+    }
+
+    return false; // Si aucun avis n'est trouvé, renvoie false
 }
 
 
@@ -68,7 +91,9 @@ function Livrable(props) {
     }
 
     const ArticlesAvisDispo=({article})=>{
+
     
+        if(checkAvisLow(article))
         return (
             <View style={styles.articleSpace}>
                 <View>
@@ -92,6 +117,7 @@ function Livrable(props) {
                 }
             </View>
         )
+        return <></>
     
     }
 

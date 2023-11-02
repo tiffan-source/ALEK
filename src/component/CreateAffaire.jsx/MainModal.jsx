@@ -28,6 +28,7 @@ const MainModal = ({ handleClose }) => {
     charge_id: '',
     assistant_id: '',
     chef_id: '',
+    etendu: '',
   });
 
   const [dataFormPlanAffaire, setDataFormPlanAffaire] = useState({

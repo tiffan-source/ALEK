@@ -75,7 +75,7 @@ function Article({article, level, mission, rict}) {
             setAddComment(false)
             setCommentEdit(null)
         }}
-        setComments={setCommentaires} edit={commentEdit}/>}
+        setComments={setCommentaires} edit={commentEdit} avis={avis}/>}
 
         {errors && <Flash setFlash={setErrors}>{errors}</Flash>}
 

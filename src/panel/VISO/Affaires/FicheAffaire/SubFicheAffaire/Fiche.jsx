@@ -9,6 +9,7 @@ import axios from 'axios';
 import Button from '../../../../../component/utils/Button/Button';
 import validator from 'validator';
 import Flash from '../../../../../component/utils/Flash/Flash';
+import LabelTextArea from '../../../../../component/utils/LabelTextArea/LabelTextArea';
 
 function Fiche({data, setData}) {
     const [datepicker, setDatePicker] = useState(false);
@@ -37,25 +38,38 @@ function Fiche({data, setData}) {
 
     let validate = ()=>{
         if(data){
-            const {libelle, numero_contrat} = data.affaire;
+            const {libelle, numero_contrat, etendu} = data.affaire;
 
             if(validator.isEmpty(libelle)){
                 setErrors("Le libelle ne peut etre vide");
-                return;
+                setFlash(true);
+                return false;
             }
     
-            if(validator.isEmpty(numero_contrat.toString()) || !validator.isNumeric(numero_contrat.toString())){
+            if(validator.isEmpty(numero_contrat.toString())){
                 setErrors("Le numero de contrat doit etre un nombre valid");
-                return;
-            }    
+                setFlash(true);
+                return false;
+            }
+
+            if(validator.isEmpty(etendu)){
+                setErrors("L'etendu de la mission ne peut etre vide");
+                setFlash(true);
+                return false;
+            }
         }
 
         setErrors('');
-        return;
+        return true;
     }
 
     let enregistrer = async ()=>{
         console.log("Done");
+        if(!validate())
+        {
+            setAction(false);
+            return;
+        }
         try {
             await axios.put(process.env.REACT_APP_STARTURIBACK + `/admin/affaire/${data.affaire.id}/`, data.affaire, {withCredentials:true});
             setSuccess(true);
@@ -141,6 +155,17 @@ function Fiche({data, setData}) {
                         return prev;
                     }, {})}/> : <MiniLoader/> }
                 </div>
+            </fieldset>
+
+            <fieldset className='border border-gray-300 m-1 p-2'>
+                <legend>Mission</legend>
+
+                <div className='flex gap-1'>
+                    <LabelTextArea label={"Etendu de la mission"} value={data.affaire.etendu} onChange={(e)=>{
+                        setData({...data, affaire: {...data.affaire, 'etendu': e.target.value}});
+                    }}/>
+                </div>
+
             </fieldset>
 
             <fieldset className='border border-gray-300 m-1 p-2'>

@@ -5,6 +5,7 @@ import LabelSelect from '../../utils/LabelSelect/LabelSelect';
 import validator from 'validator';
 import Datepicker from 'tailwind-datepicker-react';
 import moment from 'moment';
+import LabelTextArea from '../../utils/LabelTextArea/LabelTextArea';
 
 const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
   const [client, setClient] = useState([]);
@@ -32,14 +33,18 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
   }, [dataAffaire])
 
   let validate = () => {
-    let {numero_contrat, libelle} = dataAffaire;
-    if(validator.isEmpty(numero_contrat) || !validator.isNumeric(numero_contrat)){
-      setStringError("Le numero de contrat doit etre un nombre valid");
+    let {numero_contrat, libelle, etendu} = dataAffaire;
+    if(validator.isEmpty(numero_contrat)){
+      setStringError("Le numero de contrat ne peut etre vide");
       return;
     }
     if (validator.isEmpty(libelle)) {
       setStringError("Le libelle ne peut etre vide")    ;  
       return;
+    }
+    if (validator.isEmpty(etendu)) {
+        setStringError("L'etendu de la mission ne peut etre vide");
+        return;        
     }
     setStringError('');
   }
@@ -116,6 +121,12 @@ const Etape3 = ({ modifyField, dataAffaire, setStringError }) => {
           }}/>
         </div>
 
+      </div>
+
+      <div className='border border-gray-400 p-2 mb-2'>
+          <LabelTextArea label={"Entendu de la mission"} value={dataAffaire.etendu} onChange={(e)=>{
+            modifyField("etendu", e.target.value);
+          }}/>
       </div>
     </div>
   );

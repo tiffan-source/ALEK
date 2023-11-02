@@ -11,6 +11,7 @@ import moment from 'moment';
 import DescriptionBatiment from './SubStepRICT/DescriptionBatiment';
 import Flash from '../../../../../component/utils/Flash/Flash';
 import Livrable from './SubStepRICT/Livrable';
+import DocumentConception from './SubStepRICT/DocumentConception';
 
 function RICT() {
 
@@ -228,7 +229,8 @@ function RICT() {
             {title : "Renseignement Generaux", content : <Renseignement/>},
             {title : "Description Sommaire", content : <DescriptionSommaire rict={rict}/>},
             {title : "Description Batiment", content : <DescriptionBatiment rict={rict}/>},
-			{title : "Livrable", content: <Livrable rict={rict}/>}
+            {title : "Documents en Conception", content : <DocumentConception rict={rict}/>},
+			{title : "Livrable", content: <Livrable rict={rict}/>},
         ]}/>
       </div>}
 
